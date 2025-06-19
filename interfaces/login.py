@@ -62,9 +62,13 @@ class LoginApp(tk.Tk):
             self.destroy()
             GerenteApp().mainloop()
         elif rol == 'admin':
-            from interfaces.admin import AdminApp
+            from Consulta import MySQLApp
+            from ttkthemes import ThemedTk
+            from conexion.conexion import ConexionBD
             self.destroy()
-            AdminApp().mainloop()
+            root = ThemedTk(theme='arc')
+            MySQLApp(root, ConexionBD())
+            root.mainloop()
         else:
             messagebox.showerror('Error', 'Rol desconocido')
 
