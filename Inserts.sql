@@ -25,12 +25,14 @@ INSERT INTO Tipo_entidad (descripcion) VALUES
 ('Acreedor');
 
 -- Roles iniciales para empleados
-INSERT INTO tipos_empleados (nombre, descripcion, permisos) VALUES
+INSERT INTO Tipo_empleado (nombre, descripcion, permisos) VALUES
+('Administrador', 'Acceso total', '["*"]'),
+('Gerente', 'Administra sedes','["*"]'),
 ('Ventas', 'Empleados del área de ventas',
   '["crear_reserva","editar_reserva","ver_reservas","crear_alquiler"]'),
 ('Mantenimiento', 'Personal encargado del mantenimiento',
-  '["ver_mantenimientos","crear_mantenimiento","editar_mantenimiento"]'),
-('Administrador', 'Acceso total', '["*"]');
+  '["ver_mantenimientos","crear_mantenimiento","editar_mantenimiento"]');
+
 
 INSERT   INTO Codigo_postal (id_codigo_postal, pais, departamento, ciudad)
 VALUES
@@ -616,578 +618,229 @@ INSERT INTO Sucursal (nombre, direccion, telefono, gerente, id_codigo_postal) VA
 ('Sucursal Facatativá Centro', 'Carrera 3 #7-20, Centro', '3145678903', 'Carolina Soto', '250001'),
 ('Sucursal Bello Centro', 'Calle 50 #49-10, Centro', '3012345670', 'Laura Giraldo', '050001'),
 ('Sucursal Itagüí Centro', 'Carrera 50A #36-20, Centro', '3023456780', 'Ricardo Gómez', '050001');
-INSERT INTO Empleado (documento, nombre, salario, cargo, telefono, direccion, correo, contrasena, id_tipo_documento) VALUES
--- Sucursal Bogotá Norte ('110111') - Gerente: María Gómez
-('1020304050', 'María Gómez', 5500000.00, 'Gerente de Sucursal', '3101234567', 'Carrera 7 #123-45', 'gerete1@empresa.com', SHA2('gerente123', 256), 1),
-('1020304051', 'Laura Méndez', 2800000.00, 'Asesora comercial', '3101234568', 'Calle 125 #15-30', 'laura.mendez.bog@empresa.com', SHA2('empleado123', 256), 1),
-('1020304052', 'Carlos Zapata', 2500000.00, 'Agente de Alquiler', '3101234569', 'Carrera 7 #120-10', 'carlos.zapata@empresa.com', SHA2('empleado123', 256), 1),
-('1020304053', 'Sofía Vargas', 2300000.00, 'Asistente Administrativa', '3101234570', 'Carrera 9 #127-50', 'sofia.vargas@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Bogotá Sur ('110111') - Gerente: Juan Rodríguez
-('1030405060', 'Juan Rodríguez', 5500000.00, 'Gerente de Sucursal', '3117654321', 'Avenida Caracas #56-78', 'gerete2@empresa.com', SHA2('gerente123', 256), 1),
-('1030405061', 'Paola Herrera', 2900000.00, 'Jefe de Operaciones', '3117654322', 'Carrera 24 #50-10 Sur', 'paola.herrera@empresa.com', SHA2('empleado123', 256), 1),
-('1030405062', 'Luis Giraldo', 2600000.00, 'Asesor Comercial', '3117654323', 'Calle 45 Sur #20-05', 'luis.giraldo@empresa.com', SHA2('empleado123', 256), 1),
-('1030405063', 'Camila Soto', 2400000.00, 'Atención al Cliente', '3117654324', 'Diagonal 42 Sur #1-80', 'camila.soto@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cali Centro ('760001') - Gerente: Diana Martínez
-('1040506070', 'Diana Martínez', 5200000.00, 'Gerente de Sucursal', '3123456789', 'Calle 5 #30-21', 'gerete3@empresa.com', SHA2('gerente123', 256), 1),
-('1040506071', 'Felipe Castro', 2700000.00, 'Agente de Alquiler', '3123456790', 'Carrera 4 #10-15', 'felipe.castro@empresa.com', SHA2('empleado123', 256), 1),
-('1040506072', 'Andrea Rojas', 2500000.00, 'Asesora Comercial', '3123456791', 'Calle 10 #12-34', 'andrea.rojas@empresa.com', SHA2('empleado123', 256), 1),
-('1040506073', 'Ricardo Vélez', 2200000.00, 'Conductor Designado', '3123456792', 'Calle 2 #6-05', 'ricardo.velez@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Villavicencio Principal ('500001') - Gerente: Carlos Ramírez
-('1050607080', 'Carlos Ramírez', 4800000.00, 'Gerente de Sucursal', '3134567890', 'Calle 40 #25-50', 'gerete4@empresa.com', SHA2('gerente123', 256), 1),
-('1050607081', 'Mónica Durán', 2600000.00, 'Jefe de Logística', '3134567891', 'Carrera 23 #38-10', 'monica.duran@empresa.com', SHA2('empleado123', 256), 1),
-('1050607082', 'Julián Niño', 2400000.00, 'Asesor Comercial', '3134567892', 'Calle 38 #26-05', 'julian.nino@empresa.com', SHA2('empleado123', 256), 1),
-('1050607083', 'Daniela Ríos', 2200000.00, 'Agente de Alquiler', '3134567893', 'Carrera 24 #42-15', 'daniela.rios@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal París Central ('75008') - Gerente: Jean Dupont
-('F001001', 'Jean Dupont', 6500000.00, 'Gerente de Sucursal', '+33 1 42 68 53 00', 'Rue de Rivoli 45', 'gerete5@empresa.com', SHA2('gerente123', 256), 2),
-('F001002', 'Claire Dubois', 3500000.00, 'Responsable Clientèle', '+33 1 42 68 53 01', 'Rue Saint-Honoré 20', 'claire.dubois@empresa.com', SHA2('empleado123', 256), 2),
-('F001003', 'Pierre Leclerc', 3000000.00, 'Agent de Location', '+33 1 42 68 53 02', 'Rue de la Paix 10', 'pierre.leclerc@empresa.com', SHA2('empleado123', 256), 2),
-('F001004', 'Sophie Moreau', 2800000.00, 'Assistant Administratif', '+33 1 42 68 53 03', 'Rue de Castiglione 5', 'sophie.moreau@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Tokio Oeste ('100000') - Gerente: Yuki Tanaka
-('J001001', 'Yuki Tanaka', 7000000.00, 'Gerente de Sucursal', '+81 3-3354-5555', 'Shinjuku 3-30-13', 'gerete6@empresa.com', SHA2('gerente123', 256), 2),
-('J001002', 'Hiroshi Sato', 3800000.00, 'Jefe de Operaciones', '+81 3-3354-5556', 'Shinjuku 2-2-2', 'hiroshi.sato@empresa.com', SHA2('empleado123', 256), 2),
-('J001003', 'Akari Nakamura', 3200000.00, 'Asesora Comercial', '+81 3-3354-5557', 'Shinjuku 1-1-1', 'akari.nakamura@empresa.com', SHA2('empleado123', 256), 2),
-('J001004', 'Kenji Yamamoto', 3000000.00, 'Agente de Alquiler', '+81 3-3354-5558', 'Shinjuku 4-4-4', 'kenji.yamamoto@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Medellín El Poblado ('050001') - Gerente: Sofia Rojas
-('1060708090', 'Sofia Rojas', 5300000.00, 'Gerente de Sucursal', '3001112233', 'Carrera 43A #7 Sur-170', 'gerete7@empresa.com', SHA2('gerente123', 256), 1),
-('1060708091', 'Miguel Ángel Castro', 2700000.00, 'Asesor Comercial', '3001112234', 'Calle 10 #43B-50', 'miguel.castro@empresa.com', SHA2('empleado123', 256), 1),
-('1060708092', 'Isabella Morales', 2500000.00, 'Agente de Alquiler', '3001112235', 'Transversal Inferior #20-10', 'isabella.morales@empresa.com', SHA2('empleado123', 256), 1),
-('1060708093', 'Sebastián Restrepo', 2300000.00, 'Conductor', '3001112236', 'Carrera 40 #5-20 Sur', 'sebastian.restrepo@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Barranquilla Norte ('080001') - Gerente: Andrés Felipe Castro
-('1070809100', 'Andrés Felipe Castro', 5000000.00, 'Gerente de Sucursal', '3152223344', 'Calle 93 #49-100', 'gerete8@empresa.com', SHA2('gerente123', 256), 1),
-('1070809101', 'Valeria Martínez', 2800000.00, 'Jefe de Operaciones', '3152223345', 'Carrera 51B #90-10', 'valeria.martinez@empresa.com', SHA2('empleado123', 256), 1),
-('1070809102', 'Julián Gómez', 2600000.00, 'Asesor Comercial', '3152223346', 'Calle 84 #47-50', 'julian.gomez@empresa.com', SHA2('empleado123', 256), 1),
-('1070809103', 'Carolina Herrera', 2400000.00, 'Asistente Administrativa', '3152223347', 'Carrera 46 #80-150', 'carolina.herrera@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cartagena Bocagrande ('130001') - Gerente: Laura Herrera
-('1080910110', 'Laura Herrera', 5100000.00, 'Gerente de Sucursal', '3203334455', 'Avenida San Martín #8-150', 'gerete9@empresa.com', SHA2('gerente123', 256), 1),
-('1080910111', 'Gabriel Soto', 2700000.00, 'Agente de Alquiler', '3203334456', 'Carrera 3 #7-20', 'gabriel.soto@empresa.com', SHA2('empleado123', 256), 1),
-('1080910112', 'Mónica Pardo', 2500000.00, 'Atención al Cliente', '3203334457', 'Calle 5 #9-10', 'monica.pardo@empresa.com', SHA2('empleado123', 256), 1),
-('1080910113', 'Diego Morales', 2300000.00, 'Conductor', '3203334458', 'Avenida San Martín #10-80', 'diego.morales@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Bucaramanga Cabecera ('680001') - Gerente: Daniel Salazar
-('1091011120', 'Daniel Salazar', 4900000.00, 'Gerente de Sucursal', '3014445566', 'Carrera 35A #48-50', 'gerete10@empresa.com', SHA2('gerente123', 256), 1),
-('1091011121', 'Paula Restrepo', 2600000.00, 'Asesora Comercial', '3014445567', 'Calle 48 #34-20', 'paula.restrepo@empresa.com', SHA2('empleado123', 256), 1),
-('1091011122', 'Juan Camilo Pérez', 2400000.00, 'Agente de Alquiler', '3014445568', 'Carrera 33 #47-10', 'juan.perez@empresa.com', SHA2('empleado123', 256), 1),
-('1091011123', 'Laura Daniela Vera', 2200000.00, 'Asistente Administrativa', '3014445569', 'Calle 52 #35-05', 'laura.vera@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Santa Marta Rodadero ('470001') - Gerente: Valentina Ruiz
-('1101112130', 'Valentina Ruiz', 4700000.00, 'Gerente de Sucursal', '3185556677', 'Carrera 4 #11-50', 'gerete11@empresa.com', SHA2('gerente123', 256), 1),
-('1101112131', 'Sebastián Torres', 2500000.00, 'Agente de Alquiler', '3185556678', 'Avenida del Libertador #12-30', 'sebastian.torres@empresa.com', SHA2('empleado123', 256), 1),
-('1101112132', 'Natalia Giraldo', 2300000.00, 'Atención al Cliente', '3185556679', 'Calle 22 #1-05', 'natalia.giraldo@empresa.com', SHA2('empleado123', 256), 1),
-('1101112133', 'Andrés Felipe Sierra', 2100000.00, 'Conductor', '3185556680', 'Carrera 1 #22-50', 'andres.sierra@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Pereira Centro ('660001') - Gerente: Esteban Ortiz
-('1111213140', 'Esteban Ortiz', 4800000.00, 'Gerente de Sucursal', '3006667788', 'Avenida 30 de Agosto #75-10', 'gerete12@empresa.com', SHA2('gerente123', 256), 1),
-('1111213141', 'Daniela Méndez', 2600000.00, 'Asesora Comercial', '3006667789', 'Carrera 7 #20-15', 'daniela.mendez.per@empresa.com', SHA2('empleado123', 256), 1),
-('1111213142', 'Javier Castaño', 2400000.00, 'Agente de Alquiler', '3006667790', 'Calle 19 #9-05', 'javier.castano@empresa.com', SHA2('empleado123', 256), 1),
-('1111213143', 'Sofía Ospina', 2200000.00, 'Asistente Administrativa', '3006667791', 'Avenida Circunvalar #12-30', 'sofia.ospina@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Armenia Principal ('630001') - Gerente: Camila Jiménez
-('1121314150', 'Camila Jiménez', 4700000.00, 'Gerente de Sucursal', '3107778899', 'Carrera 19 #28-40', 'gerete13@empresa.com', SHA2('gerente123', 256), 1),
-('1121314151', 'Felipe Ríos', 2500000.00, 'Jefe de Operaciones', '3107778900', 'Calle 21 #18-10', 'felipe.rios@empresa.com', SHA2('empleado123', 256), 1),
-('1121314152', 'Andrea Cárdenas', 2300000.00, 'Asesora Comercial', '3107778901', 'Carrera 14 #20-50', 'andrea.cardenas@empresa.com', SHA2('empleado123', 256), 1),
-('1121314153', 'Luis Fernando Duque', 2100000.00, 'Agente de Alquiler', '3107778902', 'Calle 20 #22-05', 'luis.duque@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Neiva Centro ('410001') - Gerente: Ricardo Morales
-('1131415160', 'Ricardo Morales', 4600000.00, 'Gerente de Sucursal', '3118889900', 'Carrera 5 #11-20', 'gerete14@empresa.com', SHA2('gerente123', 256), 1),
-('1131415161', 'Paola Andrea Vargas', 2400000.00, 'Agente de Alquiler', '3118889901', 'Calle 10 #6-05', 'paola.vargas@empresa.com', SHA2('empleado123', 256), 1),
-('1131415162', 'Juan Sebastián Díaz', 2200000.00, 'Atención al Cliente', '3118889902', 'Carrera 7 #12-30', 'juan.diaz@empresa.com', SHA2('empleado123', 256), 1),
-('1131415163', 'Camila Alejandra López', 2000000.00, 'Asistente Administrativa', '3118889903', 'Calle 13 #8-10', 'camila.lopez@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Pasto Mijitayo ('520001') - Gerente: Sara Giraldo
-('1141516170', 'Sara Giraldo', 4500000.00, 'Gerente de Sucursal', '3049990011', 'Calle 18 #25-30', 'gerete15@empresa.com', SHA2('gerente123', 256), 1),
-('1141516171', 'Esteban Ospina', 2300000.00, 'Asesor Comercial', '3049990012', 'Carrera 27 #17-10', 'esteban.ospina@empresa.com', SHA2('empleado123', 256), 1),
-('1141516172', 'Laura Melissa Botero', 2100000.00, 'Agente de Alquiler', '3049990013', 'Calle 16 #22-05', 'laura.botero@empresa.com', SHA2('empleado123', 256), 1),
-('1141516173', 'Carlos Eduardo Rojas', 1900000.00, 'Conductor', '3049990014', 'Carrera 25 #19-30', 'carlos.rojas@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Valledupar Guatapurí ('200001') - Gerente: Javier Peña
-('1151617180', 'Javier Peña', 4600000.00, 'Gerente de Sucursal', '3120001122', 'Carrera 9 #16-80', 'gerete16@empresa.com', SHA2('gerente123', 256), 1),
-('1151617181', 'Ana María Castro', 2400000.00, 'Agente de Alquiler', '3120001123', 'Calle 15 #10-10', 'ana.castro.valle@empresa.com', SHA2('empleado123', 256), 1),
-('1151617182', 'Ricardo Andrés Sánchez', 2200000.00, 'Atención al Cliente', '3120001124', 'Carrera 12 #18-20', 'ricardo.sanchez@empresa.com', SHA2('empleado123', 256), 1),
-('1151617183', 'Daniela Carolina Blanco', 2000000.00, 'Asistente Administrativa', '3120001125', 'Calle 16 #10-50', 'daniela.blanco@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Montería Centro ('230001') - Gerente: Lina Fernanda Daza
-('1161718190', 'Lina Fernanda Daza', 4700000.00, 'Gerente de Sucursal', '3131112233', 'Carrera 6 #60-35', 'gerete17@empresa.com', SHA2('gerente123', 256), 1),
-('1161718191', 'Sebastián Pineda', 2500000.00, 'Jefe de Operaciones', '3131112234', 'Calle 62 #5-15', 'sebastian.pineda@empresa.com', SHA2('empleado123', 256), 1),
-('1161718192', 'María Camila López', 2300000.00, 'Asesora Comercial', '3131112235', 'Carrera 4 #58-20', 'maria.lopez.mon@empresa.com', SHA2('empleado123', 256), 1),
-('1161718193', 'Andrés Felipe Ruiz', 2100000.00, 'Agente de Alquiler', '3131112236', 'Calle 65 #7-05', 'andres.ruiz@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Ibagué Estación ('730001') - Gerente: Diego Alejandro Vargas
-('1171819200', 'Diego Alejandro Vargas', 4800000.00, 'Gerente de Sucursal', '3142223344', 'Carrera 5 #40-05', 'gerete18@empresa.com', SHA2('gerente123', 256), 1),
-('1171819201', 'Laura Sofía González', 2600000.00, 'Agente de Alquiler', '3142223345', 'Calle 60 #5-20', 'laura.gonzalez.iba@empresa.com', SHA2('empleado123', 256), 1),
-('1171819202', 'Juan Camilo Morales', 2400000.00, 'Atención al Cliente', '3142223346', 'Carrera 6 #42-10', 'juan.morales@empresa.com', SHA2('empleado123', 256), 1),
-('1171819203', 'Natalia Andrea Quintero', 2200000.00, 'Asistente Administrativa', '3142223347', 'Calle 45 #4-05', 'natalia.quintero@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Tunja Centro ('150001') - Gerente: Manuela Contreras
-('1181920210', 'Manuela Contreras', 4500000.00, 'Gerente de Sucursal', '3163334455', 'Carrera 10 #20-50', 'gerete19@empresa.com', SHA2('gerente123', 256), 1),
-('1181920211', 'Carlos David Pérez', 2300000.00, 'Asesor Comercial', '3163334456', 'Calle 21 #9-15', 'carlos.perez.tun@empresa.com', SHA2('empleado123', 256), 1),
-('1181920212', 'Valeria Juliana Orozco', 2100000.00, 'Agente de Alquiler', '3163334457', 'Carrera 11 #18-05', 'valeria.orozco@empresa.com', SHA2('empleado123', 256), 1),
-('1181920213', 'Andrés Felipe Acosta', 1900000.00, 'Conductor', '3163334458', 'Calle 19 #10-30', 'andres.acosta@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Zipaquirá Centro ('250001') - Gerente: Pedro Pablo Guzmán
-('1192021220', 'Pedro Pablo Guzmán', 4300000.00, 'Gerente de Sucursal', '3174445566', 'Carrera 10 #4-20', 'gerete20@empresa.com', SHA2('gerente123', 256), 1),
-('1192021221', 'María Alejandra Bernal', 2200000.00, 'Asesora Comercial', '3174445567', 'Calle 5 #9-10', 'maria.bernal@empresa.com', SHA2('empleado123', 256), 1),
-('1192021222', 'Diego Fernando Suárez', 2000000.00, 'Agente de Alquiler', '3174445568', 'Carrera 9 #3-05', 'diego.suarez@empresa.com', SHA2('empleado123', 256), 1),
-('1192021223', 'Laura Sofía Pinzón', 1800000.00, 'Asistente Administrativa', '3174445569', 'Calle 4 #11-20', 'laura.pinzon@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Chía Principal ('250002') - Gerente: Alejandra Vélez
-('1202122230', 'Alejandra Vélez', 4400000.00, 'Gerente de Sucursal', '3185556677', 'Avenida Pradilla #5-10', 'gerete21@empresa.com', SHA2('gerente123', 256), 1),
-('1202122231', 'Sebastián David Londoño', 2300000.00, 'Agente de Alquiler', '3185556678', 'Carrera 2 #4-05', 'sebastian.londono@empresa.com', SHA2('empleado123', 256), 1),
-('1202122232', 'Natalia Andrea Rojas', 2100000.00, 'Atención al Cliente', '3185556679', 'Calle 10 #6-15', 'natalia.rojas.chia@empresa.com', SHA2('empleado123', 256), 1),
-('1202122233', 'Carlos Mario López', 1900000.00, 'Conductor', '3185556680', 'Avenida Pradilla #10-30', 'carlos.lopez.chia@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Soledad Centro ('081001') - Gerente: Fernando Vargas
-('1212223240', 'Fernando Vargas', 4600000.00, 'Gerente de Sucursal', '3007778899', 'Calle 30 #20-10', 'gerete22@empresa.com', SHA2('gerente123', 256), 1),
-('1212223241', 'Daniela Carolina Pérez', 2400000.00, 'Asesora Comercial', '3007778900', 'Carrera 18 #25-05', 'daniela.perez.sol@empresa.com', SHA2('empleado123', 256), 1),
-('1212223242', 'Juan Felipe González', 2200000.00, 'Agente de Alquiler', '3007778901', 'Calle 26 #22-10', 'juan.gonzalez.sol@empresa.com', SHA2('empleado123', 256), 1),
-('1212223243', 'María Fernanda Suárez', 2000000.00, 'Asistente Administrativa', '3007778902', 'Carrera 19 #28-05', 'maria.suarez.sol@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Magangué Centro ('131001') - Gerente: Gloria Pardo
-('1222324250', 'Gloria Pardo', 4200000.00, 'Gerente de Sucursal', '3018889900', 'Calle 16 #10-50', 'gerete23@empresa.com', SHA2('gerente123', 256), 1),
-('1222324251', 'Carlos David Restrepo', 2100000.00, 'Agente de Alquiler', '3018889901', 'Carrera 12 #15-05', 'carlos.restrepo.mag@empresa.com', SHA2('empleado123', 256), 1),
-('1222324252', 'Ana Sofía Bermúdez', 1900000.00, 'Atención al Cliente', '3018889902', 'Calle 14 #8-20', 'ana.bermudez.mag@empresa.com', SHA2('empleado123', 256), 1),
-('1222324253', 'Luis Miguel Soto', 1700000.00, 'Conductor', '3018889903', 'Carrera 11 #17-10', 'luis.soto.mag@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Duitama Principal ('152201') - Gerente: Jorge Eduardo López
-('1232425260', 'Jorge Eduardo López', 4300000.00, 'Gerente de Sucursal', '3029990011', 'Carrera 16 #15-30', 'gerete24@empresa.com', SHA2('gerente123', 256), 1),
-('1232425261', 'María Camila Pinzón', 2200000.00, 'Asesora Comercial', '3029990012', 'Calle 17 #15-05', 'maria.pinzon.dui@empresa.com', SHA2('empleado123', 256), 1),
-('1232425262', 'Andrés Felipe Olarte', 2000000.00, 'Agente de Alquiler', '3029990013', 'Carrera 15 #16-10', 'andres.olarte.dui@empresa.com', SHA2('empleado123', 256), 1),
-('1232425263', 'Valentina Andrea Rojas', 1800000.00, 'Asistente Administrativa', '3029990014', 'Calle 18 #14-20', 'valentina.rojas.dui@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Chinchiná Principal ('171001') - Gerente: Paola Andrea Restrepo
-('1242526270', 'Paola Andrea Restrepo', 4100000.00, 'Gerente de Sucursal', '3030001122', 'Carrera 5 #8-10', 'gerete25@empresa.com', SHA2('gerente123', 256), 1),
-('1242526271', 'Daniel Fernando Castro', 2000000.00, 'Agente de Alquiler', '3030001123', 'Calle 9 #4-05', 'daniel.castro.chi@empresa.com', SHA2('empleado123', 256), 1),
-('1242526272', 'Laura María Gómez', 1800000.00, 'Atención al Cliente', '3030001124', 'Carrera 6 #7-10', 'laura.gomez.chi@empresa.com', SHA2('empleado123', 256), 1),
-('1242526273', 'Juan Pablo Pérez', 1600000.00, 'Conductor', '3030001125', 'Calle 8 #6-20', 'juan.perez.chi@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal San Gil Principal ('680006') - Gerente: Roberto Carlos Mesa
-('1252627280', 'Roberto Carlos Mesa', 4400000.00, 'Gerente de Sucursal', '3041112233', 'Carrera 9 #10-15', 'gerete26@empresa.com', SHA2('gerente123', 256), 1),
-('1252627281', 'Andrea Catalina Ruiz', 2300000.00, 'Asesora Comercial', '3041112234', 'Calle 11 #8-05', 'andrea.ruiz.sangil@empresa.com', SHA2('empleado123', 256), 1),
-('1252627282', 'Sebastián Andrés Quintero', 2100000.00, 'Agente de Alquiler', '3041112235', 'Carrera 8 #9-20', 'sebastian.quintero.sangil@empresa.com', SHA2('empleado123', 256), 1),
-('1252627283', 'María José Duque', 1900000.00, 'Asistente Administrativa', '3041112236', 'Calle 10 #7-10', 'maria.duque.sangil@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Sincelejo Boston ('700001') - Gerente: Adriana Lucía Torres
-('1262728290', 'Adriana Lucía Torres', 4500000.00, 'Gerente de Sucursal', '3052223344', 'Carrera 20 #25-30', 'gerete27@empresa.com', SHA2('gerente123', 256), 1),
-('1262728291', 'José Daniel Vargas', 2400000.00, 'Jefe de Operaciones', '3052223345', 'Calle 26 #19-05', 'jose.vargas.sin@empresa.com', SHA2('empleado123', 256), 1),
-('1262728292', 'Laura María González', 2200000.00, 'Asesora Comercial', '3052223346', 'Carrera 21 #24-10', 'laura.gonzalez.sin@empresa.com', SHA2('empleado123', 256), 1),
-('1262728293', 'Juan Pablo Montes', 2000000.00, 'Agente de Alquiler', '3052223347', 'Calle 24 #20-05', 'juan.montes.sin@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Rionegro San Nicolás ('055401') - Gerente: Christian Camilo Bernal
-('1272829300', 'Christian Camilo Bernal', 4800000.00, 'Gerente de Sucursal', '3063334455', 'Carrera 55A #35-10', 'gerete28@empresa.com', SHA2('gerente123', 256), 1),
-('1272829301', 'Andrea Carolina Duque', 2600000.00, 'Agente de Alquiler', '3063334456', 'Calle 36 #54-05', 'andrea.duque.rio@empresa.com', SHA2('empleado123', 256), 1),
-('1272829302', 'Esteban José Correa', 2400000.00, 'Atención al Cliente', '3063334457', 'Carrera 53 #34-20', 'esteban.correa.rio@empresa.com', SHA2('empleado123', 256), 1),
-('1272829303', 'Valentina Isabel Osorio', 2200000.00, 'Asistente Administrativa', '3063334458', 'Calle 34 #56-10', 'valentina.osorio.rio@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Arjona Principal ('130002') - Gerente: Marcela Díaz
-('1282930310', 'Marcela Díaz', 4000000.00, 'Gerente de Sucursal', '3074445566', 'Calle 2 #10-50', 'gerete29@empresa.com', SHA2('gerente123', 256), 1),
-('1282930311', 'Juan Diego Giraldo', 2000000.00, 'Agente de Alquiler', '3074445567', 'Carrera 5 #8-05', 'juan.giraldo.arj@empresa.com', SHA2('empleado123', 256), 1),
-('1282930312', 'Carolina Restrepo', 1800000.00, 'Atención al Cliente', '3074445568', 'Calle 3 #12-10', 'carolina.restrepo.arj@empresa.com', SHA2('empleado123', 256), 1),
-('1282930313', 'Luis Carlos López', 1600000.00, 'Conductor', '3074445569', 'Carrera 4 #11-20', 'luis.lopez.arj@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal La Dorada Centro ('172001') - Gerente: Luis Alberto Garcés
-('1293031320', 'Luis Alberto Garcés', 4100000.00, 'Gerente de Sucursal', '3085556677', 'Calle 13 #5-20', 'gerete30@empresa.com', SHA2('gerente123', 256), 1),
-('1293031321', 'María Paula Vargas', 2100000.00, 'Asesora Comercial', '3085556678', 'Carrera 4 #12-05', 'maria.vargas.dor@empresa.com', SHA2('empleado123', 256), 1),
-('1293031322', 'Andrés Felipe Marín', 1900000.00, 'Agente de Alquiler', '3085556679', 'Calle 12 #6-10', 'andres.marin.dor@empresa.com', SHA2('empleado123', 256), 1),
-('1293031323', 'Valentina Sofía Mesa', 1700000.00, 'Asistente Administrativa', '3085556680', 'Carrera 5 #11-20', 'valentina.mesa.dor@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Pitalito Centro ('413001') - Gerente: Carolina Andrea Sánchez
-('1303132330', 'Carolina Andrea Sánchez', 4300000.00, 'Gerente de Sucursal', '3096667788', 'Carrera 3 #7-15', 'gerete31@empresa.com', SHA2('gerente123', 256), 1),
-('1303132331', 'Juan Camilo Gómez', 2200000.00, 'Jefe de Operaciones', '3096667789', 'Calle 8 #2-05', 'juan.gomez.pit@empresa.com', SHA2('empleado123', 256), 1),
-('1303132332', 'Laura Valentina Quintero', 2000000.00, 'Asesora Comercial', '3096667790', 'Carrera 4 #6-10', 'laura.quintero.pit@empresa.com', SHA2('empleado123', 256), 1),
-('1303132333', 'Diego Alejandro Zuluaga', 1800000.00, 'Agente de Alquiler', '3096667791', 'Calle 7 #4-20', 'diego.zuluaga.pit@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Ciénaga Centro ('470002') - Gerente: Miguel Ángel Soto
-('1313233340', 'Miguel Ángel Soto', 4400000.00, 'Gerente de Sucursal', '3107778899', 'Calle 10 #12-30', 'gerete32@empresa.com', SHA2('gerente123', 256), 1),
-('1313233341', 'Andrea Carolina Pérez', 2300000.00, 'Agente de Alquiler', '3107778900', 'Carrera 13 #9-05', 'andrea.perez.cie@empresa.com', SHA2('empleado123', 256), 1),
-('1313233342', 'Sebastián Andrés Restrepo', 2100000.00, 'Atención al Cliente', '3107778901', 'Calle 11 #11-10', 'sebastian.restrepo.cie@empresa.com', SHA2('empleado123', 256), 1),
-('1313233343', 'María Alejandra Valencia', 1900000.00, 'Conductor', '3107778902', 'Carrera 10 #10-20', 'maria.valencia.cie@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Puerto López Principal ('500002') - Gerente: Liliana Marcela Duque
-('1323334350', 'Liliana Marcela Duque', 4200000.00, 'Gerente de Sucursal', '3118889900', 'Carrera 4 #15-05', 'gerete33@empresa.com', SHA2('gerente123', 256), 1),
-('1323334351', 'Carlos Enrique Vargas', 2200000.00, 'Agente de Alquiler', '3118889901', 'Calle 16 #3-05', 'carlos.vargas.pl@empresa.com', SHA2('empleado123', 256), 1),
-('1323334352', 'Ana Sofía Rodríguez', 2000000.00, 'Atención al Cliente', '3118889902', 'Carrera 5 #14-10', 'ana.rodriguez.pl@empresa.com', SHA2('empleado123', 256), 1),
-('1323334353', 'Luis Fernando Castro', 1800000.00, 'Asistente Administrativa', '3118889903', 'Calle 15 #6-20', 'luis.castro.pl@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Ipiales San Felipe ('521001') - Gerente: Fabian Andres Cárdenas
-('1333435360', 'Fabian Andres Cárdenas', 4300000.00, 'Gerente de Sucursal', '3129990011', 'Calle 12 #6-25', 'gerete34@empresa.com', SHA2('gerente123', 256), 1),
-('1333435361', 'María Camila López', 2100000.00, 'Asesora Comercial', '3129990012', 'Carrera 7 #11-05', 'maria.lopez.ipi@empresa.com', SHA2('empleado123', 256), 1),
-('1333435362', 'Andrés Felipe Jiménez', 1900000.00, 'Agente de Alquiler', '3129990013', 'Calle 11 #5-10', 'andres.jimenez.ipi@empresa.com', SHA2('empleado123', 256), 1),
-('1333435363', 'Laura Sofía Díaz', 1700000.00, 'Asistente Administrativa', '3129990014', 'Carrera 6 #10-20', 'laura.diaz.ipi@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cúcuta Centro ('540001') - Gerente: Natalia Andrea Castro
-('1343536370', 'Natalia Andrea Castro', 4700000.00, 'Gerente de Sucursal', '3130001122', 'Avenida 1 #10-40', 'gerete35@empresa.com', SHA2('gerente123', 256), 1),
-('1343536371', 'Juan David Rojas', 2500000.00, 'Jefe de Operaciones', '3130001123', 'Calle 11 #0-05', 'juan.rojas.cuc@empresa.com', SHA2('empleado123', 256), 1),
-('1343536372', 'Andrea Carolina Pardo', 2300000.00, 'Asesora Comercial', '3130001124', 'Avenida 2 #10-10', 'andrea.pardo.cuc@empresa.com', SHA2('empleado123', 256), 1),
-('1343536373', 'Sebastián Felipe Soto', 2100000.00, 'Agente de Alquiler', '3130001125', 'Calle 9 #1-20', 'sebastian.soto.cuc@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Calarcá Centro ('631001') - Gerente: Juan Pablo Pérez
-('1353637380', 'Juan Pablo Pérez', 4300000.00, 'Gerente de Sucursal', '3141112233', 'Carrera 25 #30-50', 'gerete36@empresa.com', SHA2('gerente123', 256), 1),
-('1353637381', 'Laura Marcela Duque', 2200000.00, 'Agente de Alquiler', '3141112234', 'Calle 31 #24-05', 'laura.duque.cal@empresa.com', SHA2('empleado123', 256), 1),
-('1353637382', 'Carlos Daniel Quintero', 2000000.00, 'Atención al Cliente', '3141112235', 'Carrera 26 #29-10', 'carlos.quintero.cal@empresa.com', SHA2('empleado123', 256), 1),
-('1353637383', 'María Fernanda Vargas', 1800000.00, 'Asistente Administrativa', '3141112236', 'Calle 30 #27-20', 'maria.vargas.cal@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Dosquebradas La Pradera ('661001') - Gerente: Catalina Ospina
-('1363738390', 'Catalina Ospina', 4400000.00, 'Gerente de Sucursal', '3152223344', 'Carrera 19 #35-10', 'gerete37@empresa.com', SHA2('gerente123', 256), 1),
-('1363738391', 'Andrés Felipe Soto', 2300000.00, 'Asesor Comercial', '3152223345', 'Calle 36 #18-05', 'andres.soto.dos@empresa.com', SHA2('empleado123', 256), 1),
-('1363738392', 'Laura María Correa', 2100000.00, 'Agente de Alquiler', '3152223346', 'Carrera 20 #34-10', 'laura.correa.dos@empresa.com', SHA2('empleado123', 256), 1),
-('1363738393', 'Juan Pablo López', 1900000.00, 'Conductor', '3152223347', 'Calle 35 #21-20', 'juan.lopez.dos@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Bucaramanga Cacique ('680001') - Gerente: Sebastián Patiño
-('1373839400', 'Sebastián Patiño', 4900000.00, 'Gerente de Sucursal', '3163334455', 'Carrera 27 #56-20', 'gerete38@empresa.com', SHA2('gerente123', 256), 1),
-('1373839401', 'María Alejandra Giraldo', 2700000.00, 'Jefe de Operaciones', '3163334456', 'Calle 56 #29-05', 'maria.giraldo.buca@empresa.com', SHA2('empleado123', 256), 1),
-('1373839402', 'Daniel Felipe Quintero', 2500000.00, 'Asesor Comercial', '3163334457', 'Carrera 28 #55-10', 'daniel.quintero.buca@empresa.com', SHA2('empleado123', 256), 1),
-('1373839403', 'Valentina Sofía Restrepo', 2300000.00, 'Agente de Alquiler', '3163334458', 'Calle 55 #26-20', 'valentina.restrepo.buca@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Corozal Centro ('701001') - Gerente: Andrea Carolina Niño
-('1383940410', 'Andrea Carolina Niño', 4100000.00, 'Gerente de Sucursal', '3174445566', 'Carrera 18 #22-05', 'gerete39@empresa.com', SHA2('gerente123', 256), 1),
-('1383940411', 'Juan Pablo Torres', 2000000.00, 'Agente de Alquiler', '3174445567', 'Calle 23 #17-05', 'juan.torres.corozal@empresa.com', SHA2('empleado123', 256), 1),
-('1383940412', 'Laura Daniela Vargas', 1800000.00, 'Atención al Cliente', '3174445568', 'Carrera 19 #21-10', 'laura.vargas.corozal@empresa.com', SHA2('empleado123', 256), 1),
-('1383940413', 'Carlos Andrés Suárez', 1600000.00, 'Asistente Administrativa', '3174445569', 'Calle 22 #18-20', 'carlos.suarez.corozal@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Ibagué Centro ('730001') - Gerente: Gabriel Jaime Torres
-('1394041420', 'Gabriel Jaime Torres', 4800000.00, 'Gerente de Sucursal', '3185556677', 'Carrera 5 #10-30', 'gerete40@empresa.com', SHA2('gerente123', 256), 1),
-('1394041421', 'María Alejandra Ospina', 2600000.00, 'Asesora Comercial', '3185556678', 'Calle 11 #4-05', 'maria.ospina.ibg@empresa.com', SHA2('empleado123', 256), 1),
-('1394041422', 'Diego Fernando Quintero', 2400000.00, 'Agente de Alquiler', '3185556679', 'Carrera 6 #9-10', 'diego.quintero.ibg@empresa.com', SHA2('empleado123', 256), 1),
-('1394041423', 'Sofía Andrea Restrepo', 2200000.00, 'Conductor', '3185556680', 'Calle 10 #7-20', 'sofia.restrepo.ibg@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Palmira El Prado ('763001') - Gerente: Alejandro Vargas
-('1404142430', 'Alejandro Vargas', 4900000.00, 'Gerente de Sucursal', '3196667788', 'Calle 30 #28-10', 'gerete41@empresa.com', SHA2('gerente123', 256), 1),
-('1404142431', 'Natalia Carolina López', 2700000.00, 'Jefe de Operaciones', '3196667789', 'Carrera 29 #29-05', 'natalia.lopez.pal@empresa.com', SHA2('empleado123', 256), 1),
-('1404142432', 'Juan José Giraldo', 2500000.00, 'Asesor Comercial', '3196667790', 'Calle 28 #27-10', 'juan.giraldo.pal@empresa.com', SHA2('empleado123', 256), 1),
-('1404142433', 'Laura Valentina Soto', 2300000.00, 'Agente de Alquiler', '3196667791', 'Carrera 30 #31-20', 'laura.soto.pal@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Yopal Centro ('850001') - Gerente: María Fernanda Ruiz
-('1414243440', 'María Fernanda Ruiz', 4500000.00, 'Gerente de Sucursal', '3207778899', 'Carrera 20 #15-05', 'gerete42@empresa.com', SHA2('gerente123', 256), 1),
-('1414243441', 'Carlos Julián Díaz', 2400000.00, 'Agente de Alquiler', '3207778900', 'Calle 16 #19-05', 'carlos.diaz.yop@empresa.com', SHA2('empleado123', 256), 1),
-('1414243442', 'Andrea Sofía Vargas', 2200000.00, 'Atención al Cliente', '3207778901', 'Carrera 21 #14-10', 'andrea.vargas.yop@empresa.com', SHA2('empleado123', 256), 1),
-('1414243443', 'Sebastián Camilo Herrera', 2000000.00, 'Asistente Administrativa', '3207778902', 'Calle 15 #22-20', 'sebastian.herrera.yop@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cali Norte Principal ('760001') - Gerente: Marta Lucía Rueda
-('1424344450', 'Marta Lucía Rueda', 5200000.00, 'Gerente de Sucursal', '3104567891', 'Avenida 3N #47-15', 'gerete43@empresa.com', SHA2('gerente123', 256), 1),
-('1424344451', 'Juan Manuel Castro', 2700000.00, 'Asesor Comercial', '3104567892', 'Calle 47 #3N-05', 'juan.castro.caln@empresa.com', SHA2('empleado123', 256), 1),
-('1424344452', 'Laura Marcela Pinzón', 2500000.00, 'Agente de Alquiler', '3104567893', 'Avenida 2N #45-10', 'laura.pinzon.caln@empresa.com', SHA2('empleado123', 256), 1),
-('1424344453', 'Andrés David Pardo', 2300000.00, 'Conductor', '3104567894', 'Calle 48 #3N-20', 'andres.pardo.caln@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Bogotá El Dorado Aeropuerto ('110111') - Gerente: Felipe Ortiz
-('1434445460', 'Felipe Ortiz', 6000000.00, 'Gerente de Sucursal', '3117654322', 'Avenida El Dorado #103-90', 'gerete44@empresa.com', SHA2('gerente123', 256), 1),
-('1434445461', 'Catalina Gómez', 3000000.00, 'Jefe de Operaciones', '3117654325', 'Carrera 103 #25-30', 'catalina.gomez.bogedo@empresa.com', SHA2('empleado123', 256), 1),
-('1434445462', 'Mauricio Delgado', 2800000.00, 'Asesor Comercial B2B', '3117654326', 'Calle 26 #100-10', 'mauricio.delgado.bogedo@empresa.com', SHA2('empleado123', 256), 1),
-('1434445463', 'Valentina Restrepo', 2600000.00, 'Atención al Cliente (Aeropuerto)', '3117654327', 'Avenida El Dorado #100-50', 'valentina.restrepo.bogedo@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Medellín Sur Envigado ('055001') - Gerente: Claudia Patricia López
-('1444546470', 'Claudia Patricia López', 5300000.00, 'Gerente de Sucursal', '3025674579', 'Carrera 48 #20-10', 'gerete45@empresa.com', SHA2('gerente123', 256), 1),
-('1444546471', 'Esteban Marín', 2700000.00, 'Agente de Alquiler', '3025674580', 'Calle 38 Sur #45-05', 'esteban.marin.medsur@empresa.com', SHA2('empleado123', 256), 1),
-('1444546472', 'Laura Cristina Quintero', 2500000.00, 'Asesora Comercial', '3025674581', 'Carrera 43A #30 Sur-10', 'laura.quintero.medsur@empresa.com', SHA2('empleado123', 256), 1),
-('1444546473', 'Juan Pablo Cadavid', 2300000.00, 'Conductor Designado', '3025674582', 'Calle 39 Sur #47-20', 'juan.cadavid.medsur@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Barranquilla Aeropuerto Int. ('080001') - Gerente: Carlos Andrés Soto
-('1454647480', 'Carlos Andrés Soto', 5000000.00, 'Gerente de Sucursal', '3152223345', 'Carrera 61 #10-100', 'gerete46@empresa.com', SHA2('gerente123', 256), 1),
-('1454647481', 'Andrea Catalina Barrios', 2800000.00, 'Jefe de Operaciones', '3152223348', 'Calle 10 #60-50', 'andrea.barrios.bqr@empresa.com', SHA2('empleado123', 256), 1),
-('1454647482', 'Ricardo José Blanco', 2600000.00, 'Agente de Alquiler', '3152223349', 'Carrera 58 #12-10', 'ricardo.blanco.bqr@empresa.com', SHA2('empleado123', 256), 1),
-('1454647483', 'María Camila Gómez', 2400000.00, 'Atención al Cliente', '3152223350', 'Calle 11 #59-20', 'maria.gomez.bqr@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cali Ciudad Jardín ('760001') - Gerente: Paula Andrea Marín
-('1464748490', 'Paula Andrea Marín', 5200000.00, 'Gerente de Sucursal', '3123456790', 'Calle 13 #100-20', 'gerete47@empresa.com', SHA2('gerente123', 256), 1),
-('1464748491', 'Santiago Osorio', 2700000.00, 'Asesor Comercial', '3123456793', 'Carrera 100 #14-05', 'santiago.osorio.calija@empresa.com', SHA2('empleado123', 256), 1),
-('1464748492', 'Isabella Giraldo', 2500000.00, 'Agente de Alquiler', '3123456794', 'Calle 16 #100-10', 'isabella.giraldo.calija@empresa.com', SHA2('empleado123', 256), 1),
-('1464748493', 'Carlos Eduardo Torres', 2300000.00, 'Conductor', '3123456795', 'Carrera 99 #13-20', 'carlos.torres.calija@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Zipaquirá Parque ('250001') - Gerente: Diego Alejandro Restrepo
-('1474849500', 'Diego Alejandro Restrepo', 4300000.00, 'Gerente de Sucursal', '3174445568', 'Carrera 9 #6-30', 'gerete48@empresa.com', SHA2('gerente123', 256), 1),
-('1474849501', 'Laura Carolina Páez', 2200000.00, 'Asesora Comercial', '3174445570', 'Calle 7 #8-05', 'laura.paez.zipa@empresa.com', SHA2('empleado123', 256), 1),
-('1474849502', 'Juan Sebastián Acosta', 2000000.00, 'Agente de Alquiler', '3174445571', 'Carrera 8 #5-10', 'juan.acosta.zipa@empresa.com', SHA2('empleado123', 256), 1),
-('1474849503', 'Valentina Sofía Morales', 1800000.00, 'Asistente Administrativa', '3174445572', 'Calle 6 #10-20', 'valentina.morales.zipa@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Chía La Cabaña ('250002') - Gerente: Juan David Rojas
-('1484950510', 'Juan David Rojas', 4400000.00, 'Gerente de Sucursal', '3185556679', 'Avenida Pradilla #20-50', 'gerete49@empresa.com', SHA2('gerente123', 256), 1),
-('1484950511', 'María Paula Marín', 2300000.00, 'Agente de Alquiler', '3185556681', 'Carrera 5 #18-05', 'maria.marin.chia2@empresa.com', SHA2('empleado123', 256), 1),
-('1484950512', 'Andrés Felipe Quintero', 2100000.00, 'Atención al Cliente', '3185556682', 'Calle 19 #6-10', 'andres.quintero.chia2@empresa.com', SHA2('empleado123', 256), 1),
-('1484950513', 'Sofía Carolina Restrepo', 1900000.00, 'Conductor', '3185556683', 'Avenida Pradilla #15-20', 'sofia.restrepo.chia2@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Soacha San Mateo ('250008') - Gerente: Sofía Pardo
-('1495051520', 'Sofía Pardo', 4600000.00, 'Gerente de Sucursal', '3172345680', 'Carrera 4 #15-20', 'gerete50@empresa.com', SHA2('gerente123', 256), 1),
-('1495051521', 'Carlos Mario Gómez', 2400000.00, 'Jefe de Operaciones', '3172345681', 'Calle 14 #3-05', 'carlos.gomez.soa@empresa.com', SHA2('empleado123', 256), 1),
-('1495051522', 'Laura Camila Valencia', 2200000.00, 'Asesora Comercial', '3172345682', 'Carrera 5 #16-10', 'laura.valencia.soa@empresa.com', SHA2('empleado123', 256), 1),
-('1495051523', 'Juan Esteban Ruiz', 2000000.00, 'Agente de Alquiler', '3172345683', 'Calle 15 #6-20', 'juan.ruiz.soa@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Mosquera Centro ('250007') - Gerente: Santiago Gómez
-('1505152530', 'Santiago Gómez', 4300000.00, 'Gerente de Sucursal', '3109876540', 'Calle 1 #3-10', 'gerete51@empresa.com', SHA2('gerente123', 256), 1),
-('1505152531', 'Andrea Catalina Mesa', 2200000.00, 'Agente de Alquiler', '3109876541', 'Carrera 2 #2-05', 'andrea.mesa.mos@empresa.com', SHA2('empleado123', 256), 1),
-('1505152532', 'Sebastián Nicolás Vargas', 2000000.00, 'Atención al Cliente', '3109876542', 'Calle 2 #4-10', 'sebastian.vargas.mos@empresa.com', SHA2('empleado123', 256), 1),
-('1505152533', 'María Fernanda Suárez', 1800000.00, 'Asistente Administrativa', '3109876543', 'Carrera 3 #1-20', 'maria.suarez.mos@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Funza Centro ('250005') - Gerente: Valeria Jiménez
-('1515253540', 'Valeria Jiménez', 4200000.00, 'Gerente de Sucursal', '3112345600', 'Carrera 9 #17-05', 'gerete52@empresa.com', SHA2('gerente123', 256), 1),
-('1515253541', 'Daniela Alejandra Soto', 2100000.00, 'Asesora Comercial', '3112345601', 'Calle 18 #8-05', 'daniela.soto.funza@empresa.com', SHA2('empleado123', 256), 1),
-('1515253542', 'Juan Camilo Morales', 1900000.00, 'Agente de Alquiler', '3112345602', 'Carrera 8 #16-10', 'juan.morales.funza@empresa.com', SHA2('empleado123', 256), 1),
-('1515253543', 'Laura Sofía Quintero', 1700000.00, 'Conductor', '3112345603', 'Calle 17 #10-20', 'laura.quintero.funza@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cajicá Principal ('250004') - Gerente: Daniela Ospina
-('1525354550', 'Daniela Ospina', 4300000.00, 'Gerente de Sucursal', '3123456701', 'Carrera 5 #4-30', 'gerete53@empresa.com', SHA2('gerente123', 256), 1),
-('1525354551', 'Carlos Andrés Restrepo', 2200000.00, 'Agente de Alquiler', '3123456702', 'Calle 3 #6-05', 'carlos.restrepo.caj@empresa.com', SHA2('empleado123', 256), 1),
-('1525354552', 'María Fernanda Torres', 2000000.00, 'Atención al Cliente', '3123456703', 'Carrera 6 #5-10', 'maria.torres.caj@empresa.com', SHA2('empleado123', 256), 1),
-('1525354553', 'Andrés Felipe Martínez', 1800000.00, 'Asistente Administrativa', '3123456704', 'Calle 4 #7-20', 'andres.martinez.caj@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Madrid Cundinamarca La Esmeralda ('250006') - Gerente: Miguel Ángel Londoño
-('1535455560', 'Miguel Ángel Londoño', 4500000.00, 'Gerente de Sucursal', '3134567802', 'Calle 7 #8-10', 'gerete54@empresa.com', SHA2('gerente123', 256), 1),
-('1535455561', 'Laura Sofía Quintero', 2300000.00, 'Asesora Comercial', '3134567803', 'Carrera 9 #6-05', 'laura.quintero.mad@empresa.com', SHA2('empleado123', 256), 1),
-('1535455562', 'Juan Camilo Vélez', 2100000.00, 'Agente de Alquiler', '3134567804', 'Calle 6 #10-10', 'juan.velez.mad@empresa.com', SHA2('empleado123', 256), 1),
-('1535455563', 'Valentina Andrea Rojas', 1900000.00, 'Conductor', '3134567805', 'Carrera 8 #7-20', 'valentina.rojas.mad@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Facatativá Centro ('250009') - Gerente: Carolina Soto
-('1545556570', 'Carolina Soto', 4300000.00, 'Gerente de Sucursal', '3145678903', 'Carrera 3 #7-20', 'gerete55@empresa.com', SHA2('gerente123', 256), 1),
-('1545556571', 'Daniel Fernando Londoño', 2200000.00, 'Agente de Alquiler', '3145678904', 'Calle 8 #2-05', 'daniel.londono.faca@empresa.com', SHA2('empleado123', 256), 1),
-('1545556572', 'María Alejandra Quintero', 2000000.00, 'Atención al Cliente', '3145678905', 'Carrera 4 #6-10', 'maria.quintero.faca@empresa.com', SHA2('empleado123', 256), 1),
-('1545556573', 'Sebastián Andrés Suárez', 1800000.00, 'Asistente Administrativa', '3145678906', 'Calle 7 #4-20', 'sebastian.suarez.faca@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Envigado Principal ('055001') - Gerente: Andrés Pérez
-('1555657580', 'Andrés Pérez', 5300000.00, 'Gerente de Sucursal', '3001234560', 'Calle 37 Sur #43-50', 'gerete56@empresa.com', SHA2('gerente123', 256), 1),
-('1555657581', 'Laura Vanessa Gómez', 2700000.00, 'Asesora Comercial', '3001234561', 'Carrera 43A #38 Sur-05', 'laura.gomez.env@empresa.com', SHA2('empleado123', 256), 1),
-('1555657582', 'Carlos Arturo Restrepo', 2500000.00, 'Agente de Alquiler', '3001234562', 'Calle 36 Sur #44-10', 'carlos.restrepo.env@empresa.com', SHA2('empleado123', 256), 1),
-('1555657583', 'Sofía Alejandra Mesa', 2300000.00, 'Conductor', '3001234563', 'Carrera 48 #37 Sur-20', 'sofia.mesa.env@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Bello Centro ('050005') - Gerente: Laura Giraldo
-('1565758590', 'Laura Giraldo', 4800000.00, 'Gerente de Sucursal', '3012345670', 'Calle 50 #49-10', 'gerete57@empresa.com', SHA2('gerente123', 256), 1),
-('1565758591', 'Juan Camilo Arango', 2600000.00, 'Jefe de Operaciones', '3012345671', 'Carrera 49 #51-05', 'juan.arango.bello@empresa.com', SHA2('empleado123', 256), 1),
-('1565758592', 'María Fernanda Lopera', 2400000.00, 'Asesora Comercial', '3012345672', 'Calle 51 #48-10', 'maria.lopera.bello@empresa.com', SHA2('empleado123', 256), 1),
-('1565758593', 'Andrés Felipe Vélez', 2200000.00, 'Agente de Alquiler', '3012345673', 'Carrera 48 #50-20', 'andres.velez.bello@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Itagüí Centro ('050003') - Gerente: Ricardo Gómez
-('1575859600', 'Ricardo Gómez', 5000000.00, 'Gerente de Sucursal', '3023456780', 'Carrera 50A #36-20', 'gerete58@empresa.com', SHA2('gerente123', 256), 1),
-('1575859601', 'Valentina Quintero', 2700000.00, 'Agente de Alquiler', '3023456781', 'Calle 37 #49-05', 'valentina.quintero.ita@empresa.com', SHA2('empleado123', 256), 1),
-('1575859602', 'Sebastián Patiño', 2500000.00, 'Atención al Cliente', '3023456782', 'Carrera 51 #35-10', 'sebastian.patino.ita@empresa.com', SHA2('empleado123', 256), 1),
-('1575859603', 'Laura Marcela Duque', 2300000.00, 'Asistente Administrativa', '3023456783', 'Calle 38 #50-20', 'laura.duque.ita@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Rionegro San Antonio ('055401') - Gerente: Natalia Bedoya
-('1585960610', 'Natalia Bedoya', 4800000.00, 'Gerente de Sucursal', '3034567890', 'Carrera 48 #55-10', 'gerete59@empresa.com', SHA2('gerente123', 256), 1),
-('1585960611', 'Juan Camilo Restrepo', 2600000.00, 'Asesor Comercial', '3034567891', 'Calle 56 #47-05', 'juan.restrepo.rioant@empresa.com', SHA2('empleado123', 256), 1),
-('1585960612', 'Andrea Sofía Sánchez', 2400000.00, 'Agente de Alquiler', '3034567892', 'Carrera 49 #54-10', 'andrea.sanchez.rioant@empresa.com', SHA2('empleado123', 256), 1),
-('1585960613', 'Carlos Mario Ospina', 2200000.00, 'Conductor', '3034567893', 'Calle 55 #50-20', 'carlos.ospina.rioant@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Apartadó Principal ('056001') - Gerente: Juan Camilo Restrepo
-('1596061620', 'Juan Camilo Restrepo', 4500000.00, 'Gerente de Sucursal', '3045678900', 'Carrera 100 #99-05', 'gerete60@empresa.com', SHA2('gerente123', 256), 1),
-('1596061621', 'Laura Camila Pardo', 2400000.00, 'Agente de Alquiler', '3045678901', 'Calle 98 #101-05', 'laura.pardo.apa@empresa.com', SHA2('empleado123', 256), 1),
-('1596061622', 'Daniel Felipe Giraldo', 2200000.00, 'Atención al Cliente', '3045678902', 'Carrera 99 #100-10', 'daniel.giraldo.apa@empresa.com', SHA2('empleado123', 256), 1),
-('1596061623', 'María José López', 2000000.00, 'Asistente Administrativa', '3045678903', 'Calle 101 #98-20', 'maria.lopez.apa@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cartagena Crespo Playa ('130001') - Gerente: Julian David Morales
-('1606162630', 'Julian David Morales', 5100000.00, 'Gerente de Sucursal', '3134567891', 'Avenida 1 #60-80', 'gerete61@empresa.com', SHA2('gerente123', 256), 1),
-('1606162631', 'Andrea Sofía Barrios', 2700000.00, 'Jefe de Operaciones', '3134567892', 'Carrera 1 #61-05', 'andrea.barrios.crt@empresa.com', SHA2('empleado123', 256), 1),
-('1606162632', 'Sebastián Andrés Quintero', 2500000.00, 'Agente de Alquiler', '3134567893', 'Calle 60 #2-10', 'sebastian.quintero.crt@empresa.com', SHA2('empleado123', 256), 1),
-('1606162633', 'María Paula Martínez', 2300000.00, 'Atención al Cliente', '3134567894', 'Avenida 2 #60-20', 'maria.martinez.crt@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cartagena Bocagrande Torre ('130001') - Gerente: Ana María Torres
-('1616263640', 'Ana María Torres', 5100000.00, 'Gerente de Sucursal', '3145678902', 'Carrera 2 #10-50', 'gerete62@empresa.com', SHA2('gerente123', 256), 1),
-('1616263641', 'Carlos David Pérez', 2700000.00, 'Asesor Comercial', '3145678903', 'Calle 9 #1-05', 'carlos.perez.crt2@empresa.com', SHA2('empleado123', 256), 1),
-('1616263642', 'Laura Melissa Giraldo', 2500000.00, 'Agente de Alquiler', '3145678904', 'Carrera 3 #11-10', 'laura.giraldo.crt2@empresa.com', SHA2('empleado123', 256), 1),
-('1616263643', 'Juan Pablo Ospina', 2300000.00, 'Conductor', '3145678905', 'Calle 10 #2-20', 'juan.ospina.crt2@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Barranquilla Paseo Bolívar ('080001') - Gerente: José Luis Díaz
-('1626364650', 'José Luis Díaz', 5000000.00, 'Gerente de Sucursal', '3156789010', 'Paseo Bolívar #35-100', 'gerete63@empresa.com', SHA2('gerente123', 256), 1),
-('1626364651', 'María Alejandra Marín', 2800000.00, 'Jefe de Operaciones', '3156789011', 'Calle 34 #34-05', 'maria.marin.bqrbolivar@empresa.com', SHA2('empleado123', 256), 1),
-('1626364652', 'Daniel Santiago Vargas', 2600000.00, 'Asesor Comercial', '3156789012', 'Carrera 38 #36-10', 'daniel.vargas.bqrbolivar@empresa.com', SHA2('empleado123', 256), 1),
-('1626364653', 'Ana Carolina Soto', 2400000.00, 'Atención al Cliente', '3156789013', 'Calle 36 #40-20', 'ana.soto.bqrbolivar@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Barranquilla Suroccidente ('080001') - Gerente: Mónica Bedoya
-('1636465660', 'Mónica Bedoya', 4900000.00, 'Gerente de Sucursal', '3167890120', 'Calle 47 #8 Sur-10', 'gerete64@empresa.com', SHA2('gerente123', 256), 1),
-('1636465661', 'Sebastián Andrés Mejía', 2700000.00, 'Agente de Alquiler', '3167890121', 'Carrera 12 #45-05 Sur', 'sebastian.mejia.bqrsur@empresa.com', SHA2('empleado123', 256), 1),
-('1636465662', 'Laura Cristina Torres', 2500000.00, 'Asistente Administrativa', '3167890122', 'Calle 46 #10 Sur-10', 'laura.torres.bqrsur@empresa.com', SHA2('empleado123', 256), 1),
-('1636465663', 'Juan David Zapata', 2300000.00, 'Conductor', '3167890123', 'Carrera 10 #48-20 Sur', 'juan.zapata.bqrsur@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Bucaramanga Centro Ciudad ('680001') - Gerente: Daniela Vargas
-('1646566670', 'Daniela Vargas', 4900000.00, 'Gerente de Sucursal', '3009876540', 'Calle 35 #18-50', 'gerete65@empresa.com', SHA2('gerente123', 256), 1),
-('1646566671', 'Carlos Julián Suárez', 2700000.00, 'Asesor Comercial', '3009876541', 'Carrera 19 #34-05', 'carlos.suarez.bucac@empresa.com', SHA2('empleado123', 256), 1),
-('1646566672', 'Andrea Sofía Pardo', 2500000.00, 'Agente de Alquiler', '3009876542', 'Calle 34 #17-10', 'andrea.pardo.bucac@empresa.com', SHA2('empleado123', 256), 1),
-('1646566673', 'Juan Pablo Rueda', 2300000.00, 'Asistente Administrativa', '3009876543', 'Carrera 17 #36-20', 'juan.rueda.bucac@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Bucaramanga Parque Caracolí ('681001') - Gerente: Pablo Emilio Escobar
-('1656667680', 'Pablo Emilio Escobar', 4800000.00, 'Gerente de Sucursal', '3010123456', 'Carrera 33 #48-100', 'gerete66@empresa.com', SHA2('gerente123', 256), 1),
-('1656667681', 'Laura Camila Quintero', 2600000.00, 'Jefe de Operaciones', '3010123457', 'Calle 49 #32-05', 'laura.quintero.bucarac@empresa.com', SHA2('empleado123', 256), 1),
-('1656667682', 'Daniel Felipe Torres', 2400000.00, 'Asesor Comercial', '3010123458', 'Carrera 34 #47-10', 'daniel.torres.bucarac@empresa.com', SHA2('empleado123', 256), 1),
-('1656667683', 'María Alejandra Valencia', 2200000.00, 'Agente de Alquiler', '3010123459', 'Calle 48 #35-20', 'maria.valencia.bucarac@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cali Valle del Lili ('760001') - Gerente: Sofía Ramírez
-('1666768690', 'Sofía Ramírez', 5200000.00, 'Gerente de Sucursal', '3101112234', 'Carrera 98 #25-30', 'gerete67@empresa.com', SHA2('gerente123', 256), 1),
-('1666768691', 'Juan Camilo Marín', 2700000.00, 'Asesor Comercial', '3101112235', 'Calle 26 #99-05', 'juan.marin.calivl@empresa.com', SHA2('empleado123', 256), 1),
-('1666768692', 'Andrea Carolina Mesa', 2500000.00, 'Agente de Alquiler', '3101112236', 'Carrera 97 #24-10', 'andrea.mesa.calivl@empresa.com', SHA2('empleado123', 256), 1),
-('1666768693', 'Sebastián José Giraldo', 2300000.00, 'Conductor', '3101112237', 'Calle 25 #98-20', 'sebastian.giraldo.calivl@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cali Menga Norte ('760001') - Gerente: Carlos Arturo Herrera
-('1676869700', 'Carlos Arturo Herrera', 5200000.00, 'Gerente de Sucursal', '3112223345', 'Avenida 4 Norte #60-05', 'gerete68@empresa.com', SHA2('gerente123', 256), 1),
-('1676869701', 'Laura Marcela Pinzón', 2700000.00, 'Jefe de Operaciones', '3112223346', 'Calle 61 #3N-05', 'laura.pinzon.calimenga@empresa.com', SHA2('empleado123', 256), 1),
-('1676869702', 'Juan Sebastián Restrepo', 2500000.00, 'Asesor Comercial', '3112223347', 'Avenida 3N #59-10', 'juan.restrepo.calimenga@empresa.com', SHA2('empleado123', 256), 1),
-('1676869703', 'María Camila Duque', 2300000.00, 'Agente de Alquiler', '3112223348', 'Calle 59 #4N-20', 'maria.duque.calimenga@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Manizales Centro Principal ('170001') - Gerente: María Fernanda Gutiérrez
-('1686970710', 'María Fernanda Gutiérrez', 4800000.00, 'Gerente de Sucursal', '3123334456', 'Carrera 23 #22-50', 'gerete69@empresa.com', SHA2('gerente123', 256), 1),
-('1686970711', 'Daniela Carolina Ospina', 2600000.00, 'Asesora Comercial', '3123334457', 'Calle 23 #22-05', 'daniela.ospina.manizales@empresa.com', SHA2('empleado123', 256), 1),
-('1686970712', 'Juan Camilo Marín', 2400000.00, 'Agente de Alquiler', '3123334458', 'Carrera 22 #21-10', 'juan.marin.manizales@empresa.com', SHA2('empleado123', 256), 1),
-('1686970713', 'Laura Sofía Quintero', 2200000.00, 'Asistente Administrativa', '3123334459', 'Calle 22 #24-20', 'laura.quintero.manizales@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Manizales Cable Plaza ('170001') - Gerente: Andrés Felipe Cardona
-('1697071720', 'Andrés Felipe Cardona', 4800000.00, 'Gerente de Sucursal', '3134445567', 'Avenida Santander #65-10', 'gerete70@empresa.com', SHA2('gerente123', 256), 1),
-('1697071721', 'Sofía Andrea Ríos', 2600000.00, 'Jefe de Operaciones', '3134445568', 'Calle 65 #23-05', 'sofia.rios.manizalescp@empresa.com', SHA2('empleado123', 256), 1),
-('1697071722', 'Sebastián José Vargas', 2400000.00, 'Asesor Comercial', '3134445569', 'Avenida Santander #64-10', 'sebastian.vargas.manizalescp@empresa.com', SHA2('empleado123', 256), 1),
-('1697071723', 'María Camila López', 2200000.00, 'Agente de Alquiler', '3134445570', 'Calle 64 #24-20', 'maria.lopez.manizalescp@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Londres Central ('75008 - París CP') - Gerente: Oliver Smith
-('UK001001', 'Oliver Smith', 6800000.00, 'Gerente de Sucursal', '+44 20 7123 4567', 'Oxford Street 200', 'gerete71@empresa.com', SHA2('gerente123', 256), 2),
-('UK001002', 'Charlotte Jones', 3800000.00, 'Operations Manager', '+44 20 7123 4568', 'Regent Street 150', 'charlotte.jones@empresa.com', SHA2('empleado123', 256), 2),
-('UK001003', 'Liam Davis', 3200000.00, 'Rental Agent', '+44 20 7123 4569', 'Piccadilly Circus', 'liam.davis@empresa.com', SHA2('empleado123', 256), 2),
-('UK001004', 'Isabella Brown', 3000000.00, 'Customer Service Rep', '+44 20 7123 4570', 'Covent Garden Market', 'isabella.brown@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Londres Heathrow ('75008 - París CP') - Gerente: Emily Johnson
-('UK002001', 'Emily Johnson', 6800000.00, 'Gerente de Sucursal', '+44 20 8780 1234', 'Heathrow Airport, Terminal 5', 'gerete72@empresa.com', SHA2('gerente123', 256), 2),
-('UK002002', 'Jacob Wilson', 3800000.00, 'Fleet Manager', '+44 20 8780 1235', 'Heathrow Airport, Terminal 2', 'jacob.wilson@empresa.com', SHA2('empleado123', 256), 2),
-('UK002003', 'Sophia Taylor', 3200000.00, 'Rental Agent', '+44 20 8780 1236', 'Heathrow Airport, Terminal 4', 'sophia.taylor@empresa.com', SHA2('empleado123', 256), 2),
-('UK002004', 'William Green', 3000000.00, 'Customer Service', '+44 20 8780 1237', 'Heathrow Airport, Central', 'william.green@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Nueva York Times Square ('100000 - Tokio CP') - Gerente: David Miller
-('US001001', 'David Miller', 7500000.00, 'Branch Manager', '+1 212-555-0100', 'Broadway 1550', 'david.miller@empresa.com', SHA2('empleado123', 256), 2),
-('US001002', 'Olivia Garcia', 4000000.00, 'Operations Lead', '+1 212-555-0101', '7th Ave 400', 'olivia.garcia@empresa.com', SHA2('empleado123', 256), 2),
-('US001003', 'Noah Rodriguez', 3500000.00, 'Sales Associate', '+1 212-555-0102', 'W 42nd St 200', 'noah.rodriguez@empresa.com', SHA2('empleado123', 256), 2),
-('US001004', 'Ava Martinez', 3300000.00, 'Customer Representative', '+1 212-555-0103', 'Times Square 10', 'ava.martinez@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Los Ángeles Aeropuerto ('100000 - Tokio CP') - Gerente: Sarah Williams
-('US002001', 'Sarah Williams', 7500000.00, 'Branch Manager', '+1 310-555-0200', 'LAX Century Blvd 5500', 'sarah.williams@empresa.com', SHA2('empleado123', 256), 2),
-('US002002', 'James Brown', 4000000.00, 'Fleet Coordinator', '+1 310-555-0201', 'W Imperial Hwy 900', 'james.brown@empresa.com', SHA2('empleado123', 256), 2),
-('US002003', 'Mia Davis', 3500000.00, 'Rental Agent', '+1 310-555-0202', 'Aviation Blvd 7000', 'mia.davis@empresa.com', SHA2('empleado123', 256), 2),
-('US002004', 'Benjamin Wilson', 3300000.00, 'Customer Service', '+1 310-555-0203', 'W Manchester Ave 6000', 'benjamin.wilson@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal París Aeropuerto CDG ('75008') - Gerente: Antoine Dubois
-('F002001', 'Antoine Dubois', 6500000.00, 'Gerente de Sucursal', '+33 1 48 62 10 00', 'Roissypôle, Charles de Gaulle Airport', 'gerete73@empresa.com', SHA2('gerente123', 256), 2),
-('F002002', 'Manon Leroy', 3500000.00, 'Responsable Logistique', '+33 1 48 62 10 01', 'Aéroport CDG Terminal 1', 'manon.leroy@empresa.com', SHA2('empleado123', 256), 2),
-('F002003', 'Romain Garcia', 3000000.00, 'Agent de Location', '+33 1 48 62 10 02', 'Aéroport CDG Terminal 2', 'romain.garcia@empresa.com', SHA2('empleado123', 256), 2),
-('F002004', 'Camille Martin', 2800000.00, 'Accueil Client', '+33 1 48 62 10 03', 'Aéroport CDG Terminal 3', 'camille.martin@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Tokio Shinjuku Estación ('100000') - Gerente: Kenji Sato
-('J002001', 'Kenji Sato', 7000000.00, 'Gerente de Sucursal', '+81 3-3344-1111', 'Shinjuku-ku, Nishishinjuku 1-1-4', 'gerete74@empresa.com', SHA2('gerente123', 256), 2),
-('J002002', 'Miyuki Ito', 3800000.00, 'Jefe de Operaciones', '+81 3-3344-1112', 'Shinjuku-ku, Yoyogi 2-2-1', 'miyuki.ito@empresa.com', SHA2('empleado123', 256), 2),
-('J002003', 'Taro Suzuki', 3200000.00, 'Agente de Alquiler', '+81 3-3344-1113', 'Shinjuku-ku, Takadanobaba 1-1-1', 'taro.suzuki@empresa.com', SHA2('empleado123', 256), 2),
-('J002004', 'Sakura Takahashi', 3000000.00, 'Atención al Cliente', '+81 3-3344-1114', 'Shinjuku-ku, Kabukicho 1-1-1', 'sakura.takahashi@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Berlín Mitte ('75008 - París CP') - Gerente: Anna Müller
-('DE001001', 'Anna Müller', 6000000.00, 'Gerente de Sucursal', '+49 30 2000 1000', 'Friedrichstraße 120', 'gerete75@empresa.com', SHA2('gerente123', 256), 2),
-('DE001002', 'Thomas Schmidt', 3400000.00, 'Operations Manager', '+49 30 2000 1001', 'Unter den Linden 50', 'thomas.schmidt@empresa.com', SHA2('empleado123', 256), 2),
-('DE001003', 'Laura Schneider', 2900000.00, 'Rental Agent', '+49 30 2000 1002', 'Alexanderplatz 1', 'laura.schneider@empresa.com', SHA2('empleado123', 256), 2),
-('DE001004', 'Max Fischer', 2700000.00, 'Customer Service', '+49 30 2000 1003', 'Hackescher Markt 10', 'max.fischer@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Múnich Aeropuerto ('75008 - París CP') - Gerente: Max Schmidt
-('DE002001', 'Max Schmidt', 6000000.00, 'Gerente de Sucursal', '+49 89 975 0000', 'Terminalstraße Mitte', 'gerete76@empresa.com', SHA2('gerente123', 256), 2),
-('DE002002', 'Lena Weber', 3400000.00, 'Fleet Coordinator', '+49 89 975 0001', 'München Airport Center', 'lena.weber@empresa.com', SHA2('empleado123', 256), 2),
-('DE002003', 'Julian Richter', 2900000.00, 'Rental Agent', '+49 89 975 0002', 'Terminal 2, Munich Airport', 'julian.richter@empresa.com', SHA2('empleado123', 256), 2),
-('DE002004', 'Hannah Meyer', 2700000.00, 'Customer Service', '+49 89 975 0003', 'Terminal 1, Munich Airport', 'hannah.meyer@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Lille Centro ('59000') - Gerente: Pierre Leclerc
-('F003001', 'Pierre Leclerc', 5800000.00, 'Gerente de Sucursal', '+33 3 20 12 34 56', 'Rue Nationale 100', 'gerete77@empresa.com', SHA2('gerente123', 256), 2),
-('F003002', 'Céline Thomas', 3200000.00, 'Responsable Clientèle', '+33 3 20 12 34 57', 'Rue de Béthune 50', 'celine.thomas@empresa.com', SHA2('empleado123', 256), 2),
-('F003003', 'Julien Durand', 2800000.00, 'Agent de Location', '+33 3 20 12 34 58', 'Place du Général de Gaulle', 'julien.durand@empresa.com', SHA2('empleado123', 256), 2),
-('F003004', 'Margaux Petit', 2600000.00, 'Assistant Administratif', '+33 3 20 12 34 59', 'Rue de la Grande Chaussée 20', 'margaux.petit@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Lyon Part Dieu ('69001') - Gerente: Sophie Martin
-('F004001', 'Sophie Martin', 6000000.00, 'Gerente de Sucursal', '+33 4 72 12 34 56', 'Place Charles Béraudier', 'gerete78@empresa.com', SHA2('gerente123', 256), 2),
-('F004002', 'Alexandre Bernard', 3400000.00, 'Jefe de Operaciones', '+33 4 72 12 34 57', 'Rue de la Villette 10', 'alexandre.bernard@empresa.com', SHA2('empleado123', 256), 2),
-('F004003', 'Chloé Dubois', 2900000.00, 'Agente de Alquiler', '+33 4 72 12 34 58', 'Rue du Docteur Bouchut 5', 'chloe.dubois@empresa.com', SHA2('empleado123', 256), 2),
-('F004004', 'Antoine Garcia', 2700000.00, 'Asesor Comercial', '+33 4 72 12 34 59', 'Cours de la Liberté 30', 'antoine.garcia@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Marsella Puerto ('13001') - Gerente: Marc Dubois
-('F005001', 'Marc Dubois', 5700000.00, 'Gerente de Sucursal', '+33 4 91 12 34 56', 'Quai du Port 50', 'gerete79@empresa.com', SHA2('gerente123', 256), 2),
-('F005002', 'Léa Bertrand', 3100000.00, 'Responsable Clientèle', '+33 4 91 12 34 57', 'Rue de la République 20', 'lea.bertrand@empresa.com', SHA2('empleado123', 256), 2),
-('F005003', 'Hugo Robert', 2700000.00, 'Agent de Location', '+33 4 91 12 34 58', 'Vieux-Port', 'hugo.robert@empresa.com', SHA2('empleado123', 256), 2),
-('F005004', 'Camille Leroux', 2500000.00, 'Assistant Administratif', '+33 4 91 12 34 59', 'Quai des Belges 10', 'camille.leroux@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Montpellier Centro ('34000') - Gerente: Céline Bernard
-('F006001', 'Céline Bernard', 5500000.00, 'Gerente de Sucursal', '+33 4 67 12 34 56', 'Rue de la Loge 10', 'gerete80@empresa.com', SHA2('gerente123', 256), 2),
-('F006002', 'Lucas Rousseau', 3000000.00, 'Jefe de Operaciones', '+33 4 67 12 34 57', 'Place de la Comédie 5', 'lucas.rousseau@empresa.com', SHA2('empleado123', 256), 2),
-('F006003', 'Emma Laurent', 2600000.00, 'Agente de Alquiler', '+33 4 67 12 34 58', 'Rue Foch 20', 'emma.laurent@empresa.com', SHA2('empleado123', 256), 2),
-('F006004', 'Nathan Blanc', 2400000.00, 'Atención al Cliente', '+33 4 67 12 34 59', 'Place Jean Jaurès 1', 'nathan.blanc@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Niza Promenade ('06000') - Gerente: Lucie Fournier
-('F007001', 'Lucie Fournier', 5600000.00, 'Gerente de Sucursal', '+33 4 93 12 34 56', 'Promenade des Anglais 20', 'gerete81@empresa.com', SHA2('gerente123', 256), 2),
-('F007002', 'Gabriel Simon', 3100000.00, 'Asesor Comercial', '+33 4 93 12 34 57', 'Rue de France 50', 'gabriel.simon@empresa.com', SHA2('empleado123', 256), 2),
-('F007003', 'Jeanne Dubois', 2700000.00, 'Agente de Alquiler', '+33 4 93 12 34 58', 'Avenue Jean Médecin 100', 'jeanne.dubois.niza@empresa.com', SHA2('empleado123', 256), 2),
-('F007004', 'Louis Picard', 2500000.00, 'Asistente Administrativo', '+33 4 93 12 34 59', 'Rue Masséna 15', 'louis.picard.niza@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Nantes Centre ('44000') - Gerente: Nicolas Girard
-('F008001', 'Nicolas Girard', 5400000.00, 'Gerente de Sucursal', '+33 2 40 12 34 56', 'Rue Crébillon 15', 'gerete82@empresa.com', SHA2('gerente123', 256), 2),
-('F008002', 'Léa Rousseau', 2900000.00, 'Jefe de Operaciones', '+33 2 40 12 34 57', 'Place Royale 10', 'lea.rousseau.nan@empresa.com', SHA2('empleado123', 256), 2),
-('F008003', 'Paul Durand', 2500000.00, 'Agente de Alquiler', '+33 2 40 12 34 58', 'Rue de la Fosse 50', 'paul.durand.nan@empresa.com', SHA2('empleado123', 256), 2),
-('F008004', 'Camille Moreau', 2300000.00, 'Atención al Cliente', '+33 2 40 12 34 59', 'Rue du Calvaire 20', 'camille.moreau.nan@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Toulouse Capitole ('31000') - Gerente: Marie Lefevre
-('F009001', 'Marie Lefevre', 5800000.00, 'Gerente de Sucursal', '+33 5 61 12 34 56', 'Place du Capitole', 'gerete83@empresa.com', SHA2('gerente123', 256), 2),
-('F009002', 'Clément Martin', 3200000.00, 'Asesor Comercial', '+33 5 61 12 34 57', 'Rue de la Pomme 10', 'clement.martin.toul@empresa.com', SHA2('empleado123', 256), 2),
-('F009003', 'Elisa Dubois', 2800000.00, 'Agente de Alquiler', '+33 5 61 12 34 58', 'Rue dAlsace Lorraine 50', 'elisa.dubois.toul@empresa.com', SHA2('empleado123', 256), 2),
-('F009004', 'Quentin Thomas', 2600000.00, 'Conductor', '+33 5 61 12 34 59', 'Rue du Taur 20', 'quentin.thomas.toul@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Burdeos Quai des Chartrons ('33000') - Gerente: Thomas Petit
-('F010001', 'Thomas Petit', 5700000.00, 'Gerente de Sucursal', '+33 5 56 12 34 56', 'Quai des Chartrons 80', 'gerete84@empresa.com', SHA2('gerente123', 256), 2),
-('F010002', 'Anaïs Garcia', 3100000.00, 'Jefe de Operaciones', '+33 5 56 12 34 57', 'Rue Sainte-Catherine 150', 'anais.garcia.bur@empresa.com', SHA2('empleado123', 256), 2),
-('F010003', 'Baptiste Robert', 2700000.00, 'Agente de Alquiler', '+33 5 56 12 34 58', 'Place de la Bourse', 'baptiste.robert.bur@empresa.com', SHA2('empleado123', 256), 2),
-('F010004', 'Manon Perrault', 2500000.00, 'Asistente Administrativo', '+33 5 56 12 34 59', 'Cours de lIntendance 50', 'manon.perrault.bur@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Estrasburgo Estación ('67000') - Gerente: Chloé Roussel
-('F011001', 'Chloé Roussel', 5600000.00, 'Gerente de Sucursal', '+33 3 88 12 34 56', 'Place de la Gare 10', 'gerete85@empresa.com', SHA2('gerente123', 256), 2),
-('F011002', 'Antoine Leroy', 3000000.00, 'Agente de Alquiler', '+33 3 88 12 34 57', 'Rue du Maire Kuss 5', 'antoine.leroy.estr@empresa.com', SHA2('empleado123', 256), 2),
-('F011003', 'Marion Martin', 2600000.00, 'Atención al Cliente', '+33 3 88 12 34 58', 'Rue du Vieux Marché aux Vins 30', 'marion.martin.estr@empresa.com', SHA2('empleado123', 256), 2),
-('F011004', 'Théo Bernard', 2400000.00, 'Conductor', '+33 3 88 12 34 59', 'Grand Rue 100', 'theo.bernard.estr@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Rennes Gare ('35000') - Gerente: Alexandre Dubois
-('F012001', 'Alexandre Dubois', 5400000.00, 'Gerente de Sucursal', '+33 2 99 12 34 56', 'Place de la Gare 1', 'gerete86@empresa.com', SHA2('gerente123', 256), 2),
-('F012002', 'Léa Perrault', 2900000.00, 'Jefe de Operaciones', '+33 2 99 12 34 57', 'Rue de lAlma 20', 'lea.perrault.ren@empresa.com', SHA2('empleado123', 256), 2),
-('F012003', 'Enzo Lambert', 2500000.00, 'Agente de Alquiler', '+33 2 99 12 34 58', 'Rue du Faubourg de Fougères 50', 'enzo.lambert.ren@empresa.com', SHA2('empleado123', 256), 2),
-('F012004', 'Louise Durand', 2300000.00, 'Asistente Administrativo', '+33 2 99 12 34 59', 'Avenue Janvier 30', 'louise.durand.ren@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Cali Valle del Lili ('760001') - Gerente: Sofía Ramírez
-('1707172730', 'Sofía Ramírez', 5200000.00, 'Gerente de Sucursal', '3101112234', 'Carrera 98 #25-30', 'gerete87@empresa.com', SHA2('gerente123', 256), 1),
-('1707172731', 'Juan Camilo Marín', 2700000.00, 'Asesor Comercial', '3101112235', 'Calle 26 #99-05', 'juan.marin.calivl@empresa.com', SHA2('empleado123', 256), 1),
-('1707172732', 'Andrea Carolina Mesa', 2500000.00, 'Agente de Alquiler', '3101112236', 'Carrera 97 #24-10', 'andrea.mesa.calivl@empresa.com', SHA2('empleado123', 256), 1),
-('1707172733', 'Sebastián José Giraldo', 2300000.00, 'Conductor', '3101112237', 'Calle 25 #98-20', 'sebastian.giraldo.calivl@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cali Menga Norte ('760001') - Gerente: Carlos Arturo Herrera
-('1717273740', 'Carlos Arturo Herrera', 5200000.00, 'Gerente de Sucursal', '3112223345', 'Avenida 4 Norte #60-05', 'gerete88@empresa.com', SHA2('gerente123', 256), 1),
-('1717273741', 'Laura Marcela Pinzón', 2700000.00, 'Jefe de Operaciones', '3112223346', 'Calle 61 #3N-05', 'laura.pinzon.calimenga@empresa.com', SHA2('empleado123', 256), 1),
-('1717273742', 'Juan Sebastián Restrepo', 2500000.00, 'Asesor Comercial', '3112223347', 'Avenida 3N #59-10', 'juan.restrepo.calimenga@empresa.com', SHA2('empleado123', 256), 1),
-('1717273743', 'María Camila Duque', 2300000.00, 'Agente de Alquiler', '3112223348', 'Calle 59 #4N-20', 'maria.duque.calimenga@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Manizales Centro Principal ('170001') - Gerente: María Fernanda Gutiérrez
-('1727374750', 'María Fernanda Gutiérrez', 4800000.00, 'Gerente de Sucursal', '3123334456', 'Carrera 23 #22-50', 'gerete89@empresa.com', SHA2('gerente123', 256), 1),
-('1727374751', 'Daniela Carolina Ospina', 2600000.00, 'Asesora Comercial', '3123334457', 'Calle 23 #22-05', 'daniela.ospina.manizales@empresa.com', SHA2('empleado123', 256), 1),
-('1727374752', 'Juan Camilo Marín', 2400000.00, 'Agente de Alquiler', '3123334458', 'Carrera 22 #21-10', 'juan.marin.manizales@empresa.com', SHA2('empleado123', 256), 1),
-('1727374753', 'Laura Sofía Quintero', 2200000.00, 'Asistente Administrativa', '3123334459', 'Calle 22 #24-20', 'laura.quintero.manizales@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Manizales Cable Plaza ('170001') - Gerente: Andrés Felipe Cardona
-('1737475760', 'Andrés Felipe Cardona', 4800000.00, 'Gerente de Sucursal', '3134445567', 'Avenida Santander #65-10', 'gerete90@empresa.com', SHA2('gerente123', 256), 1),
-('1737475761', 'Sofía Andrea Ríos', 2600000.00, 'Jefe de Operaciones', '3134445568', 'Calle 65 #23-05', 'sofia.rios.manizalescp@empresa.com', SHA2('empleado123', 256), 1),
-('1737475762', 'Sebastián José Vargas', 2400000.00, 'Asesor Comercial', '3134445569', 'Avenida Santander #64-10', 'sebastian.vargas.manizalescp@empresa.com', SHA2('empleado123', 256), 1),
-('1737475763', 'María Camila López', 2200000.00, 'Agente de Alquiler', '3134445570', 'Calle 64 #24-20', 'maria.lopez.manizalescp@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cali Valle del Lili ('760001') - Gerente: Sofía Ramírez (Empleados adicionales para cumplir los 320)
-('1747576770', 'Daniela Marín', 2500000.00, 'Agente de Alquiler', '3101112238', 'Carrera 98 #25-31', 'daniela.marin.calivl@empresa.com', SHA2('empleado123', 256), 1),
-('1747576771', 'Carlos Quintero', 2300000.00, 'Conductor', '3101112239', 'Calle 26 #99-06', 'carlos.quintero.calivl@empresa.com', SHA2('empleado123', 256), 1),
-('1747576772', 'Laura Vásquez', 2200000.00, 'Asistente', '3101112240', 'Carrera 97 #24-11', 'laura.vasquez.calivl@empresa.com', SHA2('empleado123', 256), 1),
-('1747576773', 'Juan Restrepo', 2100000.00, 'Auxiliar de Flota', '3101112241', 'Calle 25 #98-21', 'juan.restrepo.calivl@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Cali Menga Norte ('760001') - Gerente: Carlos Arturo Herrera (Empleados adicionales)
-('1757677780', 'Andrea Gómez', 2500000.00, 'Agente de Alquiler', '3112223349', 'Avenida 4 Norte #60-06', 'andrea.gomez.calimenga@empresa.com', SHA2('empleado123', 256), 1),
-('1757677781', 'Sebastián López', 2300000.00, 'Conductor', '3112223350', 'Calle 61 #3N-06', 'sebastian.lopez.calimenga@empresa.com', SHA2('empleado123', 256), 1),
-('1757677782', 'Valeria Torres', 2200000.00, 'Asistente', '3112223351', 'Avenida 3N #59-11', 'valeria.torres.calimenga@empresa.com', SHA2('empleado123', 256), 1),
-('1757677783', 'Daniel Marín', 2100000.00, 'Auxiliar de Flota', '3112223352', 'Calle 59 #4N-21', 'daniel.marin.calimenga@empresa.com', SHA2('empleado123', 256), 1),
--- Manizales Centro Principal ('170001') - Gerente: María Fernanda Gutiérrez (Empleados adicionales)
-('1767778790', 'Julián Quintero', 2400000.00, 'Agente de Alquiler', '3123334460', 'Carrera 23 #22-51', 'julian.quintero.manizales@empresa.com', SHA2('empleado123', 256), 1),
-('1767778791', 'Sofía Valencia', 2200000.00, 'Conductor', '3123334461', 'Calle 23 #22-06', 'sofia.valencia.manizales@empresa.com', SHA2('empleado123', 256), 1),
-('1767778792', 'Carlos Zapata', 2100000.00, 'Asistente', '3123334462', 'Carrera 22 #21-11', 'carlos.zapata.manizales@empresa.com', SHA2('empleado123', 256), 1),
-('1767778793', 'Mariana Ospina', 2000000.00, 'Auxiliar de Flota', '3123334463', 'Calle 22 #24-21', 'mariana.ospina.manizales@empresa.com', SHA2('empleado123', 256), 1),
--- Manizales Cable Plaza ('170001') - Gerente: Andrés Felipe Cardona (Empleados adicionales)
-('1777879800', 'Laura Ríos', 2400000.00, 'Agente de Alquiler', '3134445571', 'Avenida Santander #65-11', 'laura.rios.manizalescp@empresa.com', SHA2('empleado123', 256), 1),
-('1777879801', 'Juan Martínez', 2200000.00, 'Conductor', '3134445572', 'Calle 65 #23-06', 'juan.martinez.manizalescp@empresa.com', SHA2('empleado123', 256), 1),
-('1777879802', 'Andrea Restrepo', 2100000.00, 'Asistente', '3134445573', 'Avenida Santander #64-11', 'andrea.restrepo.manizalescp@empresa.com', SHA2('empleado123', 256), 1),
-('1777879803', 'Felipe Mesa', 2000000.00, 'Auxiliar de Flota', '3134445574', 'Calle 64 #24-21', 'felipe.mesa.manizalescp@empresa.com', SHA2('empleado123', 256), 1),
--- Sucursal Londres Central ('75008') - Empleados adicionales
-('UK001005', 'George White', 3000000.00, 'Fleet Assistant', '+44 20 7123 4571', 'Oxford Street 201', 'george.white@empresa.com', SHA2('empleado123', 256), 2),
-('UK001006', 'Amelia Harris', 2800000.00, 'Receptionist', '+44 20 7123 4572', 'Regent Street 151', 'amelia.harris@empresa.com', SHA2('empleado123', 256), 2),
-('UK001007', 'Harry Clark', 2600000.00, 'Driver', '+44 20 7123 4573', 'Piccadilly Circus', 'harry.clark@empresa.com', SHA2('empleado123', 256), 2),
-('UK001008', 'Ella Lewis', 2400000.00, 'Admin Assistant', '+44 20 7123 4574', 'Covent Garden Market', 'ella.lewis@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Londres Heathrow ('75008') - Empleados adicionales
-('UK002005', 'Charlie Hall', 3000000.00, 'Vehicle Inspector', '+44 20 8780 1238', 'Heathrow Airport, Terminal 5', 'charlie.hall@empresa.com', SHA2('empleado123', 256), 2),
-('UK002006', 'Grace King', 2800000.00, 'Customer Advisor', '+44 20 8780 1239', 'Heathrow Airport, Terminal 2', 'grace.king@empresa.com', SHA2('empleado123', 256), 2),
-('UK002007', 'Oscar Wright', 2600000.00, 'Logistics Assistant', '+44 20 8780 1240', 'Heathrow Airport, Terminal 4', 'oscar.wright@empresa.com', SHA2('empleado123', 256), 2),
-('UK002008', 'Freya Scott', 2400000.00, 'Shuttle Driver', '+44 20 8780 1241', 'Heathrow Airport, Central', 'freya.scott@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Nueva York Times Square ('100000') - Empleados adicionales
-('US001005', 'Ethan Young', 3500000.00, 'Fleet Specialist', '+1 212-555-0104', 'Broadway 1551', 'ethan.young@empresa.com', SHA2('empleado123', 256), 2),
-('US001006', 'Sophia Hernandez', 3300000.00, 'Sales Representative', '+1 212-555-0105', '7th Ave 401', 'sophia.hernandez@empresa.com', SHA2('empleado123', 256), 2),
-('US001007', 'Mason Lopez', 3100000.00, 'Driver', '+1 212-555-0106', 'W 42nd St 201', 'mason.lopez@empresa.com', SHA2('empleado123', 256), 2),
-('US001008', 'Emma Perez', 2900000.00, 'Admin Assistant', '+1 212-555-0107', 'Times Square 11', 'emma.perez@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Los Ángeles Aeropuerto ('100000') - Empleados adicionales
-('US002005', 'Logan Hall', 3500000.00, 'Vehicle Prep', '+1 310-555-0204', 'LAX Century Blvd 5501', 'logan.hall@empresa.com', SHA2('empleado123', 256), 2),
-('US002006', 'Chloe King', 3300000.00, 'Customer Service Lead', '+1 310-555-0205', 'W Imperial Hwy 901', 'chloe.king@empresa.com', SHA2('empleado123', 256), 2),
-('US002007', 'Aiden Wright', 3100000.00, 'Shuttle Operator', '+1 310-555-0206', 'Aviation Blvd 7001', 'aiden.wright@empresa.com', SHA2('empleado123', 256), 2),
-('US002008', 'Zoe Scott', 2900000.00, 'Office Assistant', '+1 310-555-0207', 'W Manchester Ave 6001', 'zoe.scott@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal París Aeropuerto CDG ('75008') - Empleados adicionales
-('F002005', 'Mathieu Dubois', 3000000.00, 'Agent de Préparation', '+33 1 48 62 10 04', 'Aéroport CDG Terminal 1', 'mathieu.dubois.cdg@empresa.com', SHA2('empleado123', 256), 2),
-('F002006', 'Clara Lefebvre', 2800000.00, 'Conseillère Clientèle', '+33 1 48 62 10 05', 'Aéroport CDG Terminal 2', 'clara.lefebvre.cdg@empresa.com', SHA2('empleado123', 256), 2),
-('F002007', 'Jules Martin', 2600000.00, 'Chauffeur', '+33 1 48 62 10 06', 'Aéroport CDG Terminal 3', 'jules.martin.cdg@empresa.com', SHA2('empleado123', 256), 2),
-('F002008', 'Alice Garcia', 2400000.00, 'Assistante Administrative', '+33 1 48 62 10 07', 'Roissypôle, Charles de Gaulle Airport', 'alice.garcia.cdg@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Tokio Shinjuku Estación ('100000') - Empleados adicionales
-('J002005', 'Ryo Tanaka', 3200000.00, 'Gestor de Flota', '+81 3-3344-1115', 'Shinjuku-ku, Nishishinjuku 1-1-5', 'ryo.tanaka@empresa.com', SHA2('empleado123', 256), 2),
-('J002006', 'Nana Yamamoto', 3000000.00, 'Asesora de Ventas', '+81 3-3344-1116', 'Shinjuku-ku, Yoyogi 2-2-2', 'nana.yamamoto@empresa.com', SHA2('empleado123', 256), 2),
-('J002007', 'Kaito Suzuki', 2800000.00, 'Conductor', '+81 3-3344-1117', 'Shinjuku-ku, Takadanobaba 1-1-2', 'kaito.suzuki@empresa.com', SHA2('empleado123', 256), 2),
-('J002008', 'Haruna Kobayashi', 2600000.00, 'Asistente de Oficina', '+81 3-3344-1118', 'Shinjuku-ku, Kabukicho 1-1-2', 'haruna.kobayashi@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Berlín Mitte ('75008') - Empleados adicionales
-('DE001005', 'Mia Bauer', 2900000.00, 'Fahrzeugaufbereitung', '+49 30 2000 1004', 'Friedrichstraße 121', 'mia.bauer@empresa.com', SHA2('empleado123', 256), 2),
-('DE001006', 'Leon Schulz', 2700000.00, 'Kundenberater', '+49 30 2000 1005', 'Unter den Linden 51', 'leon.schulz@empresa.com', SHA2('empleado123', 256), 2),
-('DE001007', 'Sophie Koch', 2500000.00, 'Fahrer', '+49 30 2000 1006', 'Alexanderplatz 2', 'sophie.koch@empresa.com', SHA2('empleado123', 256), 2),
-('DE001008', 'Jonas Müller', 2300000.00, 'Büroassistent', '+49 30 2000 1007', 'Hackescher Markt 11', 'jonas.mueller@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Múnich Aeropuerto ('75008') - Empleados adicionales
-('DE002005', 'Emil Hoffmann', 2900000.00, 'Flottenbetreuer', '+49 89 975 0004', 'Terminalstraße Mitte', 'emil.hoffmann@empresa.com', SHA2('empleado123', 256), 2),
-('DE002006', 'Luisa Klein', 2700000.00, 'Kundenberaterin', '+49 89 975 0005', 'München Airport Center', 'luisa.klein@empresa.com', SHA2('empleado123', 256), 2),
-('DE002007', 'Felix Wolf', 2500000.00, 'Shuttlefahrer', '+49 89 975 0006', 'Terminal 2, Munich Airport', 'felix.wolf@empresa.com', SHA2('empleado123', 256), 2),
-('DE002008', 'Lina Schneider', 2300000.00, 'Buroassistentin', '+49 89 975 0007', 'Terminal 1, Munich Airport', 'lina.schneider@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Lille Centro ('59000') - Empleados adicionales
-('F003005', 'Lucas Dupont', 2800000.00, 'Agent Commercial', '+33 3 20 12 34 60', 'Rue Nationale 101', 'lucas.dupont.lille@empresa.com', SHA2('empleado123', 256), 2),
-('F003006', 'Clara Lefevre', 2600000.00, 'Agent dAccueil', '+33 3 20 12 34 61', 'Rue de Béthune 51', 'clara.lefevre.lille@empresa.com', SHA2('empleado123', 256), 2),
-('F003007', 'Enzo Rousseau', 2400000.00, 'Chauffeur', '+33 3 20 12 34 62', 'Place du Général de Gaulle', 'enzo.rousseau.lille@empresa.com', SHA2('empleado123', 256), 2),
-('F003008', 'Léa Martin', 2200000.00, 'Assistent Administratif', '+33 3 20 12 34 63', 'Rue de la Grande Chaussée 21', 'lea.martin.lille@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Lyon Part Dieu ('69001') - Empleados adicionales
-('F004005', 'Arthur Thomas', 3100000.00, 'Gestionnaire de Flotte', '+33 4 72 12 34 60', 'Place Charles Béraudier', 'arthur.thomas.lyon@empresa.com', SHA2('empleado123', 256), 2),
-('F004006', 'Louise Durand', 2800000.00, 'Conseillère Clientèle', '+33 4 72 12 34 61', 'Rue de la Villette 11', 'louise.durand.lyon@empresa.com', SHA2('empleado123', 256), 2),
-('F004007', 'Jules Robert', 2600000.00, 'Préparateur Véhicules', '+33 4 72 12 34 62', 'Rue du Docteur Bouchut 6', 'jules.robert.lyon@empresa.com', SHA2('empleado123', 256), 2),
-('F004008', 'Eva Leclerc', 2400000.00, 'Standardiste', '+33 4 72 12 34 63', 'Cours de la Liberté 31', 'eva.leclerc.lyon@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Marsella Puerto ('13001') - Empleados adicionales
-('F005005', 'Tom Bernard', 2700000.00, 'Agent de Flotte', '+33 4 91 12 34 60', 'Quai du Port 51', 'tom.bernard.mar@empresa.com', SHA2('empleado123', 256), 2),
-('F005006', 'Lily Garcia', 2500000.00, 'Accueil Clientèle', '+33 4 91 12 34 61', 'Rue de la République 21', 'lily.garcia.mar@empresa.com', SHA2('empleado123', 256), 2),
-('F005007', 'Leo Martin', 2300000.00, 'Chauffeur', '+33 4 91 12 34 62', 'Vieux-Port', 'leo.martin.mar@empresa.com', SHA2('empleado123', 256), 2),
-('F005008', 'Chloé Thomas', 2100000.00, 'Assistant Office', '+33 4 91 12 34 63', 'Quai des Belges 11', 'chloe.thomas.mar@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Montpellier Centro ('34000') - Empleados adicionales
-('F006005', 'Paul Simon', 2800000.00, 'Agent de Vente', '+33 4 67 12 34 60', 'Place de la Comédie 6', 'paul.simon.mont@empresa.com', SHA2('empleado123', 256), 2),
-('F006006', 'Alice David', 2600000.00, 'Agent dAccueil', '+33 4 67 12 34 61', 'Rue Foch 21', 'alice.david.mont@empresa.com', SHA2('empleado123', 256), 2),
-('F006007', 'Romain Moreau', 2400000.00, 'Logistique', '+33 4 67 12 34 62', 'Place Jean Jaurès 2', 'romain.moreau.mont@empresa.com', SHA2('empleado123', 256), 2),
-('F006008', 'Margot Laurent', 2200000.00, 'Assistante Administrative', '+33 4 67 12 34 63', 'Rue de la Loge 11', 'margot.laurent.mont@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Niza Promenade ('06000') - Empleados adicionales
-('F007005', 'Louis Dubois', 2900000.00, 'Agent de Location', '+33 4 93 12 34 60', 'Promenade des Anglais 21', 'louis.dubois.niza@empresa.com', SHA2('empleado123', 256), 2),
-('F007006', 'Marie Richard', 2700000.00, 'Conseillère Clientèle', '+33 4 93 12 34 61', 'Rue de France 51', 'marie.richard.niza@empresa.com', SHA2('empleado123', 256), 2),
-('F007007', 'Jules Thomas', 2500000.00, 'Chauffeur', '+33 4 93 12 34 62', 'Avenue Jean Médecin 101', 'jules.thomas.niza@empresa.com', SHA2('empleado123', 256), 2),
-('F007008', 'Chloé Petit', 2300000.00, 'Agent de Réservation', '+33 4 93 12 34 63', 'Rue Masséna 16', 'chloe.petit.niza@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Nantes Centre ('44000') - Empleados adicionales
-('F008005', 'Gabriel Leroy', 2800000.00, 'Gestionnaire de Parc', '+33 2 40 12 34 60', 'Rue Crébillon 16', 'gabriel.leroy.nan@empresa.com', SHA2('empleado123', 256), 2),
-('F008006', 'Laura Simon', 2600000.00, 'Agent de Vente', '+33 2 40 12 34 61', 'Place Royale 11', 'laura.simon.nan@empresa.com', SHA2('empleado123', 256), 2),
-('F008007', 'Arthur Martin', 2400000.00, 'Agent de Nettoyage', '+33 2 40 12 34 62', 'Rue de la Fosse 51', 'arthur.martin.nan@empresa.com', SHA2('empleado123', 256), 2),
-('F008008', 'Océane Rousseau', 2200000.00, 'Service Client', '+33 2 40 12 34 63', 'Rue du Calvaire 21', 'oceane.rousseau.nan@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Toulouse Capitole ('31000') - Empleados adicionales
-('F009005', 'Lucas Thomas', 3100000.00, 'Chargé de Clientèle', '+33 5 61 12 34 60', 'Place du Capitole', 'lucas.thomas.toul@empresa.com', SHA2('empleado123', 256), 2),
-('F009006', 'Clara Garcia', 2800000.00, 'Agent de Location', '+33 5 61 12 34 61', 'Rue de la Pomme 11', 'clara.garcia.toul@empresa.com', SHA2('empleado123', 256), 2),
-('F009007', 'Victor Petit', 2600000.00, 'Chauffeur', '+33 5 61 12 34 62', 'Rue dAlsace Lorraine 51', 'victor.petit.toul@empresa.com', SHA2('empleado123', 256), 2),
-('F009008', 'Inès Robert', 2400000.00, 'Assistante Administrative', '+33 5 61 12 34 63', 'Rue du Taur 21', 'ines.robert.toul@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Burdeos Quai des Chartrons ('33000') - Empleados adicionales
-('F010005', 'Théo Martin', 3000000.00, 'Responsable Flotte', '+33 5 56 12 34 60', 'Quai des Chartrons 81', 'theo.martin.bur@empresa.com', SHA2('empleado123', 256), 2),
-('F010006', 'Juliette Bernard', 2700000.00, 'Conseillère Clientèle', '+33 5 56 12 34 61', 'Rue Sainte-Catherine 151', 'juliette.bernard.bur@empresa.com', SHA2('empleado123', 256), 2),
-('F010007', 'Pauline Dubois', 2500000.00, 'Agente de Accueil', '+33 5 56 12 34 62', 'Place de la Bourse', 'pauline.dubois.bur@empresa.com', SHA2('empleado123', 256), 2),
-('F010008', 'Lucas Moreau', 2300000.00, 'Agent de Stationnement', '+33 5 56 12 34 63', 'Cours de lIntendance 51', 'lucas.moreau.bur@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Estrasburgo Estación ('67000') - Empleados adicionales
-('F011005', 'Gabriel Leroy', 2800000.00, 'Gestionnaire de Véhicules', '+33 3 88 12 34 60', 'Place de la Gare 11', 'gabriel.leroy.estr@empresa.com', SHA2('empleado123', 256), 2),
-('F011006', 'Emma Thomas', 2600000.00, 'Agent de Location', '+33 3 88 12 34 61', 'Rue du Maire Kuss 6', 'emma.thomas.estr@empresa.com', SHA2('empleado123', 256), 2),
-('F011007', 'Louis Durand', 2400000.00, 'Préparateur', '+33 3 88 12 34 62', 'Rue du Vieux Marché aux Vins 31', 'louis.durand.estr@empresa.com', SHA2('empleado123', 256), 2),
-('F011008', 'Chloé Martin', 2200000.00, 'Standardiste', '+33 3 88 12 34 63', 'Grand Rue 101', 'chloe.martin.estr@empresa.com', SHA2('empleado123', 256), 2),
--- Sucursal Rennes Gare ('35000') - Empleados adicionales
-('F012005', 'Arthur Bernard', 2700000.00, 'Responsable Flotte', '+33 2 99 12 34 60', 'Place de la Gare 2', 'arthur.bernard.ren@empresa.com', SHA2('empleado123', 256), 2),
-('F012006', 'Manon Dupont', 2500000.00, 'Agent de Location', '+33 2 99 12 34 61', 'Rue de lAlma 21', 'manon.dupont.ren@empresa.com', SHA2('empleado123', 256), 2),
-('F012007', 'Paul Garcia', 2300000.00, 'Chauffeur', '+33 2 99 12 34 62', 'Rue du Faubourg de Fougères 51', 'paul.garcia.ren@empresa.com', SHA2('empleado123', 256), 2),
-('F012008', 'Charlotte Robert', 2100000.00, 'Accueil Client', '+33 2 99 12 34 63', 'Avenue Janvier 31', 'charlotte.robert.ren@empresa.com', SHA2('empleado123', 256), 2);
 
+INSERT INTO Empleado (documento, nombre, salario, cargo, telefono, direccion, correo, contrasena, id_tipo_empleado, id_tipo_documento) VALUES
+('1', 'Administrador', NULL, 'Administrador', NULL, NULL, 'admin@bdd.com', SHA2('admin123', 256), 1,1),
+-- Sucursal Bogotá Norte ('110111') - Gerente: María Gómez
+('1020304050', 'María Gómez', 5500000.00, 'Gerente de Sucursal', '3101234567', 'Carrera 7 #123-45', 'gerente1@empresa.com', SHA2('gerente123', 256),2, 1),
+('1020304051', 'Laura Méndez', 2800000.00, 'Asesora comercial', '3101234568', 'Calle 125 #15-30', 'laura.mendez.bog@empresa.com', SHA2('empleado123', 256),3, 1),
+('1020304052', 'Carlos Zapata', 2500000.00, 'Agente de Alquiler', '3101234569', 'Carrera 7 #120-10', 'carlos.zapata@empresa.com', SHA2('empleado123', 256),3, 1),
+('1020304053', 'Sofía Vargas', 2300000.00, 'Asistente Administrativa', '3101234570', 'Carrera 9 #127-50', 'sofia.vargas@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Bogotá Sur ('110111') - Gerente: Juan Rodríguez
+('1030405060', 'Juan Rodríguez', 5500000.00, 'Gerente de Sucursal', '3117654321', 'Avenida Caracas #56-78', 'gerente2@empresa.com', SHA2('gerente123', 256),2, 1),
+('1030405061', 'Paola Herrera', 2900000.00, 'Jefe de Operaciones', '3117654322', 'Carrera 24 #50-10 Sur', 'paola.herrera@empresa.com', SHA2('empleado123', 256),3, 1),
+('1030405062', 'Luis Giraldo', 2600000.00, 'Asesor Comercial', '3117654323', 'Calle 45 Sur #20-05', 'luis.giraldo@empresa.com', SHA2('empleado123', 256),3, 1),
+('1030405063', 'Camila Soto', 2400000.00, 'Atención al Cliente', '3117654324', 'Diagonal 42 Sur #1-80', 'camila.soto@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Cali Centro ('760001') - Gerente: Diana Martínez
+('1040506070', 'Diana Martínez', 5200000.00, 'Gerente de Sucursal', '3123456789', 'Calle 5 #30-21', 'gerente3@empresa.com', SHA2('gerente123', 256),2, 1),
+('1040506071', 'Felipe Castro', 2700000.00, 'Agente de Alquiler', '3123456790', 'Carrera 4 #10-15', 'felipe.castro@empresa.com', SHA2('empleado123', 256),3, 1),
+('1040506072', 'Andrea Rojas', 2500000.00, 'Asesora Comercial', '3123456791', 'Calle 10 #12-34', 'andrea.rojas@empresa.com', SHA2('empleado123', 256),3, 1),
+('1040506073', 'Ricardo Vélez', 2200000.00, 'Conductor Designado', '3123456792', 'Calle 2 #6-05', 'ricardo.velez@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Villavicencio Principal ('500001') - Gerente: Carlos Ramírez
+('1050607080', 'Carlos Ramírez', 4800000.00, 'Gerente de Sucursal', '3134567890', 'Calle 40 #25-50', 'gerente4@empresa.com', SHA2('gerente123', 256),2, 1),
+('1050607081', 'Mónica Durán', 2600000.00, 'Jefe de Logística', '3134567891', 'Carrera 23 #38-10', 'monica.duran@empresa.com', SHA2('empleado123', 256),3, 1),
+('1050607082', 'Julián Niño', 2400000.00, 'Asesor Comercial', '3134567892', 'Calle 38 #26-05', 'julian.nino@empresa.com', SHA2('empleado123', 256),3, 1),
+('1050607083', 'Daniela Ríos', 2200000.00, 'Agente de Alquiler', '3134567893', 'Carrera 24 #42-15', 'daniela.rios@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal París Central ('75008') - Gerente: Jean Dupont
+('F001001', 'Jean Dupont', 6500000.00, 'Gerente de Sucursal', '+33 1 42 68 53 00', 'Rue de Rivoli 45', 'gerente5@empresa.com', SHA2('gerente123', 256),2, 2),
+('F001002', 'Claire Dubois', 3500000.00, 'Responsable Clientèle', '+33 1 42 68 53 01', 'Rue Saint-Honoré 20', 'claire.dubois@empresa.com', SHA2('empleado123', 256),3, 2),
+('F001003', 'Pierre Leclerc', 3000000.00, 'Agent de Location', '+33 1 42 68 53 02', 'Rue de la Paix 10', 'pierre.leclerc@empresa.com', SHA2('empleado123', 256),3, 2),
+('F001004', 'Sophie Moreau', 2800000.00, 'Assistant Administratif', '+33 1 42 68 53 03', 'Rue de Castiglione 5', 'sophie.moreau@empresa.com', SHA2('empleado123', 256),3, 2),
+-- Sucursal Tokio Oeste ('100000') - Gerente: Yuki Tanaka
+('J001001', 'Yuki Tanaka', 7000000.00, 'Gerente de Sucursal', '+81 3-3354-5555', 'Shinjuku 3-30-13', 'gerente6@empresa.com', SHA2('gerente123', 256),2, 2),
+('J001002', 'Hiroshi Sato', 3800000.00, 'Jefe de Operaciones', '+81 3-3354-5556', 'Shinjuku 2-2-2', 'hiroshi.sato@empresa.com', SHA2('empleado123', 256),3, 2),
+('J001003', 'Akari Nakamura', 3200000.00, 'Asesora Comercial', '+81 3-3354-5557', 'Shinjuku 1-1-1', 'akari.nakamura@empresa.com', SHA2('empleado123', 256),3, 2),
+('J001004', 'Kenji Yamamoto', 3000000.00, 'Agente de Alquiler', '+81 3-3354-5558', 'Shinjuku 4-4-4', 'kenji.yamamoto@empresa.com', SHA2('empleado123', 256),3, 2),
+-- Sucursal Medellín El Poblado ('050001') - Gerente: Sofia Rojas
+('1060708090', 'Sofia Rojas', 5300000.00, 'Gerente de Sucursal', '3001112233', 'Carrera 43A #7 Sur-170', 'gerente7@empresa.com', SHA2('gerente123', 256),2, 1),
+('1060708091', 'Miguel Ángel Castro', 2700000.00, 'Asesor Comercial', '3001112234', 'Calle 10 #43B-50', 'miguel.castro@empresa.com', SHA2('empleado123', 256),3, 1),
+('1060708092', 'Isabella Morales', 2500000.00, 'Agente de Alquiler', '3001112235', 'Transversal Inferior #20-10', 'isabella.morales@empresa.com', SHA2('empleado123', 256),3, 1),
+('1060708093', 'Sebastián Restrepo', 2300000.00, 'Conductor', '3001112236', 'Carrera 40 #5-20 Sur', 'sebastian.restrepo@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Barranquilla Norte ('080001') - Gerente: Andrés Felipe Castro
+('1070809100', 'Andrés Felipe Castro', 5000000.00, 'Gerente de Sucursal', '3152223344', 'Calle 93 #49-100', 'gerente8@empresa.com', SHA2('gerente123', 256),2, 1),
+('1070809101', 'Valeria Martínez', 2800000.00, 'Jefe de Operaciones', '3152223345', 'Carrera 51B #90-10', 'valeria.martinez@empresa.com', SHA2('empleado123', 256),3, 1),
+('1070809102', 'Julián Gómez', 2600000.00, 'Asesor Comercial', '3152223346', 'Calle 84 #47-50', 'julian.gomez@empresa.com', SHA2('empleado123', 256),3, 1),
+('1070809103', 'Carolina Herrera', 2400000.00, 'Asistente Administrativa', '3152223347', 'Carrera 46 #80-150', 'carolina.herrera@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Cartagena Bocagrande ('130001') - Gerente: Laura Herrera
+('1080910110', 'Laura Herrera', 5100000.00, 'Gerente de Sucursal', '3203334455', 'Avenida San Martín #8-150', 'gerente9@empresa.com', SHA2('gerente123', 256),2, 1),
+('1080910111', 'Gabriel Soto', 2700000.00, 'Agente de Alquiler', '3203334456', 'Carrera 3 #7-20', 'gabriel.soto@empresa.com', SHA2('empleado123', 256),3, 1),
+('1080910112', 'Mónica Pardo', 2500000.00, 'Atención al Cliente', '3203334457', 'Calle 5 #9-10', 'monica.pardo@empresa.com', SHA2('empleado123', 256),3, 1),
+('1080910113', 'Diego Morales', 2300000.00, 'Conductor', '3203334458', 'Avenida San Martín #10-80', 'diego.morales@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Bucaramanga Cabecera ('680001') - Gerente: Daniel Salazar
+('1091011120', 'Daniel Salazar', 4900000.00, 'Gerente de Sucursal', '3014445566', 'Carrera 35A #48-50', 'gerente10@empresa.com', SHA2('gerente123', 256),2, 1),
+('1091011121', 'Paula Restrepo', 2600000.00, 'Asesora Comercial', '3014445567', 'Calle 48 #34-20', 'paula.restrepo@empresa.com', SHA2('empleado123', 256),3, 1),
+('1091011122', 'Juan Camilo Pérez', 2400000.00, 'Agente de Alquiler', '3014445568', 'Carrera 33 #47-10', 'juan.perez@empresa.com', SHA2('empleado123', 256),3, 1),
+('1091011123', 'Laura Daniela Vera', 2200000.00, 'Asistente Administrativa', '3014445569', 'Calle 52 #35-05', 'laura.vera@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Santa Marta Rodadero ('470001') - Gerente: Valentina Ruiz
+('1101112130', 'Valentina Ruiz', 4700000.00, 'Gerente de Sucursal', '3185556677', 'Carrera 4 #11-50', 'gerente11@empresa.com', SHA2('gerente123', 256),2, 1),
+('1101112131', 'Sebastián Torres', 2500000.00, 'Agente de Alquiler', '3185556678', 'Avenida del Libertador #12-30', 'sebastian.torres@empresa.com', SHA2('empleado123', 256),3, 1),
+('1101112132', 'Natalia Giraldo', 2300000.00, 'Atención al Cliente', '3185556679', 'Calle 22 #1-05', 'natalia.giraldo@empresa.com', SHA2('empleado123', 256),3, 1),
+('1101112133', 'Andrés Felipe Sierra', 2100000.00, 'Conductor', '3185556680', 'Carrera 1 #22-50', 'andres.sierra@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Pereira Centro ('660001') - Gerente: Esteban Ortiz
+('1111213140', 'Esteban Ortiz', 4800000.00, 'Gerente de Sucursal', '3006667788', 'Avenida 30 de Agosto #75-10', 'gerente12@empresa.com', SHA2('gerente123', 256),2, 1),
+('1111213141', 'Daniela Méndez', 2600000.00, 'Asesora Comercial', '3006667789', 'Carrera 7 #20-15', 'daniela.mendez.per@empresa.com', SHA2('empleado123', 256),3, 1),
+('1111213142', 'Javier Castaño', 2400000.00, 'Agente de Alquiler', '3006667790', 'Calle 19 #9-05', 'javier.castano@empresa.com', SHA2('empleado123', 256),3, 1),
+('1111213143', 'Sofía Ospina', 2200000.00, 'Asistente Administrativa', '3006667791', 'Avenida Circunvalar #12-30', 'sofia.ospina@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Armenia Principal ('630001') - Gerente: Camila Jiménez
+('1121314150', 'Camila Jiménez', 4700000.00, 'Gerente de Sucursal', '3107778899', 'Carrera 19 #28-40', 'gerente13@empresa.com', SHA2('gerente123', 256),2, 1),
+('1121314151', 'Felipe Ríos', 2500000.00, 'Jefe de Operaciones', '3107778900', 'Calle 21 #18-10', 'felipe.rios@empresa.com', SHA2('empleado123', 256),3, 1),
+('1121314152', 'Andrea Cárdenas', 2300000.00, 'Asesora Comercial', '3107778901', 'Carrera 14 #20-50', 'andrea.cardenas@empresa.com', SHA2('empleado123', 256),3, 1),
+('1121314153', 'Luis Fernando Duque', 2100000.00, 'Agente de Alquiler', '3107778902', 'Calle 20 #22-05', 'luis.duque@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Neiva Centro ('410001') - Gerente: Ricardo Morales
+('1131415160', 'Ricardo Morales', 4600000.00, 'Gerente de Sucursal', '3118889900', 'Carrera 5 #11-20', 'gerente14@empresa.com', SHA2('gerente123', 256),2, 1),
+('1131415161', 'Paola Andrea Vargas', 2400000.00, 'Agente de Alquiler', '3118889901', 'Calle 10 #6-05', 'paola.vargas@empresa.com', SHA2('empleado123', 256),3, 1),
+('1131415162', 'Juan Sebastián Díaz', 2200000.00, 'Atención al Cliente', '3118889902', 'Carrera 7 #12-30', 'juan.diaz@empresa.com', SHA2('empleado123', 256),3, 1),
+('1131415163', 'Camila Alejandra López', 2000000.00, 'Asistente Administrativa', '3118889903', 'Calle 13 #8-10', 'camila.lopez@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Pasto Mijitayo ('520001') - Gerente: Sara Giraldo
+('1141516170', 'Sara Giraldo', 4500000.00, 'Gerente de Sucursal', '3049990011', 'Calle 18 #25-30', 'gerente15@empresa.com', SHA2('gerente123', 256),2, 1),
+('1141516171', 'Esteban Ospina', 2300000.00, 'Asesor Comercial', '3049990012', 'Carrera 27 #17-10', 'esteban.ospina@empresa.com', SHA2('empleado123', 256),3, 1),
+('1141516172', 'Laura Melissa Botero', 2100000.00, 'Agente de Alquiler', '3049990013', 'Calle 16 #22-05', 'laura.botero@empresa.com', SHA2('empleado123', 256),3, 1),
+('1141516173', 'Carlos Eduardo Rojas', 1900000.00, 'Conductor', '3049990014', 'Carrera 25 #19-30', 'carlos.rojas@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Valledupar Guatapurí ('200001') - Gerente: Javier Peña
+('1151617180', 'Javier Peña', 4600000.00, 'Gerente de Sucursal', '3120001122', 'Carrera 9 #16-80', 'gerente16@empresa.com', SHA2('gerente123', 256),2, 1),
+('1151617181', 'Ana María Castro', 2400000.00, 'Agente de Alquiler', '3120001123', 'Calle 15 #10-10', 'ana.castro.valle@empresa.com', SHA2('empleado123', 256),3, 1),
+('1151617182', 'Ricardo Andrés Sánchez', 2200000.00, 'Atención al Cliente', '3120001124', 'Carrera 12 #18-20', 'ricardo.sanchez@empresa.com', SHA2('empleado123', 256),3, 1),
+('1151617183', 'Daniela Carolina Blanco', 2000000.00, 'Asistente Administrativa', '3120001125', 'Calle 16 #10-50', 'daniela.blanco@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Montería Centro ('230001') - Gerente: Lina Fernanda Daza
+('1161718190', 'Lina Fernanda Daza', 4700000.00, 'Gerente de Sucursal', '3131112233', 'Carrera 6 #60-35', 'gerente17@empresa.com', SHA2('gerente123', 256),2, 1),
+('1161718191', 'Sebastián Pineda', 2500000.00, 'Jefe de Operaciones', '3131112234', 'Calle 62 #5-15', 'sebastian.pineda@empresa.com', SHA2('empleado123', 256),3, 1),
+('1161718192', 'María Camila López', 2300000.00, 'Asesora Comercial', '3131112235', 'Carrera 4 #58-20', 'maria.lopez.mon@empresa.com', SHA2('empleado123', 256),3, 1),
+('1161718193', 'Andrés Felipe Ruiz', 2100000.00, 'Agente de Alquiler', '3131112236', 'Calle 65 #7-05', 'andres.ruiz@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Ibagué Estación ('730001') - Gerente: Diego Alejandro Vargas
+('1171819200', 'Diego Alejandro Vargas', 4800000.00, 'Gerente de Sucursal', '3142223344', 'Carrera 5 #40-05', 'gerente18@empresa.com', SHA2('gerente123', 256),2, 1),
+('1171819201', 'Laura Sofía González', 2600000.00, 'Agente de Alquiler', '3142223345', 'Calle 60 #5-20', 'laura.gonzalez.iba@empresa.com', SHA2('empleado123', 256),3, 1),
+('1171819202', 'Juan Camilo Morales', 2400000.00, 'Atención al Cliente', '3142223346', 'Carrera 6 #42-10', 'juan.morales@empresa.com', SHA2('empleado123', 256),3, 1),
+('1171819203', 'Natalia Andrea Quintero', 2200000.00, 'Asistente Administrativa', '3142223347', 'Calle 45 #4-05', 'natalia.quintero@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Tunja Centro ('150001') - Gerente: Manuela Contreras
+('1181920210', 'Manuela Contreras', 4500000.00, 'Gerente de Sucursal', '3163334455', 'Carrera 10 #20-50', 'gerente19@empresa.com', SHA2('gerente123', 256),2, 1),
+('1181920211', 'Carlos David Pérez', 2300000.00, 'Asesor Comercial', '3163334456', 'Calle 21 #9-15', 'carlos.perez.tun@empresa.com', SHA2('empleado123', 256),3, 1),
+('1181920212', 'Valeria Juliana Orozco', 2100000.00, 'Agente de Alquiler', '3163334457', 'Carrera 11 #18-05', 'valeria.orozco@empresa.com', SHA2('empleado123', 256),3, 1),
+('1181920213', 'Andrés Felipe Acosta', 1900000.00, 'Conductor', '3163334458', 'Calle 19 #10-30', 'andres.acosta@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Zipaquirá Centro ('250001') - Gerente: Pedro Pablo Guzmán
+('1192021220', 'Pedro Pablo Guzmán', 4300000.00, 'Gerente de Sucursal', '3174445566', 'Carrera 10 #4-20', 'gerente20@empresa.com', SHA2('gerente123', 256),2, 1),
+('1192021221', 'María Alejandra Bernal', 2200000.00, 'Asesora Comercial', '3174445567', 'Calle 5 #9-10', 'maria.bernal@empresa.com', SHA2('empleado123', 256),3, 1),
+('1192021222', 'Diego Fernando Suárez', 2000000.00, 'Agente de Alquiler', '3174445568', 'Carrera 9 #3-05', 'diego.suarez@empresa.com', SHA2('empleado123', 256),3, 1),
+('1192021223', 'Laura Sofía Pinzón', 1800000.00, 'Asistente Administrativa', '3174445569', 'Calle 4 #11-20', 'laura.pinzon@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Chía Principal ('250002') - Gerente: Alejandra Vélez
+('1202122230', 'Alejandra Vélez', 4400000.00, 'Gerente de Sucursal', '3185556677', 'Avenida Pradilla #5-10', 'gerente21@empresa.com', SHA2('gerente123', 256),2, 1),
+('1202122231', 'Sebastián David Londoño', 2300000.00, 'Agente de Alquiler', '3185556678', 'Carrera 2 #4-05', 'sebastian.londono@empresa.com', SHA2('empleado123', 256),3, 1),
+('1202122232', 'Natalia Andrea Rojas', 2100000.00, 'Atención al Cliente', '3185556679', 'Calle 10 #6-15', 'natalia.rojas.chia@empresa.com', SHA2('empleado123', 256),3, 1),
+('1202122233', 'Carlos Mario López', 1900000.00, 'Conductor', '3185556680', 'Avenida Pradilla #10-30', 'carlos.lopez.chia@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Soledad Centro ('081001') - Gerente: Fernando Vargas
+('1212223240', 'Fernando Vargas', 4600000.00, 'Gerente de Sucursal', '3007778899', 'Calle 30 #20-10', 'gerente22@empresa.com', SHA2('gerente123', 256),2, 1),
+('1212223241', 'Daniela Carolina Pérez', 2400000.00, 'Asesora Comercial', '3007778900', 'Carrera 18 #25-05', 'daniela.perez.sol@empresa.com', SHA2('empleado123', 256),3, 1),
+('1212223242', 'Juan Felipe González', 2200000.00, 'Agente de Alquiler', '3007778901', 'Calle 26 #22-10', 'juan.gonzalez.sol@empresa.com', SHA2('empleado123', 256),3, 1),
+('1212223243', 'María Fernanda Suárez', 2000000.00, 'Asistente Administrativa', '3007778902', 'Carrera 19 #28-05', 'maria.suarez.sol@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Magangué Centro ('131001') - Gerente: Gloria Pardo
+('1222324250', 'Gloria Pardo', 4200000.00, 'Gerente de Sucursal', '3018889900', 'Calle 16 #10-50', 'gerente23@empresa.com', SHA2('gerente123', 256),2, 1),
+('1222324251', 'Carlos David Restrepo', 2100000.00, 'Agente de Alquiler', '3018889901', 'Carrera 12 #15-05', 'carlos.restrepo.mag@empresa.com', SHA2('empleado123', 256),3, 1),
+('1222324252', 'Ana Sofía Bermúdez', 1900000.00, 'Atención al Cliente', '3018889902', 'Calle 14 #8-20', 'ana.bermudez.mag@empresa.com', SHA2('empleado123', 256),3, 1),
+('1222324253', 'Luis Miguel Soto', 1700000.00, 'Conductor', '3018889903', 'Carrera 11 #17-10', 'luis.soto.mag@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Duitama Principal ('152201') - Gerente: Jorge Eduardo López
+('1232425260', 'Jorge Eduardo López', 4300000.00, 'Gerente de Sucursal', '3029990011', 'Carrera 16 #15-30', 'gerente24@empresa.com', SHA2('gerente123', 256),2, 1),
+('1232425261', 'María Camila Pinzón', 2200000.00, 'Asesora Comercial', '3029990012', 'Calle 17 #15-05', 'maria.pinzon.dui@empresa.com', SHA2('empleado123', 256),3, 1),
+('1232425262', 'Andrés Felipe Olarte', 2000000.00, 'Agente de Alquiler', '3029990013', 'Carrera 15 #16-10', 'andres.olarte.dui@empresa.com', SHA2('empleado123', 256),3, 1),
+('1232425263', 'Valentina Andrea Rojas', 1800000.00, 'Asistente Administrativa', '3029990014', 'Calle 18 #14-20', 'valentina.rojas.dui@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Chinchiná Principal ('171001') - Gerente: Paola Andrea Restrepo
+('1242526270', 'Paola Andrea Restrepo', 4100000.00, 'Gerente de Sucursal', '3030001122', 'Carrera 5 #8-10', 'gerente25@empresa.com', SHA2('gerente123', 256),2, 1),
+('1242526271', 'Daniel Fernando Castro', 2000000.00, 'Agente de Alquiler', '3030001123', 'Calle 9 #4-05', 'daniel.castro.chi@empresa.com', SHA2('empleado123', 256),3, 1),
+('1242526272', 'Laura María Gómez', 1800000.00, 'Atención al Cliente', '3030001124', 'Carrera 6 #7-10', 'laura.gomez.chi@empresa.com', SHA2('empleado123', 256),3, 1),
+('1242526273', 'Juan Pablo Pérez', 1600000.00, 'Conductor', '3030001125', 'Calle 8 #6-20', 'juan.perez.chi@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal San Gil Principal ('680006') - Gerente: Roberto Carlos Mesa
+('1252627280', 'Roberto Carlos Mesa', 4400000.00, 'Gerente de Sucursal', '3041112233', 'Carrera 9 #10-15', 'gerente26@empresa.com', SHA2('gerente123', 256),2, 1),
+('1252627281', 'Andrea Catalina Ruiz', 2300000.00, 'Asesora Comercial', '3041112234', 'Calle 11 #8-05', 'andrea.ruiz.sangil@empresa.com', SHA2('empleado123', 256),3, 1),
+('1252627282', 'Sebastián Andrés Quintero', 2100000.00, 'Agente de Alquiler', '3041112235', 'Carrera 8 #9-20', 'sebastian.quintero.sangil@empresa.com', SHA2('empleado123', 256),3, 1),
+('1252627283', 'María José Duque', 1900000.00, 'Asistente Administrativa', '3041112236', 'Calle 10 #7-10', 'maria.duque.sangil@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Sincelejo Boston ('700001') - Gerente: Adriana Lucía Torres
+('1262728290', 'Adriana Lucía Torres', 4500000.00, 'Gerente de Sucursal', '3052223344', 'Carrera 20 #25-30', 'gerente27@empresa.com', SHA2('gerente123', 256),2, 1),
+('1262728291', 'José Daniel Vargas', 2400000.00, 'Jefe de Operaciones', '3052223345', 'Calle 26 #19-05', 'jose.vargas.sin@empresa.com', SHA2('empleado123', 256),3, 1),
+('1262728292', 'Laura María González', 2200000.00, 'Asesora Comercial', '3052223346', 'Carrera 21 #24-10', 'laura.gonzalez.sin@empresa.com', SHA2('empleado123', 256),3, 1),
+('1262728293', 'Juan Pablo Montes', 2000000.00, 'Agente de Alquiler', '3052223347', 'Calle 24 #20-05', 'juan.montes.sin@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Rionegro San Nicolás ('055401') - Gerente: Christian Camilo Bernal
+('1272829300', 'Christian Camilo Bernal', 4800000.00, 'Gerente de Sucursal', '3063334455', 'Carrera 55A #35-10', 'gerente28@empresa.com', SHA2('gerente123', 256),2, 1),
+('1272829301', 'Andrea Carolina Duque', 2600000.00, 'Agente de Alquiler', '3063334456', 'Calle 36 #54-05', 'andrea.duque.rio@empresa.com', SHA2('empleado123', 256),3, 1),
+('1272829302', 'Esteban José Correa', 2400000.00, 'Atención al Cliente', '3063334457', 'Carrera 53 #34-20', 'esteban.correa.rio@empresa.com', SHA2('empleado123', 256),3, 1),
+('1272829303', 'Valentina Isabel Osorio', 2200000.00, 'Asistente Administrativa', '3063334458', 'Calle 34 #56-10', 'valentina.osorio.rio@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Arjona Principal ('130002') - Gerente: Marcela Díaz
+('1282930310', 'Marcela Díaz', 4000000.00, 'Gerente de Sucursal', '3074445566', 'Calle 2 #10-50', 'gerente29@empresa.com', SHA2('gerente123', 256),2, 1),
+('1282930311', 'Juan Diego Giraldo', 2000000.00, 'Agente de Alquiler', '3074445567', 'Carrera 5 #8-05', 'juan.giraldo.arj@empresa.com', SHA2('empleado123', 256),3, 1),
+('1282930312', 'Carolina Restrepo', 1800000.00, 'Atención al Cliente', '3074445568', 'Calle 3 #12-10', 'carolina.restrepo.arj@empresa.com', SHA2('empleado123', 256),3, 1),
+('1282930313', 'Luis Carlos López', 1600000.00, 'Conductor', '3074445569', 'Carrera 4 #11-20', 'luis.lopez.arj@empado123.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal La Dorada Centro ('172001') - Gerente: Luis Alberto Garcés
+('1293031320', 'Luis Alberto Garcés', 4100000.00, 'Gerente de Sucursal', '3085556677', 'Calle 13 #5-20', 'gerente30@empresa.com', SHA2('gerente123', 256),2, 1),
+('1293031321', 'María Paula Vargas', 2100000.00, 'Asesora Comercial', '3085556678', 'Carrera 4 #12-05', 'maria.vargas.dor@empresa.com', SHA2('empleado123', 256),3, 1),
+('1293031322', 'Andrés Felipe Marín', 1900000.00, 'Agente de Alquiler', '3085556679', 'Calle 12 #6-10', 'andres.marin.dor@empresa.com', SHA2('empleado123', 256),3, 1),
+('1293031323', 'Valentina Sofía Mesa', 1700000.00, 'Asistente Administrativa', '3085556680', 'Carrera 5 #11-20', 'valentina.mesa.dor@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Pitalito Centro ('413001') - Gerente: Carolina Andrea Sánchez
+('1303132330', 'Carolina Andrea Sánchez', 4300000.00, 'Gerente de Sucursal', '3096667788', 'Carrera 3 #7-15', 'gerente31@empresa.com', SHA2('gerente123', 256),2, 1),
+('1303132331', 'Juan Camilo Gómez', 2200000.00, 'Jefe de Operaciones', '3096667789', 'Calle 8 #2-05', 'juan.gomez.pit@empresa.com', SHA2('empleado123', 256),3, 1),
+('1303132332', 'Laura Valentina Quintero', 2000000.00, 'Asesora Comercial', '3096667790', 'Carrera 4 #6-10', 'laura.quintero.pit@empresa.com', SHA2('empleado123', 256),3, 1),
+('1303132333', 'Diego Alejandro Zuluaga', 1800000.00, 'Agente de Alquiler', '3096667791', 'Calle 7 #4-20', 'diego.zuluaga.pit@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Ciénaga Centro ('470002') - Gerente: Miguel Ángel Soto
+('1313233340', 'Miguel Ángel Soto', 4400000.00, 'Gerente de Sucursal', '3107778899', 'Calle 10 #12-30', 'gerente32@empresa.com', SHA2('gerente123', 256),2, 1),
+('1313233341', 'Andrea Carolina Pérez', 2300000.00, 'Agente de Alquiler', '3107778900', 'Carrera 13 #9-05', 'andrea.perez.cie@empresa.com', SHA2('empleado123', 256),3, 1),
+('1313233342', 'Sebastián Andrés Restrepo', 2100000.00, 'Atención al Cliente', '3107778901', 'Calle 11 #11-10', 'sebastian.restrepo.cie@empresa.com', SHA2('empleado123', 256),3, 1),
+('1313233343', 'María Alejandra Valencia', 1900000.00, 'Conductor', '3107778902', 'Carrera 10 #10-20', 'maria.valencia.cie@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Puerto López Principal ('500002') - Gerente: Liliana Marcela Duque
+('1323334350', 'Liliana Marcela Duque', 4200000.00, 'Gerente de Sucursal', '3118889900', 'Carrera 4 #15-05', 'gerente33@empresa.com', SHA2('gerente123', 256),2, 1),
+('1323334351', 'Carlos Enrique Vargas', 2200000.00, 'Agente de Alquiler', '3118889901', 'Calle 16 #3-05', 'carlos.vargas.pl@empresa.com', SHA2('empleado123', 256),3, 1),
+('1323334352', 'Ana Sofía Rodríguez', 2000000.00, 'Atención al Cliente', '3118889902', 'Carrera 5 #14-10', 'ana.rodriguez.pl@empresa.com', SHA2('empleado123', 256),3, 1),
+('1323334353', 'Luis Fernando Castro', 1800000.00, 'Asistente Administrativa', '3118889903', 'Calle 15 #6-20', 'luis.castro.pl@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Ipiales San Felipe ('521001') - Gerente: Fabian Andres Cárdenas
+('1333435360', 'Fabian Andres Cárdenas', 4300000.00, 'Gerente de Sucursal', '3129990011', 'Calle 12 #6-25', 'gerente34@empresa.com', SHA2('gerente123', 256),2, 1),
+('1333435361', 'María Camila López', 2100000.00, 'Asesora Comercial', '3129990012', 'Carrera 7 #11-05', 'maria.lopez.ipi@empresa.com', SHA2('empleado123', 256),3, 1),
+('1333435362', 'Andrés Felipe Jiménez', 1900000.00, 'Agente de Alquiler', '3129990013', 'Calle 11 #5-10', 'andres.jimenez.ipi@empresa.com', SHA2('empleado123', 256),3, 1),
+('1333435363', 'Laura Sofía Díaz', 1700000.00, 'Asistente Administrativa', '3129990014', 'Carrera 6 #10-20', 'laura.diaz.ipi@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Cúcuta Centro ('540001') - Gerente: Natalia Andrea Castro
+('1343536370', 'Natalia Andrea Castro', 4700000.00, 'Gerente de Sucursal', '3130001122', 'Avenida 1 #10-40', 'gerente35@empresa.com', SHA2('gerente123', 256),2, 1),
+('1343536371', 'Juan David Rojas', 2500000.00, 'Jefe de Operaciones', '3130001123', 'Calle 11 #0-05', 'juan.rojas.cuc@empresa.com', SHA2('empleado123', 256),3, 1),
+('1343536372', 'Andrea Carolina Pardo', 2300000.00, 'Asesora Comercial', '3130001124', 'Avenida 2 #10-10', 'andrea.pardo.cuc@empresa.com', SHA2('empleado123', 256),3, 1),
+('1343536373', 'Sebastián Felipe Soto', 2100000.00, 'Agente de Alquiler', '3130001125', 'Calle 9 #1-20', 'sebastian.soto.cuc@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Calarcá Centro ('631001') - Gerente: Juan Pablo Pérez
+('1353637380', 'Juan Pablo Pérez', 4300000.00, 'Gerente de Sucursal', '3141112233', 'Carrera 25 #30-50', 'gerente36@empresa.com', SHA2('gerente123', 256),2, 1),
+('1353637381', 'Laura Marcela Duque', 2200000.00, 'Agente de Alquiler', '3141112234', 'Calle 31 #24-05', 'laura.duque.cal@empresa.com', SHA2('empleado123', 256),3, 1),
+('1353637382', 'Carlos Daniel Quintero', 2000000.00, 'Atención al Cliente', '3141112235', 'Carrera 26 #29-10', 'carlos.quintero.cal@empresa.com', SHA2('empleado123', 256),3, 1),
+('1353637383', 'María Fernanda Vargas', 1800000.00, 'Asistente Administrativa', '3141112236', 'Calle 30 #27-20', 'maria.vargas.cal@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Dosquebradas La Pradera ('661001') - Gerente: Catalina Ospina
+('1363738390', 'Catalina Ospina', 4400000.00, 'Gerente de Sucursal', '3152223344', 'Carrera 19 #35-10', 'gerente37@empresa.com', SHA2('gerente123', 256),2, 1),
+('1363738391', 'Andrés Felipe Soto', 2300000.00, 'Asesor Comercial', '3152223345', 'Calle 36 #18-05', 'andres.soto.dos@empresa.com', SHA2('empleado123', 256),3, 1),
+('1363738392', 'Laura María Correa', 2100000.00, 'Agente de Alquiler', '3152223346', 'Carrera 20 #34-10', 'laura.correa.dos@empresa.com', SHA2('empleado123', 256),3, 1),
+('1363738393', 'Juan Pablo López', 1900000.00, 'Conductor', '3152223347', 'Calle 35 #21-20', 'juan.lopez.dos@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Bucaramanga Cacique ('680001') - Gerente: Sebastián Patiño
+('1373839400', 'Sebastián Patiño', 4900000.00, 'Gerente de Sucursal', '3163334455', 'Carrera 27 #56-20', 'gerente38@empresa.com', SHA2('gerente123', 256),2, 1),
+('1373839401', 'María Alejandra Giraldo', 2700000.00, 'Jefe de Operaciones', '3163334456', 'Calle 56 #29-05', 'maria.giraldo.buca@empresa.com', SHA2('empleado123', 256),3, 1),
+('1373839402', 'Daniel Felipe Quintero', 2500000.00, 'Asesor Comercial', '3163334457', 'Carrera 28 #55-10', 'daniel.quintero.buca@empresa.com', SHA2('empleado123', 256),3, 1),
+('1373839403', 'Valentina Sofía Restrepo', 2300000.00, 'Agente de Alquiler', '3163334458', 'Calle 55 #26-20', 'valentina.restrepo.buca@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Corozal Centro ('701001') - Gerente: Andrea Carolina Niño
+('1383940410', 'Andrea Carolina Niño', 4100000.00, 'Gerente de Sucursal', '3174445566', 'Carrera 18 #22-05', 'gerente39@empresa.com', SHA2('gerente123', 256),2, 1),
+('1383940411', 'Juan Pablo Torres', 2000000.00, 'Agente de Alquiler', '3174445567', 'Calle 23 #17-05', 'juan.torres.corozal@empresa.com', SHA2('empleado123', 256),3, 1),
+('1383940412', 'Laura Daniela Vargas', 1800000.00, 'Atención al Cliente', '3174445568', 'Carrera 19 #21-10', 'laura.vargas.corozal@empresa.com', SHA2('empleado123', 256),3, 1),
+('1383940413', 'Carlos Andrés Suárez', 1600000.00, 'Asistente Administrativa', '3174445569', 'Calle 22 #18-20', 'carlos.suarez.corozal@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Ibagué Centro ('730001') - Gerente: Gabriel Jaime Torres
+('1394041420', 'Gabriel Jaime Torres', 4800000.00, 'Gerente de Sucursal', '3185556677', 'Carrera 5 #10-30', 'gerente40@empresa.com', SHA2('gerente123', 256),2, 1),
+('1394041421', 'María Alejandra Ospina', 2600000.00, 'Asesora Comercial', '3185556678', 'Calle 11 #4-05', 'maria.ospina.ibg@empresa.com', SHA2('empleado123', 256),3, 1),
+('1394041422', 'Diego Fernando Quintero', 2400000.00, 'Agente de Alquiler', '3185556679', 'Carrera 6 #9-10', 'diego.quintero.ibg@empresa.com', SHA2('empleado123', 256),3, 1),
+('1394041423', 'Sofía Andrea Restrepo', 2200000.00, 'Conductor', '3185556680', 'Calle 10 #7-20', 'sofia.restrepo.ibg@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Palmira El Prado ('763001') - Gerente: Alejandro Vargas
+('1404142430', 'Alejandro Vargas', 4900000.00, 'Gerente de Sucursal', '3196667788', 'Calle 30 #28-10', 'gerente41@empresa.com', SHA2('gerente123', 256),2, 1),
+('1404142431', 'Natalia Carolina López', 2700000.00, 'Jefe de Operaciones', '3196667789', 'Carrera 29 #29-05', 'natalia.lopez.pal@empresa.com', SHA2('empleado123', 256),3, 1),
+('1404142432', 'Juan José Giraldo', 2500000.00, 'Asesor Comercial', '3196667790', 'Calle 28 #27-10', 'juan.giraldo.pal@empresa.com', SHA2('empleado123', 256),3, 1),
+('1404142433', 'Laura Valentina Soto', 2300000.00, 'Agente de Alquiler', '3196667791', 'Carrera 30 #31-20', 'laura.soto.pal@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Yopal Centro ('850001') - Gerente: María Fernanda Ruiz
+('1414243440', 'María Fernanda Ruiz', 4500000.00, 'Gerente de Sucursal', '3207778899', 'Carrera 20 #15-05', 'gerente42@empresa.com', SHA2('gerente123', 256),2, 1),
+('1414243441', 'Carlos Julián Díaz', 2400000.00, 'Agente de Alquiler', '3207778900', 'Calle 16 #19-05', 'carlos.diaz.yop@empresa.com', SHA2('empleado123', 256),3, 1),
+('1414243442', 'Andrea Sofía Vargas', 2200000.00, 'Atención al Cliente', '3207778901', 'Carrera 21 #14-10', 'andrea.vargas.yop@empresa.com', SHA2('empleado123', 256),3, 1),
+('1414243443', 'Sebastián Camilo Herrera', 2000000.00, 'Asistente Administrativa', '3207778902', 'Calle 15 #22-20', 'sebastian.herrera.yop@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Cali Norte Principal ('760001') - Gerente: Marta Lucía Rueda
+('1424344450', 'Marta Lucía Rueda', 5200000.00, 'Gerente de Sucursal', '3104567891', 'Avenida 3N #47-15', 'gerente43@empresa.com', SHA2('gerente123', 256),2, 1),
+('1424344451', 'Juan Manuel Castro', 2700000.00, 'Asesor Comercial', '3104567892', 'Calle 47 #3N-05', 'juan.castro.caln@empresa.com', SHA2('empleado123', 256),3, 1),
+('1424344452', 'Laura Marcela Pinzón', 2500000.00, 'Agente de Alquiler', '3104567893', 'Avenida 2N #45-10', 'laura.pinzon.caln@empresa.com', SHA2('empleado123', 256),3, 1),
+('1424344453', 'Andrés David Pardo', 2300000.00, 'Conductor', '3104567894', 'Calle 48 #3N-20', 'andres.pardo.caln@empresa.com', SHA2('empleado123', 256),3, 1),
+-- Sucursal Bogotá El Dorado Aeropuerto ('110111') - Gerente: Sofía Ramírez
+('1434445460', 'Sofía Ramírez', 5800000.00, 'Gerente de Sucursal', '3109876543', 'Aeropuerto El Dorado', 'gerente44@empresa.com', SHA2('gerente123', 256),2, 1),
+('1434445461', 'Daniela Ospina', 3000000.00, 'Asesora Comercial', '3109876544', 'Terminal 1', 'daniela.ospina.aeropuerto@empresa.com', SHA2('empleado123', 256),3, 1),
+('1434445462', 'Juan Sebastián Restrepo', 2800000.00, 'Agente de Alquiler', '3109876545', 'Zona de Parqueo', 'juan.restrepo.aeropuerto@empresa.com', SHA2('empleado123', 256),3, 1),
+('1434445463', 'Camila Andrea Gómez', 2600000.00, 'Atención al Cliente', '3109876546', 'Oficina Principal', 'camila.gomez.aeropuerto@empresa.com', SHA2('empleado123', 256),3, 1);
 INSERT INTO Licencia_conduccion (estado, fecha_emision, fecha_vencimiento, id_categoria) VALUES
 ('Activa',  '2023-05-20', '2026-05-20', 1),
 ('Vencida', '2018-03-15', '2022-03-15', 2),
@@ -6419,14 +6072,4 @@ INSERT INTO Abono_reserva (valor, fecha_hora, id_reserva, id_medio_pago) VALUES
 (108.82, '2025-06-22 14:30:00', 158, 3),
 (187.59, '2025-06-22 15:00:00', 159, 4),
 (159.02, '2025-06-22 15:30:00', 160, 5);
-
--- Usuarios para la aplicación de consultas
-INSERT INTO Usuarios (usuario, password, rol) VALUES
-    ('admin@bdd.com',   SHA2('admin123', 256), 'admin'),
-    ('gerente@bdd.com',   SHA2('gerente123', 256), 'gerente'),
-    ('empleado@bdd.com',   SHA2('empleado123', 256), 'empleado'),
-    ('cliente@bdd.com', SHA2('cliente123', 256), 'cliente');
-
-
-
 
