@@ -12,6 +12,17 @@ class LoginApp(tk.Tk):
         self.autenticador = Autenticador()
         self._build_ui()
 
+    @staticmethod
+    def _normalizar_rol(rol: str) -> str:
+        """Mapear variantes comunes de nombres de rol al valor esperado."""
+        rol = rol.strip().lower()
+        mapping = {
+            'administrador': 'admin',
+            'gerete': 'gerente',
+            'empleadao': 'empleado',
+        }
+        return mapping.get(rol, rol)
+
     def _build_ui(self) -> None:
         tk.Label(self, text='Correo:').pack(pady=5)
         self.entry_correo = tk.Entry(self)
@@ -32,7 +43,7 @@ class LoginApp(tk.Tk):
             messagebox.showerror('Error', 'Credenciales inválidas')
             return
 
-        rol = rol.strip().lower()
+        rol = self._normalizar_rol(rol)
         if rol == 'cliente':
             from interfaces.cliente import ClienteApp
             self.destroy()
