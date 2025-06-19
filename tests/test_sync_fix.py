@@ -42,5 +42,32 @@ class SyncFixTest(unittest.TestCase):
         cursor.fetchall.assert_called_once()
         cursor.close.assert_called_once()
 
+    def test_fix_empleados_query(self):
+        cursor = MagicMock()
+        self.db.conn.cursor.return_value = cursor
+        err = Error(msg="1146 (42S02): Table 'alquiler_vehiculos.empleados' doesn't exist")
+        cursor.execute.side_effect = [err, None]
+        self.db.pendientes = [{
+            'query': 'INSERT INTO empleados (nombre) VALUES (%s)',
+            'params': ('Ana',)
+        }]
+        self.db._sincronizar()
+        self.assertEqual(cursor.execute.call_args_list[1][0][0],
+                         'INSERT INTO empleado (nombre) VALUES (%s)')
+
+    def test_fetch_select_results(self):
+        cursor = MagicMock()
+        self.db.conn.cursor.return_value = cursor
+        cursor.execute.side_effect = [None]
+        cursor.fetchall.return_value = [(1,)]
+        self.db.pendientes = [{
+            'query': 'SELECT * FROM empleado',
+            'params': None,
+        }]
+        self.db._sincronizar()
+        cursor.fetchall.assert_called_once()
+        cursor.close.assert_called_once()
+
 if __name__ == '__main__':
     unittest.main()
+ 

@@ -103,13 +103,34 @@ class ConexionBD:
                 else:
                     self.conn.commit()
                 cur.close()
+            except Error as c:
+                logging.error('Error al sincronizar: %s', c)
+                if (
+                    "clientes" in op['query'].lower()
+                    and "doesn't exist" in str(c)
+                ):
+                    corregida = op['query'].replace('clientes', 'cliente')
+                    logging.info('Reintentando con tabla: %s', corregida)
+                    try:
+                        cur.execute(corregida, op['params'])
+                        if corregida.strip().lower().startswith('select'):
+                            cur.fetchall()
+                        else:
+                            self.conn.commit()
+                        cur.close()
+                        continue
+                    except Error as c2:  # pragma: no cover - depende de MySQL
+                        logging.error('Error tras corregir: %s', c2)
+                        op['query'] = corregida
+                self.pendientes.insert(0, op)
+                break
             except Error as e:
                 logging.error('Error al sincronizar: %s', e)
                 if (
-                    "clientes" in op['query'].lower()
+                    "empleados" in op['query'].lower()
                     and "doesn't exist" in str(e)
                 ):
-                    corregida = op['query'].replace('clientes', 'cliente')
+                    corregida = op['query'].replace('empleados', 'empleado')
                     logging.info('Reintentando con tabla: %s', corregida)
                     try:
                         cur.execute(corregida, op['params'])
