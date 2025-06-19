@@ -98,8 +98,11 @@ class ConexionBD:
             try:
                 cur = self.conn.cursor()
                 cur.execute(op['query'], op['params'])
-                if not op['query'].strip().lower().startswith('select'):
+                if op['query'].strip().lower().startswith('select'):
+                    cur.fetchall()
+                else:
                     self.conn.commit()
+                cur.close()
             except Error as e:
                 logging.error('Error al sincronizar: %s', e)
                 if (
@@ -110,8 +113,11 @@ class ConexionBD:
                     logging.info('Reintentando con tabla: %s', corregida)
                     try:
                         cur.execute(corregida, op['params'])
-                        if not corregida.strip().lower().startswith('select'):
+                        if corregida.strip().lower().startswith('select'):
+                            cur.fetchall()
+                        else:
                             self.conn.commit()
+                        cur.close()
                         continue
                     except Error as e2:  # pragma: no cover - depende de MySQL
                         logging.error('Error tras corregir: %s', e2)
