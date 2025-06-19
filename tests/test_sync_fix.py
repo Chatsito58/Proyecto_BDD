@@ -29,5 +29,18 @@ class SyncFixTest(unittest.TestCase):
         self.assertEqual(cursor.execute.call_args_list[1][0][0],
                          'INSERT INTO cliente (nombre) VALUES (%s)')
 
+    def test_fetch_select_results(self):
+        cursor = MagicMock()
+        self.db.conn.cursor.return_value = cursor
+        cursor.execute.side_effect = [None]
+        cursor.fetchall.return_value = [(1,)]
+        self.db.pendientes = [{
+            'query': 'SELECT * FROM cliente',
+            'params': None,
+        }]
+        self.db._sincronizar()
+        cursor.fetchall.assert_called_once()
+        cursor.close.assert_called_once()
+
 if __name__ == '__main__':
     unittest.main()
