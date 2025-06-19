@@ -84,6 +84,32 @@ class ConexionBD:
             self._failover()
             raise
 
+    def ejecutar_con_columnas(
+        self, query: str, params: Tuple[Any, ...] | None = None
+    ) -> Tuple[List[str], List[Tuple[Any, ...]]]:
+        """Ejecutar una consulta y retornar columnas y filas."""
+        if not self.conn or not self.conn.is_connected():
+            self.conectar()
+        if not self.conn:
+            self._agregar_pendiente(query, params)
+            raise ConnectionError("No hay conexión disponible")
+        try:
+            cur = self.conn.cursor()
+            cur.execute(query, params)
+            columnas = [desc[0] for desc in cur.description] if cur.description else []
+            if query.strip().lower().startswith("select"):
+                filas = cur.fetchall()
+            else:
+                self.conn.commit()
+                filas = []
+            cur.close()
+            return columnas, filas
+        except Error as e:
+            logging.error("Error ejecutando consulta: %s", e)
+            self._agregar_pendiente(query, params)
+            self._failover()
+            raise
+
     def _agregar_pendiente(self, query: str, params: Tuple[Any, ...] | None) -> None:
         self.pendientes.append({'query': query, 'params': params})
         self._guardar_pendientes()

@@ -2,12 +2,12 @@ import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
 from ttkthemes import ThemedTk
 from tkinter import filedialog
-import mysql.connector
 from mysql.connector import Error
+from conexion.conexion import ConexionBD
 
 
 class MySQLApp:
-    def __init__(self, root):
+    def __init__(self, root, conexion: ConexionBD | None = None):
         self.sql_keywords = [
             "SELECT", "FROM", "WHERE", "INSERT", "INTO", "VALUES", "UPDATE", "SET",
             "DELETE", "JOIN", "INNER", "LEFT", "RIGHT", "ON", "GROUP BY", "ORDER BY",
@@ -21,7 +21,7 @@ class MySQLApp:
         self.historial_consultas = []
 
         self.configurar_estilo()
-        self.conexion = self.conectar_mysql("192.168.225.251", "admin", "admin", "alquiler_vehiculos")
+        self.conexion = conexion or ConexionBD()
 
         self.crear_encabezado()
         self.crear_tabs()
@@ -29,9 +29,8 @@ class MySQLApp:
 
     def mostrar_tablas(self):
         try:
-            cursor = self.conexion.cursor()
-            cursor.execute("SHOW TABLES")
-            tablas = [fila[0] for fila in cursor.fetchall()]
+            _, filas = self.conexion.ejecutar_con_columnas("SHOW TABLES")
+            tablas = [fila[0] for fila in filas]
         except Error as e:
             messagebox.showerror("Error al obtener tablas", f"No se pudo obtener la lista de tablas:\n{e}")
             return
@@ -66,10 +65,7 @@ class MySQLApp:
         ttk.Button(ventana, text="Ver estructura", command=ver_estructura).pack(pady=10)
     def describir_tabla(self, tabla):
         try:
-            cursor = self.conexion.cursor()
-            cursor.execute(f"DESCRIBE {tabla}")
-            columnas = [desc[0] for desc in cursor.description]
-            filas = cursor.fetchall()
+            columnas, filas = self.conexion.ejecutar_con_columnas(f"DESCRIBE {tabla}")
             self.mostrar_resultados(columnas, filas)
             self.tab_control.select(self.tab_resultado)
         except Error as e:
@@ -263,22 +259,6 @@ class MySQLApp:
         )
         status_bar.pack(fill="x", side="bottom", padx=1)
 
-    def conectar_mysql(self, ip, usuario, contraseña, base_datos):
-        try:
-            conexion = mysql.connector.connect(
-                host=ip,
-                user=usuario,
-                password=contraseña,
-                database=base_datos,
-                port=3306
-            )
-            if conexion.is_connected():
-                print("✅ Conexión exitosa")
-                return conexion
-        except Error as e:
-            messagebox.showerror("❌ Error de conexión", f"No se pudo conectar a MySQL:\n{e}")
-            return None
-
     def ejecutar_consulta(self):
         query = self.query_text.get("1.0", tk.END).strip()
 
@@ -289,19 +269,14 @@ class MySQLApp:
         # Guardar en historial
         self.actualizar_historial(query)
 
-        cursor = self.conexion.cursor()
-
         try:
-            cursor.execute(query)
+            columnas, filas = self.conexion.ejecutar_con_columnas(query)
 
             if query.lower().startswith("select"):
-                filas = cursor.fetchall()
-                columnas = [desc[0] for desc in cursor.description]
                 self.mostrar_resultados(columnas, filas)
                 self.status_var.set(f"✅ {len(filas)} filas recuperadas.")
                 self.tab_control.select(self.tab_resultado)
             else:
-                self.conexion.commit()
                 messagebox.showinfo("✅ Éxito", "Consulta ejecutada correctamente.")
                 self.status_var.set("✅ Consulta ejecutada con éxito.")
         except Error as e:
@@ -340,5 +315,5 @@ class MySQLApp:
 # ========== Ejecutar la app ==========
 if __name__ == "__main__":
     root = ThemedTk(theme="arc")
-    app = MySQLApp(root)
+    app = MySQLApp(root, ConexionBD())
     root.mainloop()
