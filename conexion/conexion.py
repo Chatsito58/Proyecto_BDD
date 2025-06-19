@@ -102,6 +102,20 @@ class ConexionBD:
                     self.conn.commit()
             except Error as e:
                 logging.error('Error al sincronizar: %s', e)
+                if (
+                    "clientes" in op['query'].lower()
+                    and "doesn't exist" in str(e)
+                ):
+                    corregida = op['query'].replace('clientes', 'cliente')
+                    logging.info('Reintentando con tabla: %s', corregida)
+                    try:
+                        cur.execute(corregida, op['params'])
+                        if not corregida.strip().lower().startswith('select'):
+                            self.conn.commit()
+                        continue
+                    except Error as e2:  # pragma: no cover - depende de MySQL
+                        logging.error('Error tras corregir: %s', e2)
+                        op['query'] = corregida
                 self.pendientes.insert(0, op)
                 break
         self._guardar_pendientes()
