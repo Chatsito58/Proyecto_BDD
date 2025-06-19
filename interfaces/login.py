@@ -20,6 +20,11 @@ class LoginApp(tk.Tk):
             'administrador': 'admin',
             'gerete': 'gerente',
             'empleadao': 'empleado',
+            'ventas': 'empleado',
+            'mantenimiento': 'empleado',
+            'operaciones': 'empleado',
+            'conductor': 'empleado',
+            'atencion al cliente': 'empleado',
         }
         return mapping.get(rol, rol)
 
