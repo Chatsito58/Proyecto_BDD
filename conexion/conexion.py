@@ -29,8 +29,6 @@ class ConexionBD:
         self.conn: MySQLConnection | None = None
         self.queue_file = 'pendientes.json'
         self._cargar_pendientes()
-        logging.basicConfig(level=logging.INFO,
-                            format='%(asctime)s - %(levelname)s - %(message)s')
         self.conectar()
 
     def _cargar_pendientes(self) -> None:
