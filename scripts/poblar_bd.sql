@@ -31,7 +31,13 @@ INSERT INTO Tipo_empleado (nombre, descripcion, permisos) VALUES
 ('Ventas', 'Empleados del área de ventas',
   '["crear_reserva","editar_reserva","ver_reservas","crear_alquiler"]'),
 ('Mantenimiento', 'Personal encargado del mantenimiento',
-  '["ver_mantenimientos","crear_mantenimiento","editar_mantenimiento"]');
+  '["ver_mantenimientos","crear_mantenimiento","editar_mantenimiento"]'),
+('Atencion al Cliente', 'Personal de servicio al cliente',
+  '["atender_clientes","ver_reservas"]'),
+('Operaciones', 'Jefes y personal de operaciones',
+  '["gestionar_operaciones"]'),
+('Conductor', 'Conductores de vehículos',
+  '["conducir_vehiculos"]');
 
 
 INSERT   INTO Codigo_postal (id_codigo_postal, pais, departamento, ciudad)
