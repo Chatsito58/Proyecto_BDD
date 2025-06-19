@@ -16,8 +16,8 @@ class Autenticador:
             "SELECT 'cliente' FROM cliente WHERE correo=%s AND contrasena=%s"
         )
         consulta_empleado = (
-            "SELECT te.nombre FROM empleados e "
-            "JOIN tipo_empleado te ON e.tipo_empleado_id=te.id "
+            "SELECT te.nombre FROM empleado e "
+            "JOIN tipo_empleado te ON e.id_tipo_empleado=te.id_tipo_empleado "
             "WHERE e.correo=%s AND e.contrasena=%s"
         )
         hashed = sha256_hash(password)

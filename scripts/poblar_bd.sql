@@ -13,7 +13,7 @@ INSERT INTO cliente (nombre, documento, telefono, direccion, correo, contrasena)
     ('María Rodríguez', '3030', '3000000003', 'Calle 3', 'cliente3@correo.com', SHA2('cliente123',256));
 
 -- Empleados de diferentes tipos
-INSERT INTO empleados (nombre, documento, telefono, direccion, correo, contrasena, tipo_empleado_id) VALUES
+INSERT INTO empleado (nombre, documento, telefono, direccion, correo, contrasena, id_tipo_empleado) VALUES
     ('Carlos Gómez', '4040', '3100000001', 'Cra 1', 'empleado1@empresa.com', SHA2('empleado123',256), 1),
     ('Laura Méndez', '5050', '3100000002', 'Cra 2', 'gerente1@empresa.com', SHA2('gerente123',256), 2),
     ('Administrador', '6060', '3100000003', 'Cra 3', 'admin@admin.com', SHA2('admin123',256), 3);
