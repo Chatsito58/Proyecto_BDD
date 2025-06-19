@@ -22,6 +22,7 @@ class LoginApp(tk.Tk):
         self.entry_pass.pack(fill='x', padx=20)
 
         tk.Button(self, text='Ingresar', command=self._ingresar).pack(pady=10)
+        tk.Button(self, text='Crear cliente', command=self._abrir_registro).pack(pady=5)
 
     def _ingresar(self) -> None:
         correo = self.entry_correo.get().strip()
@@ -45,3 +46,7 @@ class LoginApp(tk.Tk):
             AdminApp().mainloop()
         else:
             messagebox.showerror('Error', 'Rol desconocido')
+
+    def _abrir_registro(self) -> None:
+        from interfaces.registro_cliente import RegistroClienteApp
+        RegistroClienteApp(self)
