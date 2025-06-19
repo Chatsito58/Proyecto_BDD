@@ -7,7 +7,7 @@ INSERT INTO tipo_empleado (nombre, descripcion) VALUES
     ('admin', 'Administrador del sistema');
 
 -- Clientes con correos únicos
-INSERT INTO clientes (nombre, documento, telefono, direccion, correo, contrasena) VALUES
+INSERT INTO cliente (nombre, documento, telefono, direccion, correo, contrasena) VALUES
     ('Ana García', '1010', '3000000001', 'Calle 1', 'cliente1@correo.com', SHA2('cliente123',256)),
     ('Luis Pérez', '2020', '3000000002', 'Calle 2', 'cliente2@correo.com', SHA2('cliente123',256)),
     ('María Rodríguez', '3030', '3000000003', 'Calle 3', 'cliente3@correo.com', SHA2('cliente123',256));
