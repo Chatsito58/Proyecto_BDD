@@ -11,7 +11,10 @@ MySQL con tolerancia a fallos.
 
 ## Instalación
 1. Crear un entorno virtual y activar.
-2. Copiar el archivo `.env` y ajustar credenciales de las bases de datos.
+2. Copiar el archivo `.env` y configurar las variables:
+   - `DB1_HOST`, `DB1_USER`, `DB1_PASSWORD`, `DB1_NAME`
+   - `DB2_HOST`, `DB2_USER`, `DB2_PASSWORD`, `DB2_NAME`
+   - `GOOGLE_MAPS_API_KEY` y `TWILIO_API_KEY`
 3. Ejecutar los scripts de `scripts/` en la base local y remota:
    ```bash
    mysql -u root -p < scripts/crear_bd.sql

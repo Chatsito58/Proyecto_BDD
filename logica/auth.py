@@ -13,7 +13,7 @@ class Autenticador:
     def autenticar(self, correo: str, password: str) -> Optional[str]:
         """Return role name if credentials are valid."""
         consulta_cliente = (
-            "SELECT 'cliente' FROM clientes WHERE correo=%s AND contrasena=%s"
+            "SELECT 'cliente' FROM cliente WHERE correo=%s AND contrasena=%s"
         )
         consulta_empleado = (
             "SELECT te.nombre FROM empleados e "

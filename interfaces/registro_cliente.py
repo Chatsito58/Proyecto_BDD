@@ -59,7 +59,7 @@ class RegistroClienteApp(tk.Toplevel):
             return
 
         query = (
-            'INSERT INTO clientes '
+            'INSERT INTO cliente '
             '(nombre, documento, telefono, direccion, correo, contrasena) '
             'VALUES (%s, %s, %s, %s, %s, %s)'
         )

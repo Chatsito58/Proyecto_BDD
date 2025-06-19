@@ -14,16 +14,16 @@ class ConexionBD:
     def __init__(self) -> None:
         load_dotenv()
         self.local_conf = {
-            'host': os.getenv('DB_LOCAL_HOST', '127.0.0.1'),
-            'user': os.getenv('DB_USER', 'root'),
-            'password': os.getenv('DB_PASSWORD', ''),
-            'database': os.getenv('DB_NAME', 'alquiler_vehiculos'),
+            'host': os.getenv('DB1_HOST', '127.0.0.1'),
+            'user': os.getenv('DB1_USER', 'root'),
+            'password': os.getenv('DB1_PASSWORD', ''),
+            'database': os.getenv('DB1_NAME', 'alquiler_vehiculos'),
         }
         self.remote_conf = {
-            'host': os.getenv('DB_REMOTE_HOST', '192.168.0.2'),
-            'user': os.getenv('DB_USER', 'root'),
-            'password': os.getenv('DB_PASSWORD', ''),
-            'database': os.getenv('DB_NAME', 'alquiler_vehiculos'),
+            'host': os.getenv('DB2_HOST', '192.168.0.2'),
+            'user': os.getenv('DB2_USER', 'root'),
+            'password': os.getenv('DB2_PASSWORD', ''),
+            'database': os.getenv('DB2_NAME', 'alquiler_vehiculos'),
         }
         self.active = 'local'
         self.conn: MySQLConnection | None = None
