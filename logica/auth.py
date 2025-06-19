@@ -22,8 +22,11 @@ class Autenticador:
         )
         hashed = sha256_hash(password)
         if self.conexion.ejecutar(consulta_cliente, (correo, hashed)):
-            return 'cliente'
+            return "cliente"
+
         resultado = self.conexion.ejecutar(consulta_empleado, (correo, hashed))
         if resultado:
-            return resultado[0][0]
+            rol = str(resultado[0][0]).strip().lower()
+            return rol
+
         return None

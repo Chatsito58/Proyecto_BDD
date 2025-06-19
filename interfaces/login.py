@@ -31,18 +31,23 @@ class LoginApp(tk.Tk):
         if not rol:
             messagebox.showerror('Error', 'Credenciales inválidas')
             return
-        self.destroy()
+
+        rol = rol.strip().lower()
         if rol == 'cliente':
             from interfaces.cliente import ClienteApp
+            self.destroy()
             ClienteApp().mainloop()
         elif rol == 'empleado':
             from interfaces.empleado import EmpleadoApp
+            self.destroy()
             EmpleadoApp().mainloop()
         elif rol == 'gerente':
             from interfaces.gerente import GerenteApp
+            self.destroy()
             GerenteApp().mainloop()
         elif rol == 'admin':
             from interfaces.admin import AdminApp
+            self.destroy()
             AdminApp().mainloop()
         else:
             messagebox.showerror('Error', 'Rol desconocido')
