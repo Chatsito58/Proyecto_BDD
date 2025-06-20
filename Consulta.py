@@ -313,7 +313,42 @@ class MySQLApp:
 
 
 # ========== Ejecutar la app ==========
-if __name__ == "__main__":
+def run_gui() -> None:
+    """Lanzar la interfaz gráfica de consultas."""
     root = ThemedTk(theme="arc")
     app = MySQLApp(root, ConexionBD())
     root.mainloop()
+
+
+def main() -> None:
+    """Punto de entrada en consola con autenticación por roles."""
+    from getpass import getpass
+
+    from auth import login
+    from cliente import menu_cliente
+    from empleado import menu_empleado
+    from gerente import menu_gerente
+
+    conexion = ConexionBD()
+    print("Sistema de Alquiler de Vehículos")
+    for _ in range(3):
+        correo = input("Correo: ").strip()
+        password = getpass("Contraseña: ")
+        rol = login(conexion, correo, password)
+        if rol:
+            break
+        print("Credenciales inválidas. Intente nuevamente.\n")
+    else:
+        print("Demasiados intentos fallidos")
+        return
+
+    if rol == "cliente":
+        menu_cliente(conexion, correo)
+    elif rol == "empleado":
+        menu_empleado(conexion, correo)
+    else:  # gerente o admin
+        menu_gerente(conexion, correo, es_admin=(rol == "admin"))
+
+
+if __name__ == "__main__":
+    main()
