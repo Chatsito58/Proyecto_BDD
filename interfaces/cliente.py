@@ -37,7 +37,7 @@ class VentanaCliente(ThemedTk):
 
     def _ver_vehiculos(self) -> None:
         try:
-            filas = self.conexion.ejecutar("SELECT placa, modelo FROM Vehiculo LIMIT 10")
+            filas = self.conexion.ejecutar("SELECT placa, modelo FROM Vehiculo")
         except Exception as exc:
             messagebox.showerror("Error", f"No se pudieron obtener los vehículos:\n{exc}")
             return
