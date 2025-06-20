@@ -38,12 +38,17 @@ class VentanaCliente(ThemedTk):
         ventana.title("Nueva reserva")
         ventana.configure(bg="#f4f6f9")
 
-        ttk.Label(ventana, text="Fecha y hora (YYYY-MM-DD HH:MM):").pack(
-            anchor="w", padx=10, pady=(10, 2)
-        )
-        entry_fecha = ttk.Entry(ventana)
-        entry_fecha.pack(fill="x", padx=10, pady=5)
-        entry_fecha.insert(0, datetime.now().strftime("%Y-%m-%d %H:%M"))
+        ttk.Label(
+            ventana, text="Fecha y hora inicio (YYYY-MM-DD HH:MM):"
+        ).pack(anchor="w", padx=10, pady=(10, 2))
+        entry_inicio = ttk.Entry(ventana)
+        entry_inicio.pack(fill="x", padx=10, pady=5)
+
+        ttk.Label(
+            ventana, text="Fecha y hora fin (YYYY-MM-DD HH:MM):"
+        ).pack(anchor="w", padx=10, pady=(10, 2))
+        entry_fin = ttk.Entry(ventana)
+        entry_fin.pack(fill="x", padx=10, pady=5)
 
         ttk.Label(ventana, text="Abono:").pack(anchor="w", padx=10, pady=(10, 2))
         entry_abono = ttk.Entry(ventana)
@@ -56,11 +61,25 @@ class VentanaCliente(ThemedTk):
         entry_saldo.pack(fill="x", padx=10, pady=5)
 
         def registrar() -> None:
-            fecha = entry_fecha.get().strip()
+            inicio = entry_inicio.get().strip()
+            fin = entry_fin.get().strip()
             abono = entry_abono.get().strip()
             saldo = entry_saldo.get().strip()
-            if not fecha or not abono or not saldo:
+            if not inicio or not fin or not abono or not saldo:
                 messagebox.showerror("Error", "Todos los campos son obligatorios")
+                return
+            try:
+                fecha_ini = datetime.strptime(inicio, "%Y-%m-%d %H:%M")
+                fecha_fin = datetime.strptime(fin, "%Y-%m-%d %H:%M")
+            except ValueError:
+                messagebox.showerror(
+                    "Error", "Formato de fechas incorrecto (YYYY-MM-DD HH:MM)"
+                )
+                return
+            if fecha_fin < fecha_ini:
+                messagebox.showerror(
+                    "Error", "La fecha de fin debe ser posterior a la de inicio"
+                )
                 return
             try:
                 abono_val = float(abono)
@@ -69,14 +88,16 @@ class VentanaCliente(ThemedTk):
                 messagebox.showerror("Error", "Valores num\u00e9ricos inv\u00e1lidos")
                 return
             query = (
-                "INSERT INTO Reserva_alquiler (fecha_hora, abono, saldo_pendiente, id_estado_reserva) "
-                "VALUES (%s, %s, %s, %s)"
+                "INSERT INTO Reserva_alquiler "
+                "(fecha_hora, fecha_hora_inicio, fecha_hora_fin, abono, saldo_pendiente, id_estado_reserva) "
+                "VALUES (NOW(), %s, %s, %s, %s, %s)"
             )
             try:
                 self.conexion.ejecutar(
                     query,
                     (
-                        fecha,
+                        fecha_ini.strftime("%Y-%m-%d %H:%M:%S"),
+                        fecha_fin.strftime("%Y-%m-%d %H:%M:%S"),
                         abono_val,
                         saldo_val,
                         1,  # Estado 'Reservado'

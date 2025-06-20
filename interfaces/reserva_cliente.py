@@ -43,12 +43,12 @@ class VentanaReservaCliente(ThemedTk):
         self.combo_vehiculo.pack(fill="x", pady=5)
         self.combo_vehiculo.bind("<<ComboboxSelected>>", lambda _e: self._calcular_total())
 
-        ttk.Label(marco, text="Fecha inicio (YYYY-MM-DD):").pack(anchor="w")
+        ttk.Label(marco, text="Fecha y hora inicio (YYYY-MM-DD HH:MM):").pack(anchor="w")
         self.entry_inicio = ttk.Entry(marco)
         self.entry_inicio.pack(fill="x", pady=5)
         self.entry_inicio.bind("<FocusOut>", lambda _e: self._calcular_total())
 
-        ttk.Label(marco, text="Fecha fin (YYYY-MM-DD):").pack(anchor="w")
+        ttk.Label(marco, text="Fecha y hora fin (YYYY-MM-DD HH:MM):").pack(anchor="w")
         self.entry_fin = ttk.Entry(marco)
         self.entry_fin.pack(fill="x", pady=5)
         self.entry_fin.bind("<FocusOut>", lambda _e: self._calcular_total())
@@ -134,11 +134,13 @@ class VentanaReservaCliente(ThemedTk):
         self, ini: str, fin: str, mostrar_error: bool = True
     ) -> tuple[datetime, datetime] | None:
         try:
-            fecha_ini = datetime.strptime(ini, "%Y-%m-%d")
-            fecha_fin = datetime.strptime(fin, "%Y-%m-%d")
+            fecha_ini = datetime.strptime(ini, "%Y-%m-%d %H:%M")
+            fecha_fin = datetime.strptime(fin, "%Y-%m-%d %H:%M")
         except ValueError:
             if mostrar_error:
-                messagebox.showerror("Error", "Formato de fechas incorrecto")
+                messagebox.showerror(
+                    "Error", "Formato de fechas incorrecto (YYYY-MM-DD HH:MM)"
+                )
             return None
         if fecha_fin < fecha_ini:
             if mostrar_error:
@@ -198,8 +200,9 @@ class VentanaReservaCliente(ThemedTk):
         restante = total_pago - abono_val
         query_reserva = (
             "INSERT INTO Reserva_alquiler "
-            "(fecha_hora, abono, saldo_pendiente, id_estado_reserva) "
-            "VALUES (%s, %s, %s, %s)"
+            "(fecha_hora, fecha_hora_inicio, fecha_hora_fin, abono, "
+            "saldo_pendiente, id_estado_reserva) "
+            "VALUES (NOW(), %s, %s, %s, %s, %s)"
         )
         query_abono = (
             "INSERT INTO Abono_reserva (valor, fecha_hora, id_reserva, id_medio_pago) "
@@ -210,6 +213,7 @@ class VentanaReservaCliente(ThemedTk):
                 query_reserva,
                 (
                     fecha_ini.strftime("%Y-%m-%d %H:%M:%S"),
+                    fecha_fin.strftime("%Y-%m-%d %H:%M:%S"),
                     abono_val,
                     restante,
                     1,
