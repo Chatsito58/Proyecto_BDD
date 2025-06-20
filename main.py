@@ -1,10 +1,10 @@
 from utils.logger import configurar_logging
-from interfaces.login import LoginApp
+from interfaces.login import VentanaLogin
 
 
 def main() -> None:
     configurar_logging()
-    app = LoginApp()
+    app = VentanaLogin()
     app.mainloop()
 
 
