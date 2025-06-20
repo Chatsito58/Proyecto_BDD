@@ -72,6 +72,7 @@ class VentanaReservaCliente(ThemedTk):
             fill="x", pady=10
         )
         ttk.Button(marco, text="📜 Historial de reservas", command=self._abrir_historial).pack(fill="x")
+        ttk.Button(marco, text="📘 Historial de alquileres", command=self._abrir_historial_alquileres).pack(fill="x", pady=(5, 0))
         ttk.Separator(marco).pack(fill="x", pady=10)
         ttk.Button(marco, text="💰 Hacer otro abono", command=self._abrir_abono).pack(
             fill="x"
@@ -240,16 +241,19 @@ class VentanaReservaCliente(ThemedTk):
     def _abrir_historial(self) -> None:
         ventana = tk.Toplevel(self)
         ventana.title("Historial de reservas")
-        ventana.geometry("600x300")
-        cols = ("id", "fecha", "total", "estado")
+        ventana.geometry("700x350")
+        cols = ("id", "salida", "total", "estado")
         tree = ttk.Treeview(ventana, columns=cols, show="headings")
         for c in cols:
             tree.heading(c, text=c.capitalize())
             tree.column(c, anchor="center")
         tree.pack(fill="both", expand=True, padx=10, pady=10)
         query = (
-            "SELECT id_reserva, fecha_hora, abono + saldo_pendiente AS total, id_estado_reserva "
-            "FROM Reserva_alquiler WHERE id_cliente=%s"
+            "SELECT r.id_reserva, r.fecha_hora_salida, "
+            "r.abono + r.saldo_pendiente AS total, er.descripcion "
+            "FROM Reserva_alquiler r "
+            "JOIN Estado_reserva er ON r.id_estado_reserva=er.id_estado "
+            "WHERE r.id_cliente=%s"
         )
         try:
             filas = self.conexion.ejecutar(query, (self.id_cliente,))
@@ -258,6 +262,96 @@ class VentanaReservaCliente(ThemedTk):
             filas = []
         for fila in filas:
             tree.insert("", tk.END, values=fila)
+
+        def cancelar() -> None:
+            item = tree.focus()
+            if not item:
+                messagebox.showerror("Error", "Seleccione una reserva")
+                return
+            id_reserva, fecha_salida, *_rest = tree.item(item)["values"]
+            fecha_dt = (
+                fecha_salida
+                if isinstance(fecha_salida, datetime)
+                else datetime.strptime(str(fecha_salida), "%Y-%m-%d %H:%M:%S")
+            )
+            if fecha_dt <= datetime.now():
+                messagebox.showerror(
+                    "Error", "La reserva ya sucedió y no puede cancelarse"
+                )
+                return
+            if not messagebox.askyesno(
+                "Confirmar", "¿Cancelar la reserva seleccionada?"
+            ):
+                return
+            try:
+                self.conexion.ejecutar(
+                    "UPDATE Reserva_alquiler SET id_estado_reserva=2 WHERE id_reserva=%s",
+                    (id_reserva,),
+                )
+                messagebox.showinfo("Éxito", "Reserva cancelada")
+                tree.delete(item)
+            except Exception as exc:  # pragma: no cover - depende de la BD
+                messagebox.showerror("Error", f"No se pudo cancelar:\n{exc}")
+
+        ttk.Button(ventana, text="Cancelar reserva", command=cancelar).pack()
+        ttk.Button(ventana, text="Cerrar", command=ventana.destroy).pack(pady=(5, 0))
+
+    def _abrir_historial_alquileres(self) -> None:
+        ventana = tk.Toplevel(self)
+        ventana.title("Historial de alquileres")
+        ventana.geometry("700x350")
+        cols = ("id", "salida", "valor", "estado")
+        tree = ttk.Treeview(ventana, columns=cols, show="headings")
+        for c in cols:
+            tree.heading(c, text=c.capitalize())
+            tree.column(c, anchor="center")
+        tree.pack(fill="both", expand=True, padx=10, pady=10)
+        query = (
+            "SELECT a.id_alquiler, a.fecha_hora_salida, a.valor, ea.descripcion "
+            "FROM Alquiler a "
+            "JOIN Estado_alquiler ea ON a.id_estado=ea.id_estado "
+            "WHERE a.id_cliente=%s"
+        )
+        try:
+            filas = self.conexion.ejecutar(query, (self.id_cliente,))
+        except Exception as exc:  # pragma: no cover - depende de la BD
+            messagebox.showerror("Error", f"No se pudo obtener el historial:\n{exc}")
+            filas = []
+        for fila in filas:
+            tree.insert("", tk.END, values=fila)
+
+        def cancelar() -> None:
+            item = tree.focus()
+            if not item:
+                messagebox.showerror("Error", "Seleccione un alquiler")
+                return
+            id_alquiler, fecha_salida, *_rest = tree.item(item)["values"]
+            fecha_dt = (
+                fecha_salida
+                if isinstance(fecha_salida, datetime)
+                else datetime.strptime(str(fecha_salida), "%Y-%m-%d %H:%M:%S")
+            )
+            if fecha_dt <= datetime.now():
+                messagebox.showerror(
+                    "Error", "Este alquiler ya inició y no puede cancelarse"
+                )
+                return
+            if not messagebox.askyesno(
+                "Confirmar", "¿Cancelar el alquiler seleccionado?"
+            ):
+                return
+            try:
+                self.conexion.ejecutar(
+                    "DELETE FROM Alquiler WHERE id_alquiler=%s",
+                    (id_alquiler,),
+                )
+                messagebox.showinfo("Éxito", "Alquiler cancelado")
+                tree.delete(item)
+            except Exception as exc:  # pragma: no cover - depende de la BD
+                messagebox.showerror("Error", f"No se pudo cancelar:\n{exc}")
+
+        ttk.Button(ventana, text="Cancelar alquiler", command=cancelar).pack()
+        ttk.Button(ventana, text="Cerrar", command=ventana.destroy).pack(pady=(5, 0))
 
     def _logout(self) -> None:
         self.destroy()
