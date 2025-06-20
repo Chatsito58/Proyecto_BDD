@@ -89,7 +89,7 @@ class VentanaCliente(ThemedTk):
                 return
             query = (
                 "INSERT INTO Reserva_alquiler "
-                "(fecha_hora, fecha_hora_inicio, fecha_hora_fin, abono, saldo_pendiente, id_estado_reserva) "
+                "(fecha_hora, fecha_hora_entrada, fecha_hora_salida, abono, saldo_pendiente, id_estado_reserva) "
                 "VALUES (NOW(), %s, %s, %s, %s, %s)"
             )
             try:
