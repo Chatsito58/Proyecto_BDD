@@ -15,12 +15,13 @@ class VentanaReservaCliente(ThemedTk):
         super().__init__(theme="arc")
         self.title("🚗 Reservas")
         self.configure(bg="#f4f6f9")
-        self.geometry("420x460")
+        self.geometry("460x560")
         self.id_cliente = id_cliente
         self.conexion = ConexionBD()
         self._configurar_estilo()
         self._build_ui()
         self._cargar_datos()
+        self._calcular_total()
 
     def _configurar_estilo(self) -> None:
         estilo = ttk.Style(self)
@@ -40,14 +41,17 @@ class VentanaReservaCliente(ThemedTk):
         ttk.Label(marco, text="Vehículo:").pack(anchor="w")
         self.combo_vehiculo = ttk.Combobox(marco, state="readonly")
         self.combo_vehiculo.pack(fill="x", pady=5)
+        self.combo_vehiculo.bind("<<ComboboxSelected>>", lambda _e: self._calcular_total())
 
         ttk.Label(marco, text="Fecha inicio (YYYY-MM-DD):").pack(anchor="w")
         self.entry_inicio = ttk.Entry(marco)
         self.entry_inicio.pack(fill="x", pady=5)
+        self.entry_inicio.bind("<FocusOut>", lambda _e: self._calcular_total())
 
         ttk.Label(marco, text="Fecha fin (YYYY-MM-DD):").pack(anchor="w")
         self.entry_fin = ttk.Entry(marco)
         self.entry_fin.pack(fill="x", pady=5)
+        self.entry_fin.bind("<FocusOut>", lambda _e: self._calcular_total())
 
         ttk.Label(marco, text="Medio de pago:").pack(anchor="w")
         self.combo_medio = ttk.Combobox(marco, state="readonly")
@@ -57,13 +61,27 @@ class VentanaReservaCliente(ThemedTk):
         self.entry_abono = ttk.Entry(marco)
         self.entry_abono.pack(fill="x", pady=5)
 
+        self.lbl_total = ttk.Label(marco, text="Total: $0.00")
+        self.lbl_total.pack(anchor="w", pady=(5, 0))
+        self.lbl_minimo = ttk.Label(marco, text="Abono mínimo (30%): $0.00")
+        self.lbl_minimo.pack(anchor="w")
+        ttk.Label(marco, text="Mínimo debo abonar 30%").pack(anchor="w")
+
         ttk.Button(marco, text="📝 Reservar", command=self._reservar).pack(
             fill="x", pady=10
         )
+        ttk.Button(marco, text="📜 Historial de reservas", command=self._abrir_historial).pack(fill="x")
         ttk.Separator(marco).pack(fill="x", pady=10)
         ttk.Button(marco, text="💰 Hacer otro abono", command=self._abrir_abono).pack(
             fill="x"
         )
+        ttk.Label(marco, text="Descuentos disponibles:").pack(anchor="w", pady=(10, 0))
+        self.tree_desc = ttk.Treeview(marco, columns=("desc", "valor"), show="headings", height=4)
+        self.tree_desc.heading("desc", text="Descripción")
+        self.tree_desc.heading("valor", text="Valor")
+        self.tree_desc.column("desc", width=200)
+        self.tree_desc.column("valor", width=80, anchor="center")
+        self.tree_desc.pack(fill="both", expand=False, pady=5)
         ttk.Button(marco, text="Cerrar sesión", command=self._logout).pack(
             fill="x", pady=(20, 0)
         )
@@ -100,6 +118,17 @@ class VentanaReservaCliente(ThemedTk):
         for _id, desc in medios:
             self.medios_info[desc] = int(_id)
 
+        try:
+            descuentos = self.conexion.ejecutar(
+                "SELECT descripcion, valor FROM Descuento_alquiler"
+            )
+        except Exception as exc:  # pragma: no cover - depende de la BD
+            messagebox.showerror("Error", f"No se pudieron cargar descuentos:\n{exc}")
+            descuentos = []
+        self.tree_desc.delete(*self.tree_desc.get_children())
+        for desc, val in descuentos:
+            self.tree_desc.insert("", tk.END, values=(desc, f"{val}%"))
+
     # ----------------------------
     def _validar_fechas(self, ini: str, fin: str) -> tuple[datetime, datetime] | None:
         try:
@@ -114,6 +143,22 @@ class VentanaReservaCliente(ThemedTk):
             )
             return None
         return fecha_ini, fecha_fin
+
+    def _calcular_total(self) -> None:
+        vehiculo = self.combo_vehiculo.get()
+        fechas = self._validar_fechas(
+            self.entry_inicio.get().strip(), self.entry_fin.get().strip()
+        )
+        if not vehiculo or fechas is None:
+            self.lbl_total.config(text="Total: $0.00")
+            self.lbl_minimo.config(text="Abono mínimo (30%): $0.00")
+            return
+        fecha_ini, fecha_fin = fechas
+        _placa, tarifa = self.vehiculos_info.get(vehiculo, (None, 0))
+        dias = (fecha_fin - fecha_ini).days + 1
+        total = dias * tarifa
+        self.lbl_total.config(text=f"Total: ${total:.2f}")
+        self.lbl_minimo.config(text=f"Abono mínimo (30%): ${total*0.3:.2f}")
 
     def _reservar(self) -> None:
         vehiculo = self.combo_vehiculo.get()
@@ -146,7 +191,7 @@ class VentanaReservaCliente(ThemedTk):
             return
         restante -= abono_val
         query_reserva = (
-            "INSERT INTO reserva "
+            "INSERT INTO reserva_alquiler "
             "(id_cliente, id_vehiculo, fecha_inicio, fecha_fin, fecha_reserva, estado_reserva, medio_pago, total_pago) "
             "VALUES (%s, %s, %s, %s, NOW(), %s, %s, %s)"
         )
@@ -182,6 +227,28 @@ class VentanaReservaCliente(ThemedTk):
     # ----------------------------
     def _abrir_abono(self) -> None:
         VentanaAbono(self, self.id_cliente, self.conexion, self.medios_info)
+
+    def _abrir_historial(self) -> None:
+        ventana = tk.Toplevel(self)
+        ventana.title("Historial de reservas")
+        ventana.geometry("600x300")
+        cols = ("id", "inicio", "fin", "total", "estado")
+        tree = ttk.Treeview(ventana, columns=cols, show="headings")
+        for c in cols:
+            tree.heading(c, text=c.capitalize())
+            tree.column(c, anchor="center")
+        tree.pack(fill="both", expand=True, padx=10, pady=10)
+        query = (
+            "SELECT id_reserva, fecha_inicio, fecha_fin, total_pago, estado_reserva "
+            "FROM reserva_alquiler WHERE id_cliente=%s"
+        )
+        try:
+            filas = self.conexion.ejecutar(query, (self.id_cliente,))
+        except Exception as exc:  # pragma: no cover - depende de la BD
+            messagebox.showerror("Error", f"No se pudo obtener el historial:\n{exc}")
+            filas = []
+        for fila in filas:
+            tree.insert("", tk.END, values=fila)
 
     def _logout(self) -> None:
         self.destroy()
@@ -237,7 +304,7 @@ class VentanaAbono(tk.Toplevel):
         query = (
             "SELECT r.id_reserva, r.total_pago, "
             "COALESCE(SUM(a.monto_abono),0) AS pagado "
-            "FROM reserva r "
+            "FROM reserva_alquiler r "
             "LEFT JOIN abono_reserva a ON r.id_reserva=a.id_reserva "
             "WHERE r.id_cliente=%s AND r.estado_reserva='pendiente' "
             "GROUP BY r.id_reserva, r.total_pago"
