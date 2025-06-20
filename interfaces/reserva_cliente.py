@@ -130,24 +130,30 @@ class VentanaReservaCliente(ThemedTk):
             self.tree_desc.insert("", tk.END, values=(desc, f"{val}%"))
 
     # ----------------------------
-    def _validar_fechas(self, ini: str, fin: str) -> tuple[datetime, datetime] | None:
+    def _validar_fechas(
+        self, ini: str, fin: str, mostrar_error: bool = True
+    ) -> tuple[datetime, datetime] | None:
         try:
             fecha_ini = datetime.strptime(ini, "%Y-%m-%d")
             fecha_fin = datetime.strptime(fin, "%Y-%m-%d")
         except ValueError:
-            messagebox.showerror("Error", "Formato de fechas incorrecto")
+            if mostrar_error:
+                messagebox.showerror("Error", "Formato de fechas incorrecto")
             return None
         if fecha_fin < fecha_ini:
-            messagebox.showerror(
-                "Error", "La fecha de fin debe ser posterior a la de inicio"
-            )
+            if mostrar_error:
+                messagebox.showerror(
+                    "Error", "La fecha de fin debe ser posterior a la de inicio"
+                )
             return None
         return fecha_ini, fecha_fin
 
     def _calcular_total(self) -> None:
         vehiculo = self.combo_vehiculo.get()
         fechas = self._validar_fechas(
-            self.entry_inicio.get().strip(), self.entry_fin.get().strip()
+            self.entry_inicio.get().strip(),
+            self.entry_fin.get().strip(),
+            mostrar_error=False,
         )
         if not vehiculo or fechas is None:
             self.lbl_total.config(text="Total: $0.00")
@@ -189,27 +195,24 @@ class VentanaReservaCliente(ThemedTk):
                 "Error", "Cada abono debe ser mínimo el 30% del valor restante"
             )
             return
-        restante -= abono_val
+        restante = total_pago - abono_val
         query_reserva = (
-            "INSERT INTO reserva_alquiler "
-            "(id_cliente, id_vehiculo, fecha_inicio, fecha_fin, fecha_reserva, estado_reserva, medio_pago, total_pago) "
-            "VALUES (%s, %s, %s, %s, NOW(), %s, %s, %s)"
+            "INSERT INTO Reserva_alquiler "
+            "(fecha_hora, abono, saldo_pendiente, id_estado_reserva) "
+            "VALUES (%s, %s, %s, %s)"
         )
         query_abono = (
-            "INSERT INTO abono_reserva (id_reserva, monto_abono, fecha_abono, medio_pago) "
-            "VALUES (LAST_INSERT_ID(), %s, NOW(), %s)"
+            "INSERT INTO Abono_reserva (valor, fecha_hora, id_reserva, id_medio_pago) "
+            "VALUES (%s, NOW(), LAST_INSERT_ID(), %s)"
         )
         try:
             self.conexion.ejecutar(
                 query_reserva,
                 (
-                    self.id_cliente,
-                    placa,
-                    fecha_ini.strftime("%Y-%m-%d"),
-                    fecha_fin.strftime("%Y-%m-%d"),
-                    "pendiente",
-                    self.medios_info[medio],
-                    total_pago,
+                    fecha_ini.strftime("%Y-%m-%d %H:%M:%S"),
+                    abono_val,
+                    restante,
+                    1,
                 ),
             )
             self.conexion.ejecutar(
@@ -232,18 +235,18 @@ class VentanaReservaCliente(ThemedTk):
         ventana = tk.Toplevel(self)
         ventana.title("Historial de reservas")
         ventana.geometry("600x300")
-        cols = ("id", "inicio", "fin", "total", "estado")
+        cols = ("id", "fecha", "total", "estado")
         tree = ttk.Treeview(ventana, columns=cols, show="headings")
         for c in cols:
             tree.heading(c, text=c.capitalize())
             tree.column(c, anchor="center")
         tree.pack(fill="both", expand=True, padx=10, pady=10)
         query = (
-            "SELECT id_reserva, fecha_inicio, fecha_fin, total_pago, estado_reserva "
-            "FROM reserva_alquiler WHERE id_cliente=%s"
+            "SELECT id_reserva, fecha_hora, abono + saldo_pendiente AS total, id_estado_reserva "
+            "FROM Reserva_alquiler"
         )
         try:
-            filas = self.conexion.ejecutar(query, (self.id_cliente,))
+            filas = self.conexion.ejecutar(query)
         except Exception as exc:  # pragma: no cover - depende de la BD
             messagebox.showerror("Error", f"No se pudo obtener el historial:\n{exc}")
             filas = []
@@ -302,15 +305,14 @@ class VentanaAbono(tk.Toplevel):
 
     def _cargar_reservas(self) -> None:
         query = (
-            "SELECT r.id_reserva, r.total_pago, "
-            "COALESCE(SUM(a.monto_abono),0) AS pagado "
-            "FROM reserva_alquiler r "
-            "LEFT JOIN abono_reserva a ON r.id_reserva=a.id_reserva "
-            "WHERE r.id_cliente=%s AND r.estado_reserva='pendiente' "
-            "GROUP BY r.id_reserva, r.total_pago"
+            "SELECT r.id_reserva, r.abono + r.saldo_pendiente AS total, "
+            "COALESCE(SUM(a.valor),0) AS pagado "
+            "FROM Reserva_alquiler r "
+            "LEFT JOIN Abono_reserva a ON r.id_reserva=a.id_reserva "
+            "GROUP BY r.id_reserva, r.abono, r.saldo_pendiente"
         )
         try:
-            filas = self.conexion.ejecutar(query, (self.id_cliente,))
+            filas = self.conexion.ejecutar(query)
         except Exception as exc:  # pragma: no cover - depende de la BD
             messagebox.showerror("Error", f"No se pudieron cargar reservas:\n{exc}")
             filas = []
@@ -344,11 +346,11 @@ class VentanaAbono(tk.Toplevel):
             )
             return
         query = (
-            "INSERT INTO abono_reserva (id_reserva, monto_abono, fecha_abono, medio_pago) "
-            "VALUES (%s, %s, NOW(), %s)"
+            "INSERT INTO Abono_reserva (valor, fecha_hora, id_reserva, id_medio_pago) "
+            "VALUES (%s, NOW(), %s, %s)"
         )
         try:
-            self.conexion.ejecutar(query, (id_reserva, monto, self.medios[medio]))
+            self.conexion.ejecutar(query, (monto, id_reserva, self.medios[medio]))
             messagebox.showinfo("Éxito", "Abono registrado")
             self.entry_monto.delete(0, tk.END)
             self._cargar_reservas()
