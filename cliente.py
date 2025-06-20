@@ -39,7 +39,7 @@ def menu_cliente(conexion: ConexionBD, correo: str) -> None:
 def ver_vehiculos_disponibles(conexion: ConexionBD) -> None:
     try:
         filas = conexion.ejecutar(
-            "SELECT placa, modelo FROM Vehiculo LIMIT 10"
+            "SELECT placa, modelo FROM Vehiculo"
         )
         for placa, modelo in filas:
             print(f"Placa: {placa} - Modelo: {modelo}")

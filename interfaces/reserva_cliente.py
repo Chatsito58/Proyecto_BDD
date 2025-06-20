@@ -63,9 +63,10 @@ class VentanaReservaCliente(ThemedTk):
 
         self.lbl_total = ttk.Label(marco, text="Total: $0.00")
         self.lbl_total.pack(anchor="w", pady=(5, 0))
-        self.lbl_minimo = ttk.Label(marco, text="Abono mínimo (30%): $0.00")
+        ttk.Label(marco, text="Mínimo debe abonar 30%").pack(anchor="w")
+        self.lbl_minimo = ttk.Label(marco, text="Abono mínimo: $0.00")
         self.lbl_minimo.pack(anchor="w")
-        ttk.Label(marco, text="Mínimo debo abonar 30%").pack(anchor="w")
+        
 
         ttk.Button(marco, text="📝 Reservar", command=self._reservar).pack(
             fill="x", pady=10
