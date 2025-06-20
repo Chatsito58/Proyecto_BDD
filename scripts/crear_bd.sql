@@ -255,6 +255,8 @@ CREATE TABLE Seguro_alquiler (
 CREATE TABLE Reserva_alquiler (
   id_reserva         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   fecha_hora         DATETIME,
+  fecha_hora_salida  DATETIME,
+  fecha_hora_entrada DATETIME,
   abono              DECIMAL(10,2),
   saldo_pendiente    DECIMAL(10,2),
   id_estado_reserva  INT UNSIGNED,
