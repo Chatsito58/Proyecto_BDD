@@ -14,9 +14,9 @@ class ConexionBD:
     def __init__(self) -> None:
         load_dotenv()
         self.local_conf = {
-            'host': os.getenv('DB1_HOST', '127.0.0.1'),
-            'user': os.getenv('DB1_USER', 'root'),
-            'password': os.getenv('DB1_PASSWORD', ''),
+            'host': os.getenv('DB1_HOST', '192.168.57.251'),
+            'user': os.getenv('DB1_USER', 'admin'),
+            'password': os.getenv('DB1_PASSWORD', 'admin'),
             'database': os.getenv('DB1_NAME', 'alquiler_vehiculos'),
         }
         self.remote_conf = {
