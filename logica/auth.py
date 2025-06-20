@@ -17,6 +17,14 @@ class Autenticador:
     def __init__(self) -> None:
         self.conexion = ConexionBD()
 
+    def obtener_id_cliente(self, correo: str) -> int | None:
+        """Devolver el id_cliente correspondiente al correo."""
+        res = self.conexion.ejecutar(
+            "SELECT id_cliente FROM cliente WHERE correo=%s",
+            (correo,),
+        )
+        return int(res[0][0]) if res else None
+
     def autenticar(self, correo: str, password: str) -> Optional[str]:
         """Return role name if credentials are valid."""
         consulta_cliente = (

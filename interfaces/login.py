@@ -79,9 +79,13 @@ class VentanaLogin(ThemedTk):
         rol = self._normalizar_rol(rol)
         self.destroy()
         if rol == "cliente":
-            from interfaces.cliente import VentanaCliente
+            from interfaces.reserva_cliente import VentanaReservaCliente
 
-            VentanaCliente().mainloop()
+            id_cliente = self.autenticador.obtener_id_cliente(correo)
+            if id_cliente is None:
+                messagebox.showerror("Error", "Cliente no encontrado")
+                return
+            VentanaReservaCliente(id_cliente).mainloop()
         elif rol == "empleado":
             from interfaces.empleado import VentanaEmpleado
 
