@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import tkinter as tk
 from tkinter import messagebox, ttk
+from datetime import datetime
 from ttkthemes import ThemedTk
 
 from conexion.conexion import ConexionBD
@@ -33,7 +34,66 @@ class VentanaCliente(ThemedTk):
         ttk.Button(marco, text="Cerrar sesión", command=self._logout).pack(fill="x", pady=(15, 0))
 
     def _reservar(self) -> None:
-        messagebox.showinfo("Reservas", "Función de reserva no implementada")
+        ventana = tk.Toplevel(self)
+        ventana.title("Nueva reserva")
+        ventana.configure(bg="#f4f6f9")
+
+        ttk.Label(ventana, text="Fecha y hora (YYYY-MM-DD HH:MM):").pack(
+            anchor="w", padx=10, pady=(10, 2)
+        )
+        entry_fecha = ttk.Entry(ventana)
+        entry_fecha.pack(fill="x", padx=10, pady=5)
+        entry_fecha.insert(0, datetime.now().strftime("%Y-%m-%d %H:%M"))
+
+        ttk.Label(ventana, text="Abono:").pack(anchor="w", padx=10, pady=(10, 2))
+        entry_abono = ttk.Entry(ventana)
+        entry_abono.pack(fill="x", padx=10, pady=5)
+
+        ttk.Label(ventana, text="Saldo pendiente:").pack(
+            anchor="w", padx=10, pady=(10, 2)
+        )
+        entry_saldo = ttk.Entry(ventana)
+        entry_saldo.pack(fill="x", padx=10, pady=5)
+
+        def registrar() -> None:
+            fecha = entry_fecha.get().strip()
+            abono = entry_abono.get().strip()
+            saldo = entry_saldo.get().strip()
+            if not fecha or not abono or not saldo:
+                messagebox.showerror("Error", "Todos los campos son obligatorios")
+                return
+            try:
+                abono_val = float(abono)
+                saldo_val = float(saldo)
+            except ValueError:
+                messagebox.showerror("Error", "Valores num\u00e9ricos inv\u00e1lidos")
+                return
+            query = (
+                "INSERT INTO Reserva_alquiler (fecha_hora, abono, saldo_pendiente, id_estado_reserva) "
+                "VALUES (%s, %s, %s, %s)"
+            )
+            try:
+                self.conexion.ejecutar(
+                    query,
+                    (
+                        fecha,
+                        abono_val,
+                        saldo_val,
+                        1,  # Estado 'Reservado'
+                    ),
+                )
+                messagebox.showinfo(
+                    "Reserva", "Reserva registrada correctamente"
+                )
+                ventana.destroy()
+            except Exception as exc:  # pragma: no cover - depende de la BD
+                messagebox.showerror(
+                    "Error", f"No se pudo registrar la reserva:\n{exc}"
+                )
+
+        ttk.Button(ventana, text="Reservar", command=registrar).pack(
+            pady=15
+        )
 
     def _ver_vehiculos(self) -> None:
         try:
