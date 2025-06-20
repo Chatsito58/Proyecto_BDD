@@ -202,8 +202,8 @@ class VentanaReservaCliente(ThemedTk):
         query_reserva = (
             "INSERT INTO Reserva_alquiler "
             "(fecha_hora, fecha_hora_entrada, fecha_hora_salida, abono, "
-            "saldo_pendiente, id_estado_reserva) "
-            "VALUES (NOW(), %s, %s, %s, %s, %s)"
+            "saldo_pendiente, id_cliente, id_estado_reserva) "
+            "VALUES (NOW(), %s, %s, %s, %s, %s, %s)"
         )
         query_abono = (
             "INSERT INTO Abono_reserva (valor, fecha_hora, id_reserva, id_medio_pago) "
@@ -217,6 +217,7 @@ class VentanaReservaCliente(ThemedTk):
                     fecha_fin.strftime("%Y-%m-%d %H:%M:%S"),
                     abono_val,
                     restante,
+                    self.id_cliente,
                     1,
                 ),
             )
@@ -248,10 +249,10 @@ class VentanaReservaCliente(ThemedTk):
         tree.pack(fill="both", expand=True, padx=10, pady=10)
         query = (
             "SELECT id_reserva, fecha_hora, abono + saldo_pendiente AS total, id_estado_reserva "
-            "FROM Reserva_alquiler"
+            "FROM Reserva_alquiler WHERE id_cliente=%s"
         )
         try:
-            filas = self.conexion.ejecutar(query)
+            filas = self.conexion.ejecutar(query, (self.id_cliente,))
         except Exception as exc:  # pragma: no cover - depende de la BD
             messagebox.showerror("Error", f"No se pudo obtener el historial:\n{exc}")
             filas = []
@@ -314,10 +315,11 @@ class VentanaAbono(tk.Toplevel):
             "COALESCE(SUM(a.valor),0) AS pagado "
             "FROM Reserva_alquiler r "
             "LEFT JOIN Abono_reserva a ON r.id_reserva=a.id_reserva "
+            "WHERE r.id_cliente=%s "
             "GROUP BY r.id_reserva, r.abono, r.saldo_pendiente"
         )
         try:
-            filas = self.conexion.ejecutar(query)
+            filas = self.conexion.ejecutar(query, (self.id_cliente,))
         except Exception as exc:  # pragma: no cover - depende de la BD
             messagebox.showerror("Error", f"No se pudieron cargar reservas:\n{exc}")
             filas = []
