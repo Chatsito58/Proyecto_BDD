@@ -259,9 +259,12 @@ CREATE TABLE Reserva_alquiler (
   fecha_hora_entrada DATETIME,
   abono              DECIMAL(10,2),
   saldo_pendiente    DECIMAL(10,2),
+  id_cliente         INT UNSIGNED,
   id_estado_reserva  INT UNSIGNED,
   FOREIGN KEY (id_estado_reserva)
-    REFERENCES Estado_reserva(id_estado)
+    REFERENCES Estado_reserva(id_estado),
+  FOREIGN KEY (id_cliente)
+    REFERENCES Cliente(id_cliente)
 ) ENGINE=InnoDB;
 
 -- Crear tabla Alquiler
