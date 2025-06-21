@@ -13,9 +13,8 @@ class SimpleDateEntry(ttk.Frame):
     """Selector de fecha simple sin dependencias externas"""
 
     def __init__(self, parent, **kwargs):
-        super().__init__(parent)
-        self.date_var = tk.StringVar()
-        self.date_var.set(date.today().strftime("%Y-%m-%d"))
+        super().__init__(parent, **kwargs)
+        self.date_var = tk.StringVar(value=date.today().strftime("%Y-%m-%d"))
 
         self.entry = ttk.Entry(self, textvariable=self.date_var, width=12, font=("Segoe UI", 10))
         self.entry.pack(side="left", padx=(0, 5))
@@ -23,42 +22,53 @@ class SimpleDateEntry(ttk.Frame):
         self.btn_calendar = ttk.Button(self, text="📅", width=3, command=self._open_calendar)
         self.btn_calendar.pack(side="left")
 
-    def _open_calendar(self):
-        cal_window = tk.Toplevel(self)
-        cal_window.title("Seleccionar Fecha")
-        cal_window.geometry("300x200")
-        cal_window.resizable(False, False)
-        cal_window.grab_set()
+        self.cal_window: tk.Toplevel | None = None
+
+    # ------------------------------------------------------------------
+    def _open_calendar(self) -> None:
+        if self.cal_window and self.cal_window.winfo_exists():
+            self.cal_window.focus_set()
+            return
+
+        self.cal_window = tk.Toplevel(self)
+        self.cal_window.title("Seleccionar Fecha")
+        self.cal_window.resizable(False, False)
 
         today = date.today()
         self.cal_year = tk.IntVar(value=today.year)
         self.cal_month = tk.IntVar(value=today.month)
 
-        control_frame = ttk.Frame(cal_window)
+        control_frame = ttk.Frame(self.cal_window)
         control_frame.pack(pady=10)
 
         ttk.Button(control_frame, text="◀", command=lambda: self._change_month(-1)).pack(side="left")
-        self.month_label = ttk.Label(control_frame, text="", font=("Segoe UI", 12, "bold"))
+        self.month_label = ttk.Label(control_frame, font=("Segoe UI", 12, "bold"))
         self.month_label.pack(side="left", padx=20)
         ttk.Button(control_frame, text="▶", command=lambda: self._change_month(1)).pack(side="left")
 
-        self.days_frame = ttk.Frame(cal_window)
+        self.days_frame = ttk.Frame(self.cal_window)
         self.days_frame.pack(pady=10)
 
         self._update_calendar()
 
-        def _change_month(self, delta):
-            new_month = self.cal_month.get() + delta
-            if new_month > 12:
-                new_month = 1
-                self.cal_year.set(self.cal_year.get() + 1)
-            elif new_month < 1:
-                new_month = 12
-                self.cal_year.set(self.cal_year.get() - 1)
-            self.cal_month.set(new_month)
-            self._update_calendar()
+        self.cal_window.update_idletasks()
+        self.update_idletasks()
+        w, h = 320, 250
+        x = self.btn_calendar.winfo_rootx() + self.btn_calendar.winfo_width() // 2 - w // 2
+        y = self.btn_calendar.winfo_rooty() + self.btn_calendar.winfo_height()
+        self.cal_window.geometry(f"{w}x{h}+{x}+{y}")
+        self.cal_window.grab_set()
 
-        self._change_month = _change_month
+    def _change_month(self, delta: int) -> None:
+        new_month = self.cal_month.get() + delta
+        if new_month > 12:
+            new_month = 1
+            self.cal_year.set(self.cal_year.get() + 1)
+        elif new_month < 1:
+            new_month = 12
+            self.cal_year.set(self.cal_year.get() - 1)
+        self.cal_month.set(new_month)
+        self._update_calendar()
 
     def _update_calendar(self):
         for widget in self.days_frame.winfo_children():
@@ -92,10 +102,9 @@ class SimpleDateEntry(ttk.Frame):
     def _select_date(self, day):
         selected_date = date(self.cal_year.get(), self.cal_month.get(), day)
         self.date_var.set(selected_date.strftime("%Y-%m-%d"))
-        for widget in self.winfo_toplevel().winfo_children():
-            if isinstance(widget, tk.Toplevel) and widget.title() == "Seleccionar Fecha":
-                widget.destroy()
-                break
+        if self.cal_window and self.cal_window.winfo_exists():
+            self.cal_window.destroy()
+            self.cal_window = None
 
     def get_date(self):
         try:
