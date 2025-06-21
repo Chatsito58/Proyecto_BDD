@@ -1,0 +1,45 @@
+# Ignorar entornos virtuales de Python
+venv/
+.venv/
+env/
+.env/
+
+# Ignorar archivos de caché de Python
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg
+*.egg-info/
+.pytest_cache/
+
+# Ignorar archivos de Visual Studio Code
+.vscode/
+# Ignora solo archivos específicos si no quieres ignorar toda la carpeta .vscode/
+# Por ejemplo, puedes ignorar el historial de búsqueda, pero no settings.json
+.vscode/*.code-workspace
+.vscode/*.log
+.vscode/bookmarks.json
+.vscode/settings.json # Considera ignorar si tiene rutas locales
+.vscode/tasks.json # Considera ignorar si tiene rutas locales
+.vscode/launch.json # Considera ignorar si tiene rutas locales
+.vscode/extensions.json # Si es generado automáticamente por el IDE
+
+# Ignorar archivos de sistema operativo
+.DS_Store # macOS
+Thumbs.db # Windows
+
+# Ignorar archivos de configuración de entorno (.env)
+.env # Archivo para variables de entorno (¡MUY IMPORTANTE para contraseñas, claves, etc.!)
+
+# Ignorar archivos generados por editores
+*~
+*.swp
+*.swo
+
+# Logs y caches varios
+*.log
+*.temp
+temp/
+build/
+dist/
