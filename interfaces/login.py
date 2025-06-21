@@ -1,27 +1,29 @@
 from __future__ import annotations
 
-from tkinter import messagebox, ttk
-from ttkthemes import ThemedTk
+from tkinter import messagebox
+import customtkinter as ctk
+
+ctk.set_appearance_mode("dark")  # o "light"
+ctk.set_default_color_theme("blue")
 
 from logica.auth import Autenticador
 
 
-class VentanaLogin(ThemedTk):
+class VentanaLogin(ctk.CTk):
     """Ventana principal de inicio de sesión."""
 
     def __init__(self) -> None:
-        super().__init__(theme="arc")
+        super().__init__()
         self.title("🔐 Iniciar Sesión")
-        self.configure(bg="#f4f6f9")
         self.geometry("320x260")
+        self.configure(fg_color="#f4f6f9")
         self.autenticador = Autenticador()
         self._configurar_estilo()
         self._build_ui()
 
     def _configurar_estilo(self) -> None:
-        estilo = ttk.Style(self)
-        estilo.configure("TLabel", font=("Segoe UI", 11))
-        estilo.configure("TButton", font=("Segoe UI", 10, "bold"), padding=6)
+        # CustomTkinter maneja estilos a través de temas
+        pass
 
     @staticmethod
     def _normalizar_rol(rol: str) -> str:
@@ -40,29 +42,29 @@ class VentanaLogin(ThemedTk):
         return mapping.get(rol, rol)
 
     def _build_ui(self) -> None:
-        marco = ttk.Frame(self, padding=20)
-        marco.pack(expand=True)
+        marco = ctk.CTkFrame(self)
+        marco.pack(expand=True, padx=20, pady=20)
 
-        ttk.Label(
+        ctk.CTkLabel(
             marco,
             text="🔐 Iniciar Sesión",
             font=("Segoe UI", 16, "bold"),
         ).pack(pady=(0, 15))
 
-        ttk.Label(marco, text="Correo:").pack(anchor="w")
-        self.entry_correo = ttk.Entry(marco)
+        ctk.CTkLabel(marco, text="Correo:").pack(anchor="w")
+        self.entry_correo = ctk.CTkEntry(marco)
         self.entry_correo.pack(fill="x", pady=5)
 
-        ttk.Label(marco, text="Contraseña:").pack(anchor="w")
-        self.entry_pass = ttk.Entry(marco, show="*")
+        ctk.CTkLabel(marco, text="Contraseña:").pack(anchor="w")
+        self.entry_pass = ctk.CTkEntry(marco, show="*")
         self.entry_pass.pack(fill="x", pady=5)
 
-        ttk.Button(marco, text="🚪 Iniciar", command=self._ingresar).pack(pady=10, fill="x")
+        ctk.CTkButton(marco, text="🚪 Iniciar", command=self._ingresar).pack(pady=10, fill="x")
 
-        enlace = ttk.Label(
+        enlace = ctk.CTkLabel(
             marco,
             text="🆕 Crear cuenta de cliente",
-            foreground="blue",
+            text_color="blue",
             cursor="hand2",
         )
         enlace.pack()
