@@ -6,6 +6,8 @@ from datetime import datetime, date
 import calendar
 import customtkinter as ctk
 
+from interfaces.componentes.selector_fecha_hora import SelectorFechaHora
+
 from conexion.conexion import ConexionBD
 
 
@@ -166,15 +168,15 @@ class VentanaCliente(ctk.CTk):
         self.combo_vehiculo.pack(fill="x", pady=5)
         self.combo_vehiculo.bind("<<ComboboxSelected>>", lambda _e: self._calcular_total())
 
-        ctk.CTkLabel(frame, text="Fecha y hora inicio (YYYY-MM-DD HH:MM):").pack(anchor="w")
-        self.entry_inicio = ctk.CTkEntry(frame)
-        self.entry_inicio.pack(fill="x", pady=5)
-        self.entry_inicio.bind("<FocusOut>", lambda _e: self._calcular_total())
+        ctk.CTkLabel(frame, text="Inicio:").pack(anchor="w")
+        self.selector_inicio = SelectorFechaHora(frame)
+        self.selector_inicio.pack(fill="x", pady=5)
+        self.selector_inicio.entry.bind("<FocusOut>", lambda _e: self._calcular_total())
 
-        ctk.CTkLabel(frame, text="Fecha y hora fin (YYYY-MM-DD HH:MM):").pack(anchor="w")
-        self.entry_fin = ctk.CTkEntry(frame)
-        self.entry_fin.pack(fill="x", pady=5)
-        self.entry_fin.bind("<FocusOut>", lambda _e: self._calcular_total())
+        ctk.CTkLabel(frame, text="Fin:").pack(anchor="w")
+        self.selector_fin = SelectorFechaHora(frame)
+        self.selector_fin.pack(fill="x", pady=5)
+        self.selector_fin.entry.bind("<FocusOut>", lambda _e: self._calcular_total())
 
         ctk.CTkLabel(frame, text="Medio de pago:").pack(anchor="w")
         self.combo_medio = ctk.CTkComboBox(frame, values=[])
@@ -242,14 +244,7 @@ class VentanaCliente(ctk.CTk):
         for desc, val in descuentos:
             self.tree_desc.insert("", tk.END, values=(desc, f"{val}%"))
 
-    def _validar_fechas(self, ini: str, fin: str, mostrar_error: bool = True) -> tuple[datetime, datetime] | None:
-        try:
-            fecha_ini = datetime.strptime(ini, "%Y-%m-%d %H:%M")
-            fecha_fin = datetime.strptime(fin, "%Y-%m-%d %H:%M")
-        except ValueError:
-            if mostrar_error:
-                messagebox.showerror("Error", "Formato de fechas incorrecto (YYYY-MM-DD HH:MM)")
-            return None
+    def _validar_fechas(self, fecha_ini: datetime, fecha_fin: datetime, mostrar_error: bool = True) -> tuple[datetime, datetime] | None:
         if fecha_fin < fecha_ini:
             if mostrar_error:
                 messagebox.showerror("Error", "La fecha de fin debe ser posterior a la de inicio")
@@ -258,7 +253,11 @@ class VentanaCliente(ctk.CTk):
 
     def _calcular_total(self) -> None:
         vehiculo = self.combo_vehiculo.get()
-        fechas = self._validar_fechas(self.entry_inicio.get().strip(), self.entry_fin.get().strip(), mostrar_error=False)
+        fechas = self._validar_fechas(
+            self.selector_inicio.obtener_datetime(),
+            self.selector_fin.obtener_datetime(),
+            mostrar_error=False,
+        )
         if not vehiculo or fechas is None:
             self.lbl_total.configure(text="Total: $0.00")
             self.lbl_minimo.configure(text="Abono m\u00ednimo: $0.00")
@@ -277,7 +276,10 @@ class VentanaCliente(ctk.CTk):
         if not vehiculo or not medio or not abono:
             messagebox.showerror("Error", "Todos los campos son obligatorios")
             return
-        fechas = self._validar_fechas(self.entry_inicio.get().strip(), self.entry_fin.get().strip())
+        fechas = self._validar_fechas(
+            self.selector_inicio.obtener_datetime(),
+            self.selector_fin.obtener_datetime(),
+        )
         if fechas is None:
             return
         fecha_ini, fecha_fin = fechas
