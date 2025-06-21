@@ -1,15 +1,2 @@
 [
-  {
-    "query": "SELECT id_cliente FROM cliente WHERE correo=%s",
-    "params": [
-      "cliente1@gmail.com"
-    ]
-  },
-  {
-    "query": "SELECT te.nombre FROM Empleado e JOIN tipo_empleado te ON e.id_tipo_empleado=te.id_tipo_empleado WHERE e.correo=%s AND e.contrasena=%s",
-    "params": [
-      "cliente1@gamil.com",
-      "09a31a7001e261ab1e056182a71d3cf57f582ca9a29cff5eb83be0f0549730a9"
-    ]
-  }
 ]

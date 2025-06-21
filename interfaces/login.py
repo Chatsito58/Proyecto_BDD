@@ -90,20 +90,3 @@ class VentanaLogin(ctk.CTk):
             VentanaReservaCliente(id_cliente).mainloop()
         elif rol == "empleado":
             from interfaces.empleado import VentanaEmpleado
-
-            VentanaEmpleado().mainloop()
-        elif rol == "gerente":
-            from interfaces.gerente import VentanaGerente
-
-            VentanaGerente().mainloop()
-        elif rol == "admin":
-            from interfaces.admin import VentanaAdmin
-
-            VentanaAdmin().mainloop()
-        else:
-            messagebox.showerror("Error", "Rol desconocido")
-
-    def _abrir_registro(self) -> None:
-        from interfaces.registro_cliente import VentanaCrearCliente
-
-        VentanaCrearCliente(self)
