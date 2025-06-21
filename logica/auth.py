@@ -32,7 +32,7 @@ class Autenticador:
         )
         consulta_empleado = (
             "SELECT te.nombre FROM Empleado e "
-            "JOIN tipo_empleado te ON e.id_tipo_empleado=te.id_tipo_empleado "
+            "JOIN Tipo_empleado te ON e.id_tipo_empleado=te.id_tipo_empleado "
             "WHERE e.correo=%s AND e.contrasena=%s"
         )
         hashed = sha256_hash(password)
@@ -96,7 +96,7 @@ def check_permission(token: str, permiso: str) -> bool:
         return False
     conn = ConexionBD()
     res = conn.ejecutar(
-        "SELECT permisos FROM tipo_empleado WHERE LOWER(nombre)=%s",
+        "SELECT permisos FROM Tipo_empleado WHERE LOWER(nombre)=%s",
         (rol.lower(),),
     )
     if not res:

@@ -24,7 +24,7 @@ def login(conexion: ConexionBD, correo: str, password: str) -> Optional[str]:
     )
     q_empleado = (
         "SELECT te.nombre FROM Empleado e "
-        "JOIN tipo_empleado te ON e.id_tipo_empleado=te.id_tipo_empleado "
+        "JOIN Tipo_empleado te ON e.id_tipo_empleado=te.id_tipo_empleado "
         "WHERE e.correo=%s AND e.contrasena=%s"
     )
     if conexion.ejecutar(q_cliente, (correo, hashed)):
