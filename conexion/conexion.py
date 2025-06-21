@@ -14,15 +14,15 @@ class ConexionBD:
     def __init__(self) -> None:
         load_dotenv()
         self.local_conf = {
-            'host': os.getenv('DB1_HOST', '192.168.57.251'),
+            'host': os.getenv('DB1_HOST', 'localhost'),
             'user': os.getenv('DB1_USER', 'admin'),
             'password': os.getenv('DB1_PASSWORD', 'admin'),
             'database': os.getenv('DB1_NAME', 'alquiler_vehiculos'),
         }
         self.remote_conf = {
-            'host': os.getenv('DB2_HOST', '192.168.0.2'),
+            'host': os.getenv('DB2_HOST', 'localhost'),
             'user': os.getenv('DB2_USER', 'root'),
-            'password': os.getenv('DB2_PASSWORD', ''),
+            'password': os.getenv('DB2_PASSWORD', 'admin123'),
             'database': os.getenv('DB2_NAME', 'alquiler_vehiculos'),
         }
         self.active = 'local'
@@ -136,12 +136,12 @@ class ConexionBD:
                     "clientes" in op['query'].lower()
                     and "doesn't exist" in str(e)
                 ):
-                    corregida = op['query'].replace('clientes', 'cliente')
+                    corregida = op['query'].replace('clientes', 'Cliente')
                 elif (
                     "empleados" in op['query'].lower()
                     and "doesn't exist" in str(e)
                 ):
-                    corregida = op['query'].replace('empleados', 'empleado')
+                    corregida = op['query'].replace('empleados', 'Empleado')
                 if corregida:
                     logging.info('Reintentando con tabla: %s', corregida)
                     try:

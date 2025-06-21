@@ -27,7 +27,7 @@ class SyncFixTest(unittest.TestCase):
         }]
         self.db._sincronizar()
         self.assertEqual(cursor.execute.call_args_list[1][0][0],
-                         'INSERT INTO cliente (nombre) VALUES (%s)')
+                         'INSERT INTO Cliente (nombre) VALUES (%s)')
 
     def test_fetch_select_results(self):
         cursor = MagicMock()

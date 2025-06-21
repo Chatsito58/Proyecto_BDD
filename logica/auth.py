@@ -20,7 +20,7 @@ class Autenticador:
     def obtener_id_cliente(self, correo: str) -> int | None:
         """Devolver el id_cliente correspondiente al correo."""
         res = self.conexion.ejecutar(
-            "SELECT id_cliente FROM cliente WHERE correo=%s",
+            "SELECT id_cliente FROM Cliente WHERE correo=%s",
             (correo,),
         )
         return int(res[0][0]) if res else None
@@ -28,16 +28,16 @@ class Autenticador:
     def autenticar(self, correo: str, password: str) -> Optional[str]:
         """Return role name if credentials are valid."""
         consulta_cliente = (
-            "SELECT 'cliente' FROM cliente WHERE correo=%s AND contrasena=%s"
+            "SELECT 'Cliente' FROM Cliente WHERE correo=%s AND contrasena=%s"
         )
         consulta_empleado = (
-            "SELECT te.nombre FROM empleado e "
+            "SELECT te.nombre FROM Empleado e "
             "JOIN tipo_empleado te ON e.id_tipo_empleado=te.id_tipo_empleado "
             "WHERE e.correo=%s AND e.contrasena=%s"
         )
         hashed = sha256_hash(password)
         if self.conexion.ejecutar(consulta_cliente, (correo, hashed)):
-            return "cliente"
+            return "Cliente"
 
         resultado = self.conexion.ejecutar(consulta_empleado, (correo, hashed))
         if resultado:

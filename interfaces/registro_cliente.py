@@ -59,7 +59,7 @@ class VentanaCrearCliente(tk.Toplevel):
             return
 
         query = (
-            "INSERT INTO cliente (nombre, documento, correo, contrasena) "
+            "INSERT INTO Cliente (nombre, documento, correo, contrasena) "
             "VALUES (%s, %s, %s, %s)"
         )
         hashed = sha256_hash(contrasena)

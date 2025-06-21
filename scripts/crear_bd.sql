@@ -1,9 +1,9 @@
 -- ------------------------------------------------------------------
 -- 1) TABLAS AUXILIARES / CATÁLOGOS
 -- ------------------------------------------------------------------
-DROP DATABASE Alquiler_vehiculos;
-CREATE DATABASE IF NOT EXISTS Alquiler_vehiculos;
-USE Alquiler_vehiculos;
+-- DROP DATABASE alquiler_vehiculos;
+CREATE DATABASE IF NOT EXISTS alquiler_vehiculos;
+USE alquiler_vehiculos;
 CREATE TABLE Tipo_entidad (
   id_tipo_entidad   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   descripcion       VARCHAR(100) NOT NULL
