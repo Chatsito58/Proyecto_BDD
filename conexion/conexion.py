@@ -141,7 +141,7 @@ class ConexionBD:
                     "empleados" in op['query'].lower()
                     and "doesn't exist" in str(e)
                 ):
-                    corregida = op['query'].replace('empleados', 'Empleado')
+                    corregida = op['query'].replace('empleados', 'empleado')
                 if corregida:
                     logging.info('Reintentando con tabla: %s', corregida)
                     try:

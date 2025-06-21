@@ -310,7 +310,8 @@ class VentanaReservaCliente(ThemedTk):
             "SELECT a.id_alquiler, a.fecha_hora_salida, a.valor, ea.descripcion "
             "FROM Alquiler a "
             "JOIN Estado_alquiler ea ON a.id_estado=ea.id_estado "
-            "WHERE a.id_cliente=%s"
+            "WHERE a.id_cliente=%s "
+            "ORDER BY a.fecha_hora_salida DESC"
         )
         try:
             filas = self.conexion.ejecutar(query, (self.id_cliente,))
