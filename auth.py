@@ -6,9 +6,19 @@ from conexion.conexion import ConexionBD
 from utils.hash_utils import sha256_hash
 
 
+def hash_password(password: str) -> str:
+    """Return the SHA256 hash of the given password."""
+    return sha256_hash(password)
+
+
+def verificar_password(password: str, hash_guardado: str) -> bool:
+    """Return True if the password matches the stored hash."""
+    return sha256_hash(password) == hash_guardado
+
+
 def login(conexion: ConexionBD, correo: str, password: str) -> Optional[str]:
     """Verify credentials and return the user role if valid."""
-    hashed = sha256_hash(password)
+    hashed = hash_password(password)
     q_cliente = (
         "SELECT 'cliente' FROM cliente WHERE correo=%s AND contrasena=%s"
     )
@@ -26,3 +36,9 @@ def login(conexion: ConexionBD, correo: str, password: str) -> Optional[str]:
             return 'admin'
         return rol
     return None
+
+
+def login_usuario(correo: str, contrasena: str) -> Optional[str]:
+    """Connect to the DB and validate the given credentials."""
+    conexion = ConexionBD()
+    return login(conexion, correo, contrasena)
