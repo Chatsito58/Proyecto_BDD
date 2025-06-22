@@ -16,7 +16,7 @@ class VentanaLogin(ctk.CTk):
         super().__init__()
         self.title("🔐 Iniciar Sesión")
         self.geometry("320x260")
-        self.configure(fg_color="#f4f6f9")
+        self.configure(fg_color="#2a2a2a")
         self.autenticador = Autenticador()
         self._configurar_estilo()
         self._build_ui()

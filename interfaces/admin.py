@@ -12,7 +12,7 @@ class VentanaAdmin(ThemedTk):
     def __init__(self) -> None:
         super().__init__(theme="arc")
         self.title("🛠️ Panel del Administrador")
-        self.configure(bg="#f4f6f9")
+        self.configure(bg="#2a2a2a")
         self.geometry("340x220")
         self.ventana_consulta: tk.Toplevel | None = None
         self.btn_sql: ttk.Button | None = None

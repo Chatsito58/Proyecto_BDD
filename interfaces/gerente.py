@@ -22,7 +22,7 @@ class VentanaGerente(ctk.CTk):
         self.conexion = ConexionBD()
         self.title("\U0001f454 Panel del Gerente")
         self.geometry("900x600")
-        self.configure(fg_color="#f4f6f9")
+        self.configure(fg_color="#2a2a2a")
         self._build_ui()
         self._cargar_reservas()
         self._cargar_alquileres()

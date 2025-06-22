@@ -15,7 +15,7 @@ class VentanaCrearCliente(tk.Toplevel):
     def __init__(self, master: tk.Misc | None = None) -> None:
         super().__init__(master)
         self.title("Crear cliente")
-        self.configure(bg="#f4f6f9")
+        self.configure(bg="#2a2a2a")
         self.geometry("340x420")
         self.conexion = ConexionBD()
         self._configurar_estilo()

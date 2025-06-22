@@ -18,7 +18,7 @@ class MySQLApp:
         self.root = root
         self.root.title("🌐 Panel de Consultas MySQL")
         self.root.geometry("1000x700")
-        self.root.configure(bg="#f4f6f9")
+        self.root.configure(bg="#2a2a2a")
         self.historial_consultas = []
 
         self.configurar_estilo()

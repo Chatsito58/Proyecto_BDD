@@ -80,7 +80,7 @@ class VentanaCliente(ctk.CTk):
         self.conexion = ConexionBD()
         self.title("\U0001f464 Panel del Cliente")
         self.geometry("760x560")
-        self.configure(fg_color="#f4f6f9")
+        self.configure(fg_color="#2a2a2a")
         self._build_ui()
         self._cargar_datos_reserva()
         self._cargar_descuentos()

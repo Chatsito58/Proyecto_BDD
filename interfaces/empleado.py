@@ -15,7 +15,7 @@ class VentanaEmpleado(ThemedTk):
     def __init__(self) -> None:
         super().__init__(theme="arc")
         self.title("🧑‍🔧 Panel del Empleado")
-        self.configure(bg="#f4f6f9")
+        self.configure(bg="#2a2a2a")
         self.geometry("340x260")
         self._subventanas: list[tk.Toplevel] = []
         self._configurar_estilo()
