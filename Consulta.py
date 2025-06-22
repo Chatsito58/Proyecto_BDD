@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
+import re
 from ttkthemes import ThemedTk
 from tkinter import filedialog
 from mysql.connector import Error
@@ -27,42 +28,30 @@ class MySQLApp:
         self.crear_tabs()
         self.crear_barra_estado()
 
+    def _normalizar_query(self, query: str) -> str:
+        """Inserta espacios entre palabras clave y símbolos para evitar errores."""
+        # Separar operadores y paréntesis
+        query = re.sub(r"([(),=*<>])", r" \1 ", query)
+        # Agregar espacios en keywords importantes
+        keywords = (
+            r"SELECT|FROM|WHERE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|JOIN|INNER|"
+            r"LEFT|RIGHT|ON|GROUP|BY|ORDER|LIMIT|DISTINCT|AS|AND|OR|NOT|NULL"
+        )
+        query = re.sub(fr"(?i)({keywords})", r" \1 ", query)
+        return re.sub(r"\s+", " ", query).strip()
+
     def mostrar_tablas(self):
+        """Mostrar todas las tablas de la base de datos en el Treeview."""
         try:
-            _, filas = self.conexion.ejecutar_con_columnas("SHOW TABLES")
-            tablas = [fila[0] for fila in filas]
+            columnas, filas = self.conexion.ejecutar_con_columnas("SHOW TABLES")
         except Error as e:
-            messagebox.showerror("Error al obtener tablas", f"No se pudo obtener la lista de tablas:\n{e}")
+            messagebox.showerror(
+                "Error al obtener tablas", f"No se pudo obtener la lista de tablas:\n{e}"
+            )
             return
 
-        if not tablas:
-            messagebox.showinfo("Sin tablas", "No hay tablas en la base de datos.")
-            return
-
-        # Crear ventana emergente
-        ventana = tk.Toplevel(self.root)
-        ventana.title("Seleccionar una tabla")
-        ventana.geometry("300x250")
-        ventana.grab_set()
-
-        ttk.Label(ventana, text="Selecciona una tabla:", font=("Arial", 11)).pack(pady=10)
-
-        lista_tablas = tk.Listbox(ventana, height=10)
-        lista_tablas.pack(fill="both", expand=True, padx=10)
-
-        for tabla in tablas:
-            lista_tablas.insert(tk.END, tabla)
-
-        def ver_estructura():
-            seleccion = lista_tablas.curselection()
-            if not seleccion:
-                messagebox.showwarning("Sin selección", "Selecciona una tabla primero.")
-                return
-            nombre_tabla = lista_tablas.get(seleccion[0])
-            ventana.destroy()
-            self.describir_tabla(nombre_tabla)
-
-        ttk.Button(ventana, text="Ver estructura", command=ver_estructura).pack(pady=10)
+        self.mostrar_resultados(columnas, filas)
+        self.tab_control.select(self.tab_resultado)
     def describir_tabla(self, tabla):
         try:
             columnas, filas = self.conexion.ejecutar_con_columnas(f"DESCRIBE {tabla}")
@@ -261,6 +250,7 @@ class MySQLApp:
 
     def ejecutar_consulta(self):
         query = self.query_text.get("1.0", tk.END).strip()
+        query = self._normalizar_query(query)
 
         if not query:
             messagebox.showwarning("⚠ Consulta vacía", "Debes escribir una consulta SQL.")
@@ -268,6 +258,12 @@ class MySQLApp:
 
         # Guardar en historial
         self.actualizar_historial(query)
+
+        if not self.conexion.conn or not self.conexion.conn.is_connected():
+            self.conexion.conectar()
+        if not self.conexion.conn or not self.conexion.conn.is_connected():
+            messagebox.showerror("Error de conexión", "No hay conexión a la base de datos.")
+            return
 
         try:
             columnas, filas = self.conexion.ejecutar_con_columnas(query)
@@ -280,21 +276,32 @@ class MySQLApp:
                 messagebox.showinfo("✅ Éxito", "Consulta ejecutada correctamente.")
                 self.status_var.set("✅ Consulta ejecutada con éxito.")
         except Error as e:
-            messagebox.showerror("❌ Error de SQL", f"Ocurrió un error:\n{e}")
+            msg = str(e)
+            if "doesn't exist" in msg:
+                msg = "La tabla no existe"
+            elif "syntax" in msg.lower():
+                msg = "Error de sintaxis SQL"
+            messagebox.showerror("❌ Error de SQL", msg)
             self.status_var.set("❌ Error al ejecutar la consulta.")
 
     def mostrar_resultados(self, columnas, filas):
         self.tree.delete(*self.tree.get_children())
-        self.tree["columns"] = columnas
+        if filas:
+            self.tree["columns"] = columnas
 
-        for col in columnas:
-            self.tree.heading(col, text=col)
-            self.tree.column(col, anchor="center", stretch=True, width=140)
+            for col in columnas:
+                self.tree.heading(col, text=col)
+                self.tree.column(col, anchor="center", stretch=True, width=140)
 
-        for i, fila in enumerate(filas):
-            color = "#f0f8ff" if i % 2 == 0 else "#ffffff"
-            self.tree.insert("", tk.END, values=fila, tags=(f"fila{i}",))
-            self.tree.tag_configure(f"fila{i}", background=color)
+            for i, fila in enumerate(filas):
+                color = "#f0f8ff" if i % 2 == 0 else "#ffffff"
+                self.tree.insert("", tk.END, values=fila, tags=(f"fila{i}",))
+                self.tree.tag_configure(f"fila{i}", background=color)
+        else:
+            self.tree["columns"] = ["Resultado"]
+            self.tree.heading("Resultado", text="Resultado")
+            self.tree.column("Resultado", anchor="center", stretch=True)
+            self.tree.insert("", tk.END, values=("Consulta realizada, sin resultados.",))
 
     def limpiar_consulta(self):
         self.query_text.delete("1.0", tk.END)
