@@ -17,8 +17,21 @@ class VentanaEmpleado(ThemedTk):
         self.title("🧑‍🔧 Panel del Empleado")
         self.configure(bg="#f4f6f9")
         self.geometry("340x260")
+        self._subventanas: list[tk.Toplevel] = []
         self._configurar_estilo()
         self._build_ui()
+
+    # ------------------------------------------------------------------
+    def _registrar(self, win: tk.Toplevel) -> None:
+        """Mantener referencia a ventanas hijas y asegurar su cierre."""
+        self._subventanas.append(win)
+
+        def _on_close() -> None:
+            if win in self._subventanas:
+                self._subventanas.remove(win)
+            win.destroy()
+
+        win.protocol("WM_DELETE_WINDOW", _on_close)
 
     def _configurar_estilo(self) -> None:
         estilo = ttk.Style(self)
@@ -43,12 +56,16 @@ class VentanaEmpleado(ThemedTk):
         )
 
     def _abrir_reservas(self) -> None:
-        VentanaGestionReservas(self)
+        win = VentanaGestionReservas(self)
+        self._registrar(win)
 
     def _vehiculos(self) -> None:
-        messagebox.showinfo("Vehículos", "Función no implementada")
+        win = VentanaVehiculos(self)
+        self._registrar(win)
 
     def _logout(self) -> None:
+        for win in list(self._subventanas):
+            win.destroy()
         self.destroy()
         from interfaces.login import VentanaLogin
 
@@ -205,3 +222,83 @@ class VentanaAbonos(tk.Toplevel):
         except Exception as exc:  # pragma: no cover - conexion errors vary
             logging.error("Error actualizando abono: %s", exc)
             messagebox.showerror("Error", f"No se pudo actualizar:\n{exc}")
+
+
+class VentanaVehiculos(tk.Toplevel):
+    """Permite gestionar vehículos básicos."""
+
+    def __init__(self, master: tk.Misc) -> None:
+        super().__init__(master)
+        self.title("Vehículos")
+        self.geometry("600x400")
+        self.conexion = ConexionBD()
+        self._build_ui()
+        self._cargar()
+
+    def _build_ui(self) -> None:
+        self.tree = ttk.Treeview(self, columns=("placa", "modelo"), show="headings")
+        for c in ("placa", "modelo"):
+            self.tree.heading(c, text=c.capitalize())
+            self.tree.column(c, anchor="center")
+        self.tree.pack(fill="both", expand=True, padx=10, pady=10)
+
+        btns = ttk.Frame(self)
+        btns.pack(pady=5)
+        ttk.Button(btns, text="Agregar", command=self._agregar).pack(side="left", padx=5)
+        ttk.Button(btns, text="Eliminar", command=self._eliminar).pack(side="left", padx=5)
+        ttk.Button(btns, text="Actualizar", command=self._cargar).pack(side="left", padx=5)
+
+    def _cargar(self) -> None:
+        try:
+            filas = self.conexion.ejecutar("SELECT placa, modelo FROM Vehiculo")
+        except Exception as exc:  # pragma: no cover - conexion errors vary
+            logging.error("Error cargando vehículos: %s", exc)
+            messagebox.showerror("Error", f"No se pudieron cargar vehículos:\n{exc}")
+            filas = []
+        self.tree.delete(*self.tree.get_children())
+        for fila in filas:
+            self.tree.insert("", tk.END, values=fila)
+
+    def _agregar(self) -> None:
+        top = tk.Toplevel(self)
+        top.title("Nuevo vehículo")
+        ttk.Label(top, text="Placa:").grid(row=0, column=0, padx=5, pady=5)
+        entry_placa = ttk.Entry(top)
+        entry_placa.grid(row=0, column=1, padx=5, pady=5)
+        ttk.Label(top, text="Modelo:").grid(row=1, column=0, padx=5, pady=5)
+        entry_modelo = ttk.Entry(top)
+        entry_modelo.grid(row=1, column=1, padx=5, pady=5)
+
+        def guardar() -> None:
+            placa = entry_placa.get().strip()
+            modelo = entry_modelo.get().strip()
+            if not placa or not modelo:
+                messagebox.showerror("Error", "Debe ingresar placa y modelo")
+                return
+            try:
+                self.conexion.ejecutar(
+                    "INSERT INTO Vehiculo (placa, modelo) VALUES (%s, %s)",
+                    (placa, modelo),
+                )
+                messagebox.showinfo("Éxito", "Vehículo registrado")
+                top.destroy()
+                self._cargar()
+            except Exception as exc:  # pragma: no cover - conexion errors vary
+                messagebox.showerror("Error", f"No se pudo registrar:\n{exc}")
+
+        ttk.Button(top, text="Guardar", command=guardar).grid(row=2, column=0, columnspan=2, pady=10)
+
+    def _eliminar(self) -> None:
+        item = self.tree.focus()
+        if not item:
+            messagebox.showerror("Error", "Seleccione un vehículo")
+            return
+        placa = self.tree.item(item)["values"][0]
+        if not messagebox.askyesno("Confirmar", f"¿Eliminar vehículo {placa}?"):
+            return
+        try:
+            self.conexion.ejecutar("DELETE FROM Vehiculo WHERE placa=%s", (placa,))
+            messagebox.showinfo("Éxito", "Vehículo eliminado")
+            self._cargar()
+        except Exception as exc:  # pragma: no cover - conexion errors vary
+            messagebox.showerror("Error", f"No se pudo eliminar:\n{exc}")
