@@ -8,6 +8,8 @@ from tkcalendar import Calendar
 
 import customtkinter as ctk
 
+import logging
+
 from conexion.conexion import ConexionBD
 from interfaces.componentes.ctk_scrollable_combobox import CTkScrollableComboBox
 from interfaces.componentes.selector_fecha_hora import SelectorFechaHora
@@ -229,6 +231,34 @@ class VentanaCliente(ctk.CTk):
             return None
         return fecha_ini, fecha_fin
 
+    def _verificar_disponibilidad(
+        self, placa: str, fecha_ini: datetime, fecha_fin: datetime
+    ) -> bool:
+        """Return True if the vehicle is free in the given range."""
+        consulta = (
+            "SELECT COUNT(*) FROM Alquiler a "
+            "JOIN Estado_alquiler ea ON a.id_estado=ea.id_estado "
+            "WHERE a.id_vehiculo=%s "
+            "AND LOWER(ea.descripcion)!='teminado' "
+            "AND a.fecha_hora_salida < %s AND a.fecha_hora_entrada > %s"
+        )
+        try:
+            res = self.conexion.ejecutar(
+                consulta,
+                (
+                    placa,
+                    fecha_fin.strftime("%Y-%m-%d %H:%M:%S"),
+                    fecha_ini.strftime("%Y-%m-%d %H:%M:%S"),
+                ),
+            )
+            return int(res[0][0]) == 0
+        except Exception as exc:  # pragma: no cover - depende de la BD
+            logging.error("Error verificando disponibilidad: %s", exc)
+            messagebox.showerror(
+                "Error", f"No se pudo verificar disponibilidad:\n{exc}"
+            )
+            return False
+
     def _calcular_total(self) -> None:
         vehiculo = self.combo_vehiculo.get()
         fechas = self._validar_fechas(
@@ -269,6 +299,8 @@ class VentanaCliente(ctk.CTk):
         placa, tarifa = self.vehiculos_info.get(vehiculo, (None, 0))
         if not placa:
             messagebox.showerror("Error", "Veh\u00edculo inv\u00e1lido")
+            return
+        if not self._verificar_disponibilidad(placa, fecha_ini, fecha_fin):
             return
         dias = (fecha_fin - fecha_ini).days + 1
         total_pago = dias * tarifa
@@ -431,7 +463,9 @@ class VentanaCliente(ctk.CTk):
         if not item:
             messagebox.showerror("Error", "Seleccione una reserva")
             return
-        id_reserva, fecha_salida, *_rest = self.tree_reservas.item(item)["values"]
+        id_reserva, fecha_salida, _total, estado = self.tree_reservas.item(item)[
+            "values"
+        ]
         fecha_dt = (
             fecha_salida
             if isinstance(fecha_salida, datetime)
@@ -440,6 +474,11 @@ class VentanaCliente(ctk.CTk):
         if fecha_dt <= datetime.now():
             messagebox.showerror(
                 "Error", "La reserva ya sucedi\u00f3 y no puede cancelarse"
+            )
+            return
+        if str(estado).strip().lower() not in ("pendiente", "reservado"):
+            messagebox.showerror(
+                "Error", "Solo se pueden cancelar reservas pendientes"
             )
             return
         if not messagebox.askyesno(
