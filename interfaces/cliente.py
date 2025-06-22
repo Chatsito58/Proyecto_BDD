@@ -9,7 +9,12 @@ from tkcalendar import Calendar
 import customtkinter as ctk
 
 import logging
-from utils import cancel_pending_after, safe_bg_error_handler
+from utils import (
+    cancel_pending_after,
+    safe_bg_error_handler,
+    mostrar_error,
+    mostrar_notificacion,
+)
 
 from conexion.conexion import ConexionBD
 from interfaces.componentes.ctk_scrollable_combobox import CTkScrollableComboBox
@@ -185,9 +190,7 @@ class VentanaCliente(ctk.CTk):
         try:
             filas = self.conexion.ejecutar(consulta)
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror(
-                "Error", f"No se pudieron cargar veh\u00edculos:\n{exc}"
-            )
+            mostrar_error(exc)
             filas = []
         self.vehiculos_info: dict[str, tuple[str, float]] = {}
         opciones = []
@@ -202,9 +205,7 @@ class VentanaCliente(ctk.CTk):
                 "SELECT id_medio_pago, descripcion FROM Medio_pago"
             )
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror(
-                "Error", f"No se pudieron cargar medios de pago:\n{exc}"
-            )
+            mostrar_error(exc)
             medios = []
         self.medios_info: dict[str, int] = {}
         self.combo_medio.configure(values=[desc for _id, desc in medios])
@@ -217,7 +218,7 @@ class VentanaCliente(ctk.CTk):
                 "SELECT descripcion, valor FROM Descuento_alquiler"
             )
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudieron cargar descuentos:\n{exc}")
+            mostrar_error(exc)
             descuentos = []
         self.tree_desc.delete(*self.tree_desc.get_children())
         for desc, val in descuentos:
@@ -336,12 +337,12 @@ class VentanaCliente(ctk.CTk):
                 ),
             )
             self.conexion.ejecutar(q2, (abono_val, self.medios_info[medio]))
-            messagebox.showinfo("\u00c9xito", "Reserva registrada correctamente")
+            mostrar_notificacion("\u00c9xito", "Reserva registrada correctamente")
             self.entry_abono.delete(0, tk.END)
             self._cargar_reservas_abono()
             self._cargar_historial_reservas()
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudo registrar la reserva:\n{exc}")
+            mostrar_error(exc)
 
     # ------------------------------------------------------------------
     # ABONOS
@@ -382,7 +383,7 @@ class VentanaCliente(ctk.CTk):
         try:
             filas = self.conexion.ejecutar(query, (self.id_cliente,))
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudieron cargar reservas:\n{exc}")
+            mostrar_error(exc)
             filas = []
         self.reservas_restante: dict[str, float] = {}
         self.tree_abono.delete(*self.tree_abono.get_children())
@@ -419,12 +420,14 @@ class VentanaCliente(ctk.CTk):
             "VALUES (%s, NOW(), %s, %s)"
         )
         try:
-            self.conexion.ejecutar(query, (monto, id_reserva, self.medios_info[medio]))
-            messagebox.showinfo("\u00c9xito", "Abono registrado")
+            self.conexion.ejecutar(
+                query, (monto, id_reserva, self.medios_info[medio])
+            )
+            mostrar_notificacion("\u00c9xito", "Abono registrado")
             self.entry_abono_monto.delete(0, tk.END)
             self._cargar_reservas_abono()
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudo registrar el abono:\n{exc}")
+            mostrar_error(exc)
 
     # ------------------------------------------------------------------
     # HISTORIALES
@@ -455,7 +458,7 @@ class VentanaCliente(ctk.CTk):
         try:
             filas = self.conexion.ejecutar(query, (self.id_cliente,))
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudo obtener el historial:\n{exc}")
+            mostrar_error(exc)
             filas = []
         self.tree_reservas.delete(*self.tree_reservas.get_children())
         for fila in filas:
@@ -493,11 +496,11 @@ class VentanaCliente(ctk.CTk):
                 "UPDATE Reserva_alquiler SET id_estado_reserva=2 WHERE id_reserva=%s",
                 (id_reserva,),
             )
-            messagebox.showinfo("\u00c9xito", "Reserva cancelada")
+            mostrar_notificacion("\u00c9xito", "Reserva cancelada")
             self._cargar_historial_reservas()
             self._cargar_reservas_abono()
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudo cancelar:\n{exc}")
+            mostrar_error(exc)
 
     def _build_tab_historial_alquileres(self) -> None:
         frame = ctk.CTkFrame(self.tab_hist_alq, fg_color="transparent")
@@ -526,7 +529,7 @@ class VentanaCliente(ctk.CTk):
         try:
             filas = self.conexion.ejecutar(query, (self.id_cliente,))
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudo obtener el historial:\n{exc}")
+            mostrar_error(exc)
             filas = []
         self.tree_alquileres.delete(*self.tree_alquileres.get_children())
         for fila in filas:
@@ -556,10 +559,10 @@ class VentanaCliente(ctk.CTk):
             self.conexion.ejecutar(
                 "DELETE FROM Alquiler WHERE id_alquiler=%s", (id_alquiler,)
             )
-            messagebox.showinfo("\u00c9xito", "Alquiler cancelado")
+            mostrar_notificacion("\u00c9xito", "Alquiler cancelado")
             self._cargar_historial_alquileres()
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudo cancelar:\n{exc}")
+            mostrar_error(exc)
 
     # ------------------------------------------------------------------
     # VEH\u00cdCULOS Y TARIFAS
@@ -579,9 +582,7 @@ class VentanaCliente(ctk.CTk):
         try:
             filas = self.conexion.ejecutar("SELECT placa, modelo FROM Vehiculo")
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror(
-                "Error", f"No se pudieron obtener los veh\u00edculos:\n{exc}"
-            )
+            mostrar_error(exc)
             filas = []
         self.tree_veh.delete(*self.tree_veh.get_children())
         for fila in filas:
@@ -605,7 +606,7 @@ class VentanaCliente(ctk.CTk):
                 "SELECT descripcion, valor FROM Descuento_alquiler"
             )
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudieron obtener las tarifas:\n{exc}")
+            mostrar_error(exc)
             filas = []
         self.tree_tar.delete(*self.tree_tar.get_children())
         for fila in filas:

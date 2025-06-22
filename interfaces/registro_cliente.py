@@ -7,6 +7,7 @@ from conexion.conexion import ConexionBD
 from interfaces.componentes.ctk_scrollable_combobox import CTkScrollableComboBox
 from utils.hash_utils import sha256_hash
 from utils.validations import validar_correo
+from utils import mostrar_error, mostrar_notificacion
 
 
 class VentanaCrearCliente(tk.Toplevel):
@@ -66,7 +67,7 @@ class VentanaCrearCliente(tk.Toplevel):
         hashed = sha256_hash(contrasena)
         try:
             self.conexion.ejecutar(query, (nombre, documento, correo, hashed))
-            messagebox.showinfo("Éxito", "Cliente creado correctamente")
+            mostrar_notificacion("Éxito", "Cliente creado correctamente")
             self.destroy()
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror("Error", f"No se pudo crear el cliente: {exc}")
+            mostrar_error(exc)

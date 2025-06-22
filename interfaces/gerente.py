@@ -3,6 +3,7 @@ from __future__ import annotations
 import tkinter as tk
 from datetime import date
 from tkinter import messagebox, ttk
+from utils import cancel_pending_after, safe_bg_error_handler, mostrar_error, mostrar_notificacion
 
 import customtkinter as ctk
 from utils import cancel_pending_after, safe_bg_error_handler
@@ -94,9 +95,7 @@ class VentanaGerente(ctk.CTk):
         try:
             filas = self.conexion.ejecutar(query, params)
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror(
-                "Error", f"No se pudieron obtener las reservas:\n{exc}"
-            )
+            mostrar_error(exc)
             filas = []
         self.tree_res.delete(*self.tree_res.get_children())
         for fila in filas:
@@ -129,9 +128,7 @@ class VentanaGerente(ctk.CTk):
         try:
             filas = self.conexion.ejecutar(query)
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror(
-                "Error", f"No se pudieron obtener los alquileres:\n{exc}"
-            )
+            mostrar_error(exc)
             filas = []
         self.tree_alq.delete(*self.tree_alq.get_children())
         for fila in filas:
@@ -229,9 +226,7 @@ class VentanaGerente(ctk.CTk):
                 (desde.strftime("%Y-%m-%d"), hasta.strftime("%Y-%m-%d")),
             )
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror(
-                "Error", f"No se pudieron generar los reportes:\n{exc}"
-            )
+            mostrar_error(exc)
             ingresos, reservas, vehiculos, clientes = 0, 0, [], []
         self.lbl_ingresos.configure(text=f"Ingresos del mes: ${float(ingresos):,.2f}")
         self.lbl_reservas.configure(text=f"Reservas este mes: {reservas}")
@@ -279,9 +274,7 @@ class VentanaGerente(ctk.CTk):
                 "FROM Empleado e JOIN Tipo_empleado te ON e.id_tipo_empleado=te.id_tipo_empleado"
             )
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror(
-                "Error", f"No se pudieron obtener los empleados:\n{exc}"
-            )
+            mostrar_error(exc)
             filas = []
             self.tipo_map = {}
         self.tree_emp.delete(*self.tree_emp.get_children())
@@ -307,10 +300,10 @@ class VentanaGerente(ctk.CTk):
                 "UPDATE Empleado SET id_tipo_empleado=%s WHERE id_empleado=%s",
                 (id_tipo, id_emp),
             )
-            messagebox.showinfo("Éxito", "Tipo actualizado")
+            mostrar_notificacion("Éxito", "Tipo actualizado")
             self._cargar_empleados()
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror("Error", f"No se pudo actualizar:\n{exc}")
+            mostrar_error(exc)
 
     def _eliminar_empleado(self) -> None:
         item = self.tree_emp.focus()
@@ -327,10 +320,10 @@ class VentanaGerente(ctk.CTk):
             self.conexion.ejecutar(
                 "DELETE FROM Empleado WHERE id_empleado=%s", (id_emp,)
             )
-            messagebox.showinfo("Éxito", "Empleado eliminado")
+            mostrar_notificacion("Éxito", "Empleado eliminado")
             self._cargar_empleados()
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror("Error", f"No se pudo eliminar:\n{exc}")
+            mostrar_error(exc)
 
     # ------------------------------------------------------------------
     def _logout(self) -> None:

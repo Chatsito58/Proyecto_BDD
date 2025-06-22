@@ -16,3 +16,12 @@ def cancel_pending_after(widget) -> None:
     if hasattr(widget, "_after_ids"):
         widget._after_ids.clear()
 
+from .errores import mostrar_error, mostrar_notificacion
+
+__all__ = [
+    "safe_bg_error_handler",
+    "cancel_pending_after",
+    "mostrar_error",
+    "mostrar_notificacion",
+]
+
