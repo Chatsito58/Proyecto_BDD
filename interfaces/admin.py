@@ -6,11 +6,14 @@ from ttkthemes import ThemedTk
 
 from Consulta import MySQLApp
 from conexion.conexion import ConexionBD
+from utils import cancel_pending_after, safe_bg_error_handler
 
 
 class VentanaAdmin(ThemedTk):
     def __init__(self) -> None:
         super().__init__(theme="arc")
+        self.report_callback_exception = safe_bg_error_handler
+        self._after_ids: list[str] = []
         self.title("🛠️ Panel del Administrador")
         self.configure(bg="#2a2a2a")
         self.geometry("340x220")
@@ -46,6 +49,8 @@ class VentanaAdmin(ThemedTk):
     def _logout(self) -> None:
         if self.ventana_consulta and self.ventana_consulta.winfo_exists():
             self.ventana_consulta.destroy()
+        cancel_pending_after(self)
+        self.quit()
         self.destroy()
         from interfaces.login import VentanaLogin
 

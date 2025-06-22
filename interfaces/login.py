@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from tkinter import messagebox
 import customtkinter as ctk
+from utils import cancel_pending_after, safe_bg_error_handler
 
 ctk.set_appearance_mode("dark")  # o "light"
 ctk.set_default_color_theme("blue")
@@ -14,6 +15,8 @@ class VentanaLogin(ctk.CTk):
 
     def __init__(self) -> None:
         super().__init__()
+        self.report_callback_exception = safe_bg_error_handler
+        self._after_ids: list[str] = []
         self.title("🔐 Iniciar Sesión")
         self.geometry("320x260")
         self.configure(fg_color="#2a2a2a")
@@ -79,6 +82,8 @@ class VentanaLogin(ctk.CTk):
             return
 
         rol = self._normalizar_rol(rol)
+        cancel_pending_after(self)
+        self.quit()
         self.destroy()
         if rol == "cliente":
             from interfaces.cliente import VentanaCliente

@@ -9,11 +9,14 @@ import logging
 
 from conexion.conexion import ConexionBD
 from interfaces.componentes.ctk_scrollable_combobox import CTkScrollableComboBox
+from utils import cancel_pending_after, safe_bg_error_handler
 
 
 class VentanaEmpleado(ThemedTk):
     def __init__(self) -> None:
         super().__init__(theme="arc")
+        self.report_callback_exception = safe_bg_error_handler
+        self._after_ids: list[str] = []
         self.title("🧑‍🔧 Panel del Empleado")
         self.configure(bg="#2a2a2a")
         self.geometry("340x260")
@@ -66,6 +69,8 @@ class VentanaEmpleado(ThemedTk):
     def _logout(self) -> None:
         for win in list(self._subventanas):
             win.destroy()
+        cancel_pending_after(self)
+        self.quit()
         self.destroy()
         from interfaces.login import VentanaLogin
 

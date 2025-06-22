@@ -5,6 +5,7 @@ from datetime import date
 from tkinter import messagebox, ttk
 
 import customtkinter as ctk
+from utils import cancel_pending_after, safe_bg_error_handler
 
 from conexion.conexion import ConexionBD
 from interfaces.cliente import SimpleDateEntry
@@ -19,6 +20,8 @@ class VentanaGerente(ctk.CTk):
 
     def __init__(self) -> None:
         super().__init__()
+        self.report_callback_exception = safe_bg_error_handler
+        self._after_ids: list[str] = []
         self.conexion = ConexionBD()
         self.title("\U0001f454 Panel del Gerente")
         self.geometry("900x600")
@@ -331,6 +334,8 @@ class VentanaGerente(ctk.CTk):
 
     # ------------------------------------------------------------------
     def _logout(self) -> None:
+        cancel_pending_after(self)
+        self.quit()
         self.destroy()
         from interfaces.login import VentanaLogin
 
