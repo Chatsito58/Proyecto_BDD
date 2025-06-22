@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import calendar
 import tkinter as tk
 from datetime import date, datetime
 from tkinter import messagebox, ttk
+
+from tkcalendar import Calendar
 
 import customtkinter as ctk
 
@@ -13,7 +14,7 @@ from interfaces.componentes.selector_fecha_hora import SelectorFechaHora
 
 
 class SimpleDateEntry(ttk.Frame):
-    """Selector de fecha simple sin dependencias externas"""
+    """Selector de fecha basado en ``tkcalendar.Calendar``."""
 
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
@@ -25,116 +26,41 @@ class SimpleDateEntry(ttk.Frame):
         self.entry.pack(side="left", padx=(0, 5))
 
         self.btn_calendar = ttk.Button(
-            self, text="📅", width=3, command=self._open_calendar
+            self, text="\U0001f4c5", width=3, command=self._open_calendar
         )
         self.btn_calendar.pack(side="left")
 
-        self.cal_window: tk.Toplevel | None = None
+        self._top: tk.Toplevel | None = None
+        self._cal: Calendar | None = None
 
     # ------------------------------------------------------------------
     def _open_calendar(self) -> None:
-        if self.cal_window and self.cal_window.winfo_exists():
-            self.cal_window.focus_set()
+        if self._top and self._top.winfo_exists():
+            self._top.focus_set()
             return
 
-        self.cal_window = tk.Toplevel(self)
-        self.cal_window.title("Seleccionar Fecha")
-        self.cal_window.resizable(False, False)
+        self._top = tk.Toplevel(self)
+        self._top.title("Seleccionar Fecha")
+        self._top.resizable(False, False)
 
-        today = date.today()
-        self.cal_year = tk.IntVar(value=today.year)
-        self.cal_month = tk.IntVar(value=today.month)
+        self._cal = Calendar(self._top, selectmode="day", date_pattern="yyyy-mm-dd")
+        self._cal.pack(padx=10, pady=10)
 
-        control_frame = ttk.Frame(self.cal_window)
-        control_frame.pack(pady=10)
+        try:
+            current = datetime.strptime(self.date_var.get(), "%Y-%m-%d").date()
+            self._cal.selection_set(current)
+        except ValueError:
+            pass
 
-        ttk.Button(
-            control_frame, text="◀", command=lambda: self._change_month(-1)
-        ).pack(side="left")
-        self.month_label = ttk.Label(control_frame, font=("Segoe UI", 12, "bold"))
-        self.month_label.pack(side="left", padx=20)
-        ttk.Button(control_frame, text="▶", command=lambda: self._change_month(1)).pack(
-            side="left"
-        )
+        ttk.Button(self._top, text="Aceptar", command=self._confirmar).pack(pady=(0, 10))
+        self._top.grab_set()
 
-        self.days_frame = ttk.Frame(self.cal_window)
-        self.days_frame.pack(pady=10)
-
-        self._update_calendar()
-
-        self.cal_window.update_idletasks()
-        self.update_idletasks()
-        w, h = 320, 250
-        x = (
-            self.btn_calendar.winfo_rootx()
-            + self.btn_calendar.winfo_width() // 2
-            - w // 2
-        )
-        y = self.btn_calendar.winfo_rooty() + self.btn_calendar.winfo_height()
-        self.cal_window.geometry(f"{w}x{h}+{x}+{y}")
-        self.cal_window.grab_set()
-
-    def _change_month(self, delta: int) -> None:
-        new_month = self.cal_month.get() + delta
-        if new_month > 12:
-            new_month = 1
-            self.cal_year.set(self.cal_year.get() + 1)
-        elif new_month < 1:
-            new_month = 12
-            self.cal_year.set(self.cal_year.get() - 1)
-        self.cal_month.set(new_month)
-        self._update_calendar()
-
-    def _update_calendar(self):
-        for widget in self.days_frame.winfo_children():
-            widget.destroy()
-
-        year = self.cal_year.get()
-        month = self.cal_month.get()
-
-        month_names = [
-            "",
-            "Enero",
-            "Febrero",
-            "Marzo",
-            "Abril",
-            "Mayo",
-            "Junio",
-            "Julio",
-            "Agosto",
-            "Septiembre",
-            "Octubre",
-            "Noviembre",
-            "Diciembre",
-        ]
-        self.month_label.config(text=f"{month_names[month]} {year}")
-
-        cal = calendar.monthcalendar(year, month)
-
-        days = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
-        for i, day in enumerate(days):
-            ttk.Label(self.days_frame, text=day, font=("Segoe UI", 9, "bold")).grid(
-                row=0, column=i, padx=2, pady=2
-            )
-
-        for week_num, week in enumerate(cal):
-            for day_num, day in enumerate(week):
-                if day == 0:
-                    continue
-                btn = ttk.Button(
-                    self.days_frame,
-                    text=str(day),
-                    width=3,
-                    command=lambda d=day: self._select_date(d),
-                )
-                btn.grid(row=week_num + 1, column=day_num, padx=1, pady=1)
-
-    def _select_date(self, day):
-        selected_date = date(self.cal_year.get(), self.cal_month.get(), day)
-        self.date_var.set(selected_date.strftime("%Y-%m-%d"))
-        if self.cal_window and self.cal_window.winfo_exists():
-            self.cal_window.destroy()
-            self.cal_window = None
+    def _confirmar(self) -> None:
+        if self._cal is not None:
+            self.date_var.set(self._cal.get_date())
+        if self._top is not None:
+            self._top.destroy()
+            self._top = None
 
     def get_date(self):
         try:

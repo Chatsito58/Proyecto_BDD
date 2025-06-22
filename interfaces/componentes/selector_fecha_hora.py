@@ -75,3 +75,8 @@ class SelectorFechaHora(ctk.CTkFrame):
             return datetime.strptime(self.var.get(), "%Y-%m-%d %H:%M")
         except ValueError:
             return datetime.now()
+
+    # Alias para compatibilidad
+    def get_date(self) -> datetime:
+        """Devolver la fecha y hora seleccionadas."""
+        return self.obtener_datetime()

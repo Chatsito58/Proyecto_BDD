@@ -24,7 +24,11 @@ class CTkScrollableComboBox(ctk.CTkFrame):
         self._command = command
         self._var = tk.StringVar()
         self._box = ttk.Combobox(
-            self, textvariable=self._var, values=values or [], state="readonly"
+            self,
+            textvariable=self._var,
+            values=values or [],
+            state="readonly",
+            height=height,
         )
         self._box.pack(fill="both", expand=True)
         if command is not None:
