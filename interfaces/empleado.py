@@ -9,7 +9,12 @@ import logging
 
 from conexion.conexion import ConexionBD
 from interfaces.componentes.ctk_scrollable_combobox import CTkScrollableComboBox
-from utils import cancel_pending_after, safe_bg_error_handler
+from utils import (
+    cancel_pending_after,
+    safe_bg_error_handler,
+    mostrar_error,
+    mostrar_notificacion,
+)
 
 
 class VentanaEmpleado(ThemedTk):
@@ -115,7 +120,7 @@ class VentanaGestionReservas(tk.Toplevel):
             filas = self.conexion.ejecutar(query)
         except Exception as exc:  # pragma: no cover - conexion errors vary
             logging.error("Error cargando reservas: %s", exc)
-            messagebox.showerror("Error", f"No se pudieron cargar reservas:\n{exc}")
+            mostrar_error(exc)
             filas = []
         self.tree.delete(*self.tree.get_children())
         for fila in filas:
@@ -132,11 +137,11 @@ class VentanaGestionReservas(tk.Toplevel):
                 "UPDATE Reserva_alquiler SET id_estado_reserva=1 WHERE id_reserva=%s",
                 (id_reserva,),
             )
-            messagebox.showinfo("Éxito", "Reserva aprobada")
+            mostrar_notificacion("Éxito", "Reserva aprobada")
             self._cargar()
         except Exception as exc:  # pragma: no cover - conexion errors vary
             logging.error("Error aprobando reserva: %s", exc)
-            messagebox.showerror("Error", f"No se pudo aprobar:\n{exc}")
+            mostrar_error(exc)
 
     def _rechazar(self) -> None:
         item = self.tree.focus()
@@ -149,11 +154,11 @@ class VentanaGestionReservas(tk.Toplevel):
                 "UPDATE Reserva_alquiler SET id_estado_reserva=2 WHERE id_reserva=%s",
                 (id_reserva,),
             )
-            messagebox.showinfo("Éxito", "Reserva cancelada")
+            mostrar_notificacion("Éxito", "Reserva cancelada")
             self._cargar()
         except Exception as exc:  # pragma: no cover - conexion errors vary
             logging.error("Error cancelando reserva: %s", exc)
-            messagebox.showerror("Error", f"No se pudo cancelar:\n{exc}")
+            mostrar_error(exc)
 
     def _abrir_abonos(self) -> None:
         item = self.tree.focus()
@@ -199,7 +204,7 @@ class VentanaAbonos(tk.Toplevel):
             )
         except Exception as exc:  # pragma: no cover - conexion errors vary
             logging.error("Error consultando abonos: %s", exc)
-            messagebox.showerror("Error", f"No se pudieron obtener abonos:\n{exc}")
+            mostrar_error(exc)
             filas = []
         self.tree.delete(*self.tree.get_children())
         for fila in filas:
@@ -222,11 +227,11 @@ class VentanaAbonos(tk.Toplevel):
                 "UPDATE Abono_reserva SET valor=%s WHERE id_abono_reserva=%s",
                 (valor, abono_id),
             )
-            messagebox.showinfo("Éxito", "Abono actualizado")
+            mostrar_notificacion("Éxito", "Abono actualizado")
             self._cargar()
         except Exception as exc:  # pragma: no cover - conexion errors vary
             logging.error("Error actualizando abono: %s", exc)
-            messagebox.showerror("Error", f"No se pudo actualizar:\n{exc}")
+            mostrar_error(exc)
 
 
 class VentanaVehiculos(tk.Toplevel):
@@ -258,7 +263,7 @@ class VentanaVehiculos(tk.Toplevel):
             filas = self.conexion.ejecutar("SELECT placa, modelo FROM Vehiculo")
         except Exception as exc:  # pragma: no cover - conexion errors vary
             logging.error("Error cargando vehículos: %s", exc)
-            messagebox.showerror("Error", f"No se pudieron cargar vehículos:\n{exc}")
+            mostrar_error(exc)
             filas = []
         self.tree.delete(*self.tree.get_children())
         for fila in filas:
@@ -285,11 +290,11 @@ class VentanaVehiculos(tk.Toplevel):
                     "INSERT INTO Vehiculo (placa, modelo) VALUES (%s, %s)",
                     (placa, modelo),
                 )
-                messagebox.showinfo("Éxito", "Vehículo registrado")
+                mostrar_notificacion("Éxito", "Vehículo registrado")
                 top.destroy()
                 self._cargar()
             except Exception as exc:  # pragma: no cover - conexion errors vary
-                messagebox.showerror("Error", f"No se pudo registrar:\n{exc}")
+                mostrar_error(exc)
 
         ttk.Button(top, text="Guardar", command=guardar).grid(row=2, column=0, columnspan=2, pady=10)
 
@@ -303,7 +308,7 @@ class VentanaVehiculos(tk.Toplevel):
             return
         try:
             self.conexion.ejecutar("DELETE FROM Vehiculo WHERE placa=%s", (placa,))
-            messagebox.showinfo("Éxito", "Vehículo eliminado")
+            mostrar_notificacion("Éxito", "Vehículo eliminado")
             self._cargar()
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror("Error", f"No se pudo eliminar:\n{exc}")
+            mostrar_error(exc)

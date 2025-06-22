@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
+from utils import mostrar_error, mostrar_notificacion
 import re
 from ttkthemes import ThemedTk
 from tkinter import filedialog
@@ -44,17 +45,11 @@ class MySQLApp:
         """Mostrar todas las tablas de la base de datos en el Treeview."""
         try:
             columnas, filas = self.conexion.ejecutar_con_columnas("SHOW TABLES")
-        except InterfaceError:
-            messagebox.showerror(
-                "Resultado pendiente",
-                "Existe un resultado sin leer. Intente de nuevo tras cerrar la consulta previa."
-            )
+        except InterfaceError as exc:
+            mostrar_error(exc)
             return
         except Error as e:
-            messagebox.showerror(
-                "Error al obtener tablas",
-                f"No se pudo obtener la lista de tablas:\n{e}"
-            )
+            mostrar_error(e)
             return
 
         self.mostrar_resultados(columnas, filas)
@@ -66,15 +61,10 @@ class MySQLApp:
             )
             self.mostrar_resultados(columnas, filas)
             self.tab_control.select(self.tab_resultado)
-        except InterfaceError:
-            messagebox.showerror(
-                "Resultado pendiente",
-                "Existe un resultado sin leer. Intente de nuevo tras cerrar la consulta previa.",
-            )
+        except InterfaceError as exc:
+            mostrar_error(exc)
         except Error as e:
-            messagebox.showerror(
-                "Error al describir tabla", f"No se pudo describir la tabla '{tabla}':\n{e}"
-            )
+            mostrar_error(e)
 
 
     def mostrar_autocompletado(self, event=None):
@@ -220,9 +210,9 @@ class MySQLApp:
             try:
                 with open(archivo, "w", encoding="utf-8") as f:
                     f.write(query)
-                messagebox.showinfo("Guardado", f"Consulta guardada en:\n{archivo}")
+                mostrar_notificacion("Guardado", f"Consulta guardada en:\n{archivo}")
             except Exception as e:
-                messagebox.showerror("Error al guardar", f"No se pudo guardar el archivo:\n{e}")
+                mostrar_error(e)
 
     def cargar_consulta(self):
         archivo = filedialog.askopenfilename(
@@ -234,9 +224,9 @@ class MySQLApp:
                     contenido = f.read()
                     self.query_text.delete("1.0", tk.END)
                     self.query_text.insert(tk.END, contenido)
-                messagebox.showinfo("Carga exitosa", "Consulta cargada correctamente.")
+                mostrar_notificacion("Carga exitosa", "Consulta cargada correctamente.")
             except Exception as e:
-                messagebox.showerror("Error al cargar", f"No se pudo leer el archivo:\n{e}")
+                mostrar_error(e)
 
 
     def crear_tab_resultado(self):
@@ -278,7 +268,7 @@ class MySQLApp:
         if not self.conexion.conn or not self.conexion.conn.is_connected():
             self.conexion.conectar()
         if not self.conexion.conn or not self.conexion.conn.is_connected():
-            messagebox.showerror("Error de conexión", "No hay conexión a la base de datos.")
+            mostrar_error(Exception("No hay conexión a la base de datos."))
             return
 
         try:
@@ -289,13 +279,10 @@ class MySQLApp:
                 self.status_var.set(f"✅ {len(filas)} filas recuperadas.")
                 self.tab_control.select(self.tab_resultado)
             else:
-                messagebox.showinfo("✅ Éxito", "Consulta ejecutada correctamente.")
+                mostrar_notificacion("✅ Éxito", "Consulta ejecutada correctamente.")
                 self.status_var.set("✅ Consulta ejecutada con éxito.")
-        except InterfaceError:
-            messagebox.showerror(
-                "Resultado pendiente",
-                "Existe un resultado sin leer. Intente de nuevo tras cerrar la consulta previa.",
-            )
+        except InterfaceError as exc:
+            mostrar_error(exc)
             self.status_var.set("❌ Error al ejecutar la consulta.")
         except Error as e:
             msg = str(e)
@@ -303,7 +290,7 @@ class MySQLApp:
                 msg = "La tabla no existe"
             elif "syntax" in msg.lower():
                 msg = "Error de sintaxis SQL"
-            messagebox.showerror("❌ Error de SQL", msg)
+            mostrar_error(Exception(msg))
             self.status_var.set("❌ Error al ejecutar la consulta.")
 
     def mostrar_resultados(self, columnas, filas):
