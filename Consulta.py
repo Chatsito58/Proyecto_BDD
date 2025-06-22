@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox, scrolledtext
 import re
 from ttkthemes import ThemedTk
 from tkinter import filedialog
-from mysql.connector import Error
+from mysql.connector import Error, InterfaceError
 from conexion.conexion import ConexionBD
 
 
@@ -44,9 +44,16 @@ class MySQLApp:
         """Mostrar todas las tablas de la base de datos en el Treeview."""
         try:
             columnas, filas = self.conexion.ejecutar_con_columnas("SHOW TABLES")
+        except InterfaceError:
+            messagebox.showerror(
+                "Resultado pendiente",
+                "Existe un resultado sin leer. Intente de nuevo tras cerrar la consulta previa."
+            )
+            return
         except Error as e:
             messagebox.showerror(
-                "Error al obtener tablas", f"No se pudo obtener la lista de tablas:\n{e}"
+                "Error al obtener tablas",
+                f"No se pudo obtener la lista de tablas:\n{e}"
             )
             return
 
@@ -54,11 +61,20 @@ class MySQLApp:
         self.tab_control.select(self.tab_resultado)
     def describir_tabla(self, tabla):
         try:
-            columnas, filas = self.conexion.ejecutar_con_columnas(f"DESCRIBE {tabla}")
+            columnas, filas = self.conexion.ejecutar_con_columnas(
+                f"DESCRIBE {tabla}"
+            )
             self.mostrar_resultados(columnas, filas)
             self.tab_control.select(self.tab_resultado)
+        except InterfaceError:
+            messagebox.showerror(
+                "Resultado pendiente",
+                "Existe un resultado sin leer. Intente de nuevo tras cerrar la consulta previa.",
+            )
         except Error as e:
-            messagebox.showerror("Error al describir tabla", f"No se pudo describir la tabla '{tabla}':\n{e}")
+            messagebox.showerror(
+                "Error al describir tabla", f"No se pudo describir la tabla '{tabla}':\n{e}"
+            )
 
 
     def mostrar_autocompletado(self, event=None):
@@ -267,7 +283,7 @@ class MySQLApp:
 
         try:
             columnas, filas = self.conexion.ejecutar_con_columnas(query)
-
+        
             if query.lower().startswith("select"):
                 self.mostrar_resultados(columnas, filas)
                 self.status_var.set(f"✅ {len(filas)} filas recuperadas.")
@@ -275,6 +291,12 @@ class MySQLApp:
             else:
                 messagebox.showinfo("✅ Éxito", "Consulta ejecutada correctamente.")
                 self.status_var.set("✅ Consulta ejecutada con éxito.")
+        except InterfaceError:
+            messagebox.showerror(
+                "Resultado pendiente",
+                "Existe un resultado sin leer. Intente de nuevo tras cerrar la consulta previa.",
+            )
+            self.status_var.set("❌ Error al ejecutar la consulta.")
         except Error as e:
             msg = str(e)
             if "doesn't exist" in msg:
