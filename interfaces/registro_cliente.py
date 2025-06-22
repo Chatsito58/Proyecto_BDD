@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 
 from conexion.conexion import ConexionBD
+from interfaces.componentes.ctk_scrollable_combobox import CTkScrollableComboBox
 from utils.hash_utils import sha256_hash
 from utils.validations import validar_correo
 

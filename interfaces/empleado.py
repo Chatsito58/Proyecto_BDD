@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import tkinter as tk
 from tkinter import messagebox, ttk
+
 from ttkthemes import ThemedTk
+
+from interfaces.componentes.ctk_scrollable_combobox import CTkScrollableComboBox
 
 
 class VentanaEmpleado(ThemedTk):
@@ -23,10 +26,18 @@ class VentanaEmpleado(ThemedTk):
         marco = ttk.Frame(self, padding=20)
         marco.pack(expand=True)
 
-        ttk.Label(marco, text="🧑‍🔧 Panel del Empleado", font=("Segoe UI", 14, "bold")).pack(pady=(0, 15))
-        ttk.Button(marco, text="Registrar alquiler", command=self._registrar).pack(fill="x", pady=5)
-        ttk.Button(marco, text="Gestionar Vehículos", command=self._vehiculos).pack(fill="x", pady=5)
-        ttk.Button(marco, text="Cerrar sesión", command=self._logout).pack(fill="x", pady=(15, 0))
+        ttk.Label(
+            marco, text="🧑‍🔧 Panel del Empleado", font=("Segoe UI", 14, "bold")
+        ).pack(pady=(0, 15))
+        ttk.Button(marco, text="Registrar alquiler", command=self._registrar).pack(
+            fill="x", pady=5
+        )
+        ttk.Button(marco, text="Gestionar Vehículos", command=self._vehiculos).pack(
+            fill="x", pady=5
+        )
+        ttk.Button(marco, text="Cerrar sesión", command=self._logout).pack(
+            fill="x", pady=(15, 0)
+        )
 
     def _registrar(self) -> None:
         messagebox.showinfo("Registrar", "Función no implementada")
