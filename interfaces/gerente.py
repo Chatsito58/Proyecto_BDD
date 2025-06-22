@@ -140,6 +140,19 @@ class VentanaGerente(ctk.CTk):
         frame = ctk.CTkFrame(self.tab_reportes, fg_color="transparent")
         frame.pack(fill="both", expand=True, padx=10, pady=10)
 
+        filtros = ctk.CTkFrame(frame, fg_color="transparent")
+        filtros.pack(anchor="w", pady=(0, 10))
+        ctk.CTkLabel(filtros, text="Desde:").grid(row=0, column=0, padx=5)
+        self.desde_rep = SimpleDateEntry(filtros)
+        self.desde_rep.grid(row=0, column=1)
+        ctk.CTkLabel(filtros, text="Hasta:").grid(row=0, column=2, padx=5)
+        self.hasta_rep = SimpleDateEntry(filtros)
+        self.hasta_rep.grid(row=0, column=3)
+        ctk.CTkLabel(filtros, text="Estado:").grid(row=0, column=4, padx=5)
+        self.combo_estado = CTkScrollableComboBox(filtros, values=["", "reservado", "cancelado"])
+        self.combo_estado.grid(row=0, column=5)
+        ctk.CTkButton(filtros, text="Aplicar", command=self._cargar_reportes).grid(row=0, column=6, padx=5)
+
         self.lbl_ingresos = ctk.CTkLabel(frame, text="Ingresos del mes: $0")
         self.lbl_ingresos.pack(anchor="w")
         self.lbl_reservas = ctk.CTkLabel(frame, text="Reservas este mes: 0")
@@ -170,32 +183,48 @@ class VentanaGerente(ctk.CTk):
         )
 
     def _cargar_reportes(self) -> None:
-        consultas = {
-            "ingresos": (
-                "SELECT COALESCE(SUM(valor),0) FROM Alquiler "
-                "WHERE MONTH(fecha_hora_salida)=MONTH(CURDATE()) "
-                "AND YEAR(fecha_hora_salida)=YEAR(CURDATE())"
-            ),
-            "reservas": (
-                "SELECT COUNT(*) FROM Reserva_alquiler "
-                "WHERE MONTH(fecha_hora)=MONTH(CURDATE()) "
-                "AND YEAR(fecha_hora)=YEAR(CURDATE())"
-            ),
-            "vehiculos": (
-                "SELECT id_vehiculo, COUNT(*) AS c FROM Alquiler "
-                "GROUP BY id_vehiculo ORDER BY c DESC LIMIT 5"
-            ),
-            "clientes": (
-                "SELECT c.nombre, COUNT(*) AS c FROM Alquiler a "
-                "JOIN Cliente c ON a.id_cliente=c.id_cliente "
-                "GROUP BY c.id_cliente, c.nombre ORDER BY c DESC LIMIT 5"
-            ),
-        }
+        desde = self.desde_rep.get_date()
+        hasta = self.hasta_rep.get_date()
+        estado = self.combo_estado.get().strip().lower()
+
+        q_ingresos = (
+            "SELECT COALESCE(SUM(valor),0) FROM Alquiler "
+            "WHERE DATE(fecha_hora_salida) BETWEEN %s AND %s"
+        )
+        q_reservas = (
+            "SELECT COUNT(*) FROM Reserva_alquiler r "
+            "JOIN Estado_reserva er ON r.id_estado_reserva=er.id_estado "
+            "WHERE DATE(r.fecha_hora) BETWEEN %s AND %s"
+        )
+        params_res = [desde.strftime("%Y-%m-%d"), hasta.strftime("%Y-%m-%d")]
+        if estado:
+            q_reservas += " AND LOWER(er.descripcion)=%s"
+            params_res.append(estado)
+
+        q_veh = (
+            "SELECT id_vehiculo, COUNT(*) AS c FROM Alquiler "
+            "WHERE DATE(fecha_hora_salida) BETWEEN %s AND %s "
+            "GROUP BY id_vehiculo ORDER BY c DESC LIMIT 5"
+        )
+        q_cli = (
+            "SELECT c.nombre, COUNT(*) AS c FROM Reserva_alquiler r "
+            "JOIN Cliente c ON r.id_cliente=c.id_cliente "
+            "WHERE DATE(r.fecha_hora_salida) BETWEEN %s AND %s "
+            "GROUP BY c.id_cliente, c.nombre ORDER BY c DESC LIMIT 5"
+        )
         try:
-            ingresos = self.conexion.ejecutar(consultas["ingresos"])[0][0]
-            reservas = self.conexion.ejecutar(consultas["reservas"])[0][0]
-            vehiculos = self.conexion.ejecutar(consultas["vehiculos"])
-            clientes = self.conexion.ejecutar(consultas["clientes"])
+            ingresos = self.conexion.ejecutar(
+                q_ingresos, (desde.strftime("%Y-%m-%d"), hasta.strftime("%Y-%m-%d"))
+            )[0][0]
+            reservas = self.conexion.ejecutar(q_reservas, tuple(params_res))[0][0]
+            vehiculos = self.conexion.ejecutar(
+                q_veh,
+                (desde.strftime("%Y-%m-%d"), hasta.strftime("%Y-%m-%d")),
+            )
+            clientes = self.conexion.ejecutar(
+                q_cli,
+                (desde.strftime("%Y-%m-%d"), hasta.strftime("%Y-%m-%d")),
+            )
         except Exception as exc:  # pragma: no cover - conexion errors vary
             messagebox.showerror(
                 "Error", f"No se pudieron generar los reportes:\n{exc}"
