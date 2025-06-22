@@ -63,12 +63,15 @@ class ConexionBD:
             logging.error('Failover fallido: %s', e)
             self.conn = None
 
-    def ejecutar(self, query: str, params: Tuple[Any, ...] | None = None) -> List[Tuple[Any, ...]]:
+    def ejecutar(
+        self, query: str, params: Tuple[Any, ...] | None = None
+    ) -> List[Tuple[Any, ...]]:
         if not self.conn or not self.conn.is_connected():
             self.conectar()
         if not self.conn:
             self._agregar_pendiente(query, params)
             raise ConnectionError('No hay conexión disponible')
+        cur = None
         try:
             cur = self.conn.cursor()
             cur.execute(query, params)
@@ -83,6 +86,14 @@ class ConexionBD:
             self._agregar_pendiente(query, params)
             self._failover()
             raise
+        finally:
+            if cur:
+                try:
+                    if cur.with_rows and cur.fetchone() is not None:
+                        cur.fetchall()
+                except Error:
+                    pass
+                cur.close()
 
     def ejecutar_con_columnas(
         self, query: str, params: Tuple[Any, ...] | None = None
