@@ -14,6 +14,8 @@ class VentanaAdmin(ThemedTk):
         self.title("🛠️ Panel del Administrador")
         self.configure(bg="#f4f6f9")
         self.geometry("340x220")
+        self.ventana_consulta: tk.Toplevel | None = None
+        self.btn_sql: ttk.Button | None = None
         self._configurar_estilo()
         self._build_ui()
 
@@ -27,16 +29,30 @@ class VentanaAdmin(ThemedTk):
         marco.pack(expand=True)
 
         ttk.Label(marco, text="🛠️ Panel del Administrador", font=("Segoe UI", 14, "bold")).pack(pady=(0, 15))
-        ttk.Button(marco, text="Abrir consultas SQL", command=self._abrir_sql).pack(fill="x", pady=5)
+        self.btn_sql = ttk.Button(marco, text="Abrir consultas SQL", command=self._abrir_sql)
+        self.btn_sql.pack(fill="x", pady=5)
         ttk.Button(marco, text="Cerrar sesión", command=self._logout).pack(fill="x", pady=(15, 0))
 
     def _abrir_sql(self) -> None:
-        root = ThemedTk(theme="arc")
-        MySQLApp(root, ConexionBD())
-        root.mainloop()
+        if self.ventana_consulta and self.ventana_consulta.winfo_exists():
+            self.ventana_consulta.focus()
+            return
+
+        self.ventana_consulta = tk.Toplevel(self)
+        self.btn_sql.config(state=tk.DISABLED)
+        MySQLApp(self.ventana_consulta, ConexionBD())
+        self.ventana_consulta.protocol("WM_DELETE_WINDOW", self._cerrar_consulta)
 
     def _logout(self) -> None:
+        if self.ventana_consulta and self.ventana_consulta.winfo_exists():
+            self.ventana_consulta.destroy()
         self.destroy()
         from interfaces.login import VentanaLogin
 
         VentanaLogin().mainloop()
+
+    def _cerrar_consulta(self) -> None:
+        if self.ventana_consulta:
+            self.ventana_consulta.destroy()
+            self.ventana_consulta = None
+            self.btn_sql.config(state=tk.NORMAL)
