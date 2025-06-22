@@ -3,8 +3,8 @@ from __future__ import annotations
 import tkinter as tk
 from datetime import datetime
 
-from tkcalendar import Calendar
 import customtkinter as ctk
+from tkcalendar import Calendar
 
 
 class SelectorFechaHora(ctk.CTkFrame):
@@ -17,7 +17,9 @@ class SelectorFechaHora(ctk.CTkFrame):
         self.entry = ctk.CTkEntry(self, textvariable=self.var)
         self.entry.pack(side="left", fill="x", expand=True)
 
-        self.btn_open = ctk.CTkButton(self, text="\U0001F4C5", width=40, command=self._abrir)
+        self.btn_open = ctk.CTkButton(
+            self, text="\U0001f4c5", width=40, command=self._abrir
+        )
         self.btn_open.pack(side="left", padx=(5, 0))
 
         self._top: ctk.CTkToplevel | None = None
@@ -46,14 +48,16 @@ class SelectorFechaHora(ctk.CTkFrame):
 
         horas = [f"{h:02d}" for h in range(24)]
         minutos = [f"{m:02d}" for m in range(60)]
-        self.combo_hora = ctk.CTkComboBox(frame_hora, values=horas, width=60)
+        self.combo_hora = CTkScrollableComboBox(frame_hora, values=horas, width=60)
         self.combo_hora.pack(side="left", padx=(0, 5))
         self.combo_hora.set(f"{current.hour:02d}")
-        self.combo_minuto = ctk.CTkComboBox(frame_hora, values=minutos, width=60)
+        self.combo_minuto = CTkScrollableComboBox(frame_hora, values=minutos, width=60)
         self.combo_minuto.pack(side="left")
         self.combo_minuto.set(f"{current.minute:02d}")
 
-        ctk.CTkButton(self._top, text="Aceptar", command=self._confirmar).pack(pady=(0, 10))
+        ctk.CTkButton(self._top, text="Aceptar", command=self._confirmar).pack(
+            pady=(0, 10)
+        )
 
     def _confirmar(self) -> None:
         fecha = self.cal.selection_get()

@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import tkinter as tk
-from tkinter import messagebox, ttk
 from datetime import date
+from tkinter import messagebox, ttk
+
 import customtkinter as ctk
 
 from conexion.conexion import ConexionBD
 from interfaces.cliente import SimpleDateEntry
-
+from interfaces.componentes.ctk_scrollable_combobox import CTkScrollableComboBox
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -19,7 +20,7 @@ class VentanaGerente(ctk.CTk):
     def __init__(self) -> None:
         super().__init__()
         self.conexion = ConexionBD()
-        self.title("\U0001F454 Panel del Gerente")
+        self.title("\U0001f454 Panel del Gerente")
         self.geometry("900x600")
         self.configure(fg_color="#f4f6f9")
         self._build_ui()
@@ -43,7 +44,9 @@ class VentanaGerente(ctk.CTk):
         self._build_tab_reportes()
         self._build_tab_empleados()
 
-        ctk.CTkButton(self, text="\U0001F6AA Cerrar sesión", command=self._logout).pack(pady=(0, 10))
+        ctk.CTkButton(self, text="\U0001f6aa Cerrar sesión", command=self._logout).pack(
+            pady=(0, 10)
+        )
 
     # ------------------------------------------------------------------
     # RESERVAS
@@ -59,7 +62,9 @@ class VentanaGerente(ctk.CTk):
         ctk.CTkLabel(filtros, text="Hasta:").grid(row=0, column=2, padx=5)
         self.hasta_res = SimpleDateEntry(filtros)
         self.hasta_res.grid(row=0, column=3)
-        ctk.CTkButton(filtros, text="Filtrar", command=self._cargar_reservas).grid(row=0, column=4, padx=5)
+        ctk.CTkButton(filtros, text="Filtrar", command=self._cargar_reservas).grid(
+            row=0, column=4, padx=5
+        )
 
         cols = ("id", "cliente", "entrada", "salida", "estado", "abono", "saldo")
         self.tree_res = ttk.Treeview(frame, columns=cols, show="headings")
@@ -86,7 +91,9 @@ class VentanaGerente(ctk.CTk):
         try:
             filas = self.conexion.ejecutar(query, params)
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror("Error", f"No se pudieron obtener las reservas:\n{exc}")
+            messagebox.showerror(
+                "Error", f"No se pudieron obtener las reservas:\n{exc}"
+            )
             filas = []
         self.tree_res.delete(*self.tree_res.get_children())
         for fila in filas:
@@ -105,7 +112,9 @@ class VentanaGerente(ctk.CTk):
             self.tree_alq.column(c, anchor="center")
         self.tree_alq.pack(fill="both", expand=True)
 
-        ctk.CTkButton(frame, text="Actualizar", command=self._cargar_alquileres).pack(pady=5)
+        ctk.CTkButton(frame, text="Actualizar", command=self._cargar_alquileres).pack(
+            pady=5
+        )
 
     def _cargar_alquileres(self) -> None:
         query = (
@@ -117,7 +126,9 @@ class VentanaGerente(ctk.CTk):
         try:
             filas = self.conexion.ejecutar(query)
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror("Error", f"No se pudieron obtener los alquileres:\n{exc}")
+            messagebox.showerror(
+                "Error", f"No se pudieron obtener los alquileres:\n{exc}"
+            )
             filas = []
         self.tree_alq.delete(*self.tree_alq.get_children())
         for fila in filas:
@@ -135,7 +146,9 @@ class VentanaGerente(ctk.CTk):
         self.lbl_reservas.pack(anchor="w", pady=(0, 10))
 
         ctk.CTkLabel(frame, text="Vehículos más alquilados:").pack(anchor="w")
-        self.tree_veh = ttk.Treeview(frame, columns=("vehiculo", "cant"), show="headings", height=5)
+        self.tree_veh = ttk.Treeview(
+            frame, columns=("vehiculo", "cant"), show="headings", height=5
+        )
         self.tree_veh.heading("vehiculo", text="Vehículo")
         self.tree_veh.heading("cant", text="Cantidad")
         self.tree_veh.column("vehiculo", anchor="center")
@@ -143,14 +156,18 @@ class VentanaGerente(ctk.CTk):
         self.tree_veh.pack(fill="x", pady=5)
 
         ctk.CTkLabel(frame, text="Clientes frecuentes:").pack(anchor="w", pady=(10, 0))
-        self.tree_cli = ttk.Treeview(frame, columns=("cliente", "cant"), show="headings", height=5)
+        self.tree_cli = ttk.Treeview(
+            frame, columns=("cliente", "cant"), show="headings", height=5
+        )
         self.tree_cli.heading("cliente", text="Cliente")
         self.tree_cli.heading("cant", text="Cantidad")
         self.tree_cli.column("cliente", anchor="center")
         self.tree_cli.column("cant", anchor="center", width=80)
         self.tree_cli.pack(fill="x", pady=5)
 
-        ctk.CTkButton(frame, text="Actualizar", command=self._cargar_reportes).pack(pady=5)
+        ctk.CTkButton(frame, text="Actualizar", command=self._cargar_reportes).pack(
+            pady=5
+        )
 
     def _cargar_reportes(self) -> None:
         consultas = {
@@ -180,7 +197,9 @@ class VentanaGerente(ctk.CTk):
             vehiculos = self.conexion.ejecutar(consultas["vehiculos"])
             clientes = self.conexion.ejecutar(consultas["clientes"])
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror("Error", f"No se pudieron generar los reportes:\n{exc}")
+            messagebox.showerror(
+                "Error", f"No se pudieron generar los reportes:\n{exc}"
+            )
             ingresos, reservas, vehiculos, clientes = 0, 0, [], []
         self.lbl_ingresos.configure(text=f"Ingresos del mes: ${float(ingresos):,.2f}")
         self.lbl_reservas.configure(text=f"Reservas este mes: {reservas}")
@@ -207,14 +226,20 @@ class VentanaGerente(ctk.CTk):
         controls = ctk.CTkFrame(frame, fg_color="transparent")
         controls.pack(anchor="w", pady=5)
         ctk.CTkLabel(controls, text="Tipo:").grid(row=0, column=0, padx=5)
-        self.combo_tipo = ctk.CTkComboBox(controls, values=[])
+        self.combo_tipo = CTkScrollableComboBox(controls, values=[])
         self.combo_tipo.grid(row=0, column=1, padx=5)
-        ctk.CTkButton(controls, text="Cambiar tipo", command=self._cambiar_tipo).grid(row=0, column=2, padx=5)
-        ctk.CTkButton(controls, text="Eliminar", command=self._eliminar_empleado).grid(row=0, column=3, padx=5)
+        ctk.CTkButton(controls, text="Cambiar tipo", command=self._cambiar_tipo).grid(
+            row=0, column=2, padx=5
+        )
+        ctk.CTkButton(controls, text="Eliminar", command=self._eliminar_empleado).grid(
+            row=0, column=3, padx=5
+        )
 
     def _cargar_empleados(self) -> None:
         try:
-            tipos = self.conexion.ejecutar("SELECT id_tipo_empleado, nombre FROM Tipo_empleado")
+            tipos = self.conexion.ejecutar(
+                "SELECT id_tipo_empleado, nombre FROM Tipo_empleado"
+            )
             self.tipo_map = {n: i for i, n in tipos}
             self.combo_tipo.configure(values=list(self.tipo_map.keys()))
             filas = self.conexion.ejecutar(
@@ -222,7 +247,9 @@ class VentanaGerente(ctk.CTk):
                 "FROM Empleado e JOIN Tipo_empleado te ON e.id_tipo_empleado=te.id_tipo_empleado"
             )
         except Exception as exc:  # pragma: no cover - conexion errors vary
-            messagebox.showerror("Error", f"No se pudieron obtener los empleados:\n{exc}")
+            messagebox.showerror(
+                "Error", f"No se pudieron obtener los empleados:\n{exc}"
+            )
             filas = []
             self.tipo_map = {}
         self.tree_emp.delete(*self.tree_emp.get_children())
@@ -265,7 +292,9 @@ class VentanaGerente(ctk.CTk):
         if not messagebox.askyesno("Confirmar", f"¿Eliminar al empleado {nombre}?"):
             return
         try:
-            self.conexion.ejecutar("DELETE FROM Empleado WHERE id_empleado=%s", (id_emp,))
+            self.conexion.ejecutar(
+                "DELETE FROM Empleado WHERE id_empleado=%s", (id_emp,)
+            )
             messagebox.showinfo("Éxito", "Empleado eliminado")
             self._cargar_empleados()
         except Exception as exc:  # pragma: no cover - conexion errors vary

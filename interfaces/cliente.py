@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-import tkinter as tk
-from tkinter import messagebox, ttk
-from datetime import datetime, date
 import calendar
+import tkinter as tk
+from datetime import date, datetime
+from tkinter import messagebox, ttk
+
 import customtkinter as ctk
 
-from interfaces.componentes.selector_fecha_hora import SelectorFechaHora
-
 from conexion.conexion import ConexionBD
+from interfaces.componentes.ctk_scrollable_combobox import CTkScrollableComboBox
+from interfaces.componentes.selector_fecha_hora import SelectorFechaHora
 
 
 class SimpleDateEntry(ttk.Frame):
@@ -18,10 +19,14 @@ class SimpleDateEntry(ttk.Frame):
         super().__init__(parent, **kwargs)
         self.date_var = tk.StringVar(value=date.today().strftime("%Y-%m-%d"))
 
-        self.entry = ttk.Entry(self, textvariable=self.date_var, width=12, font=("Segoe UI", 10))
+        self.entry = ttk.Entry(
+            self, textvariable=self.date_var, width=12, font=("Segoe UI", 10)
+        )
         self.entry.pack(side="left", padx=(0, 5))
 
-        self.btn_calendar = ttk.Button(self, text="📅", width=3, command=self._open_calendar)
+        self.btn_calendar = ttk.Button(
+            self, text="📅", width=3, command=self._open_calendar
+        )
         self.btn_calendar.pack(side="left")
 
         self.cal_window: tk.Toplevel | None = None
@@ -43,10 +48,14 @@ class SimpleDateEntry(ttk.Frame):
         control_frame = ttk.Frame(self.cal_window)
         control_frame.pack(pady=10)
 
-        ttk.Button(control_frame, text="◀", command=lambda: self._change_month(-1)).pack(side="left")
+        ttk.Button(
+            control_frame, text="◀", command=lambda: self._change_month(-1)
+        ).pack(side="left")
         self.month_label = ttk.Label(control_frame, font=("Segoe UI", 12, "bold"))
         self.month_label.pack(side="left", padx=20)
-        ttk.Button(control_frame, text="▶", command=lambda: self._change_month(1)).pack(side="left")
+        ttk.Button(control_frame, text="▶", command=lambda: self._change_month(1)).pack(
+            side="left"
+        )
 
         self.days_frame = ttk.Frame(self.cal_window)
         self.days_frame.pack(pady=10)
@@ -56,7 +65,11 @@ class SimpleDateEntry(ttk.Frame):
         self.cal_window.update_idletasks()
         self.update_idletasks()
         w, h = 320, 250
-        x = self.btn_calendar.winfo_rootx() + self.btn_calendar.winfo_width() // 2 - w // 2
+        x = (
+            self.btn_calendar.winfo_rootx()
+            + self.btn_calendar.winfo_width() // 2
+            - w // 2
+        )
         y = self.btn_calendar.winfo_rooty() + self.btn_calendar.winfo_height()
         self.cal_window.geometry(f"{w}x{h}+{x}+{y}")
         self.cal_window.grab_set()
@@ -79,15 +92,30 @@ class SimpleDateEntry(ttk.Frame):
         year = self.cal_year.get()
         month = self.cal_month.get()
 
-        month_names = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+        month_names = [
+            "",
+            "Enero",
+            "Febrero",
+            "Marzo",
+            "Abril",
+            "Mayo",
+            "Junio",
+            "Julio",
+            "Agosto",
+            "Septiembre",
+            "Octubre",
+            "Noviembre",
+            "Diciembre",
+        ]
         self.month_label.config(text=f"{month_names[month]} {year}")
 
         cal = calendar.monthcalendar(year, month)
 
         days = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
         for i, day in enumerate(days):
-            ttk.Label(self.days_frame, text=day, font=("Segoe UI", 9, "bold")).grid(row=0, column=i, padx=2, pady=2)
+            ttk.Label(self.days_frame, text=day, font=("Segoe UI", 9, "bold")).grid(
+                row=0, column=i, padx=2, pady=2
+            )
 
         for week_num, week in enumerate(cal):
             for day_num, day in enumerate(week):
@@ -122,7 +150,7 @@ class VentanaCliente(ctk.CTk):
         super().__init__()
         self.id_cliente = id_cliente
         self.conexion = ConexionBD()
-        self.title("\U0001F464 Panel del Cliente")
+        self.title("\U0001f464 Panel del Cliente")
         self.geometry("760x560")
         self.configure(fg_color="#f4f6f9")
         self._build_ui()
@@ -153,7 +181,9 @@ class VentanaCliente(ctk.CTk):
         self._build_tab_tarifas()
         self._build_tab_abonos()
 
-        ctk.CTkButton(self, text="\U0001F6AA Cerrar sesi\u00f3n", command=self._logout).pack(pady=(0, 10))
+        ctk.CTkButton(
+            self, text="\U0001f6aa Cerrar sesi\u00f3n", command=self._logout
+        ).pack(pady=(0, 10))
 
     # ------------------------------------------------------------------
     # NUEVA RESERVA
@@ -161,12 +191,16 @@ class VentanaCliente(ctk.CTk):
         frame = ctk.CTkFrame(self.tab_reserva, fg_color="transparent")
         frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        ctk.CTkLabel(frame, text="\U0001F697 Crear nueva reserva", font=("Segoe UI", 16, "bold")).pack(pady=(0, 10))
+        ctk.CTkLabel(
+            frame, text="\U0001f697 Crear nueva reserva", font=("Segoe UI", 16, "bold")
+        ).pack(pady=(0, 10))
 
         ctk.CTkLabel(frame, text="Veh\u00edculo:").pack(anchor="w")
-        self.combo_vehiculo = ctk.CTkComboBox(frame, values=[])
+        self.combo_vehiculo = CTkScrollableComboBox(frame, values=[])
         self.combo_vehiculo.pack(fill="x", pady=5)
-        self.combo_vehiculo.bind("<<ComboboxSelected>>", lambda _e: self._calcular_total())
+        self.combo_vehiculo.bind(
+            "<<ComboboxSelected>>", lambda _e: self._calcular_total()
+        )
 
         ctk.CTkLabel(frame, text="Inicio:").pack(anchor="w")
         self.selector_inicio = SelectorFechaHora(frame)
@@ -179,7 +213,7 @@ class VentanaCliente(ctk.CTk):
         self.selector_fin.entry.bind("<FocusOut>", lambda _e: self._calcular_total())
 
         ctk.CTkLabel(frame, text="Medio de pago:").pack(anchor="w")
-        self.combo_medio = ctk.CTkComboBox(frame, values=[])
+        self.combo_medio = CTkScrollableComboBox(frame, values=[])
         self.combo_medio.pack(fill="x", pady=5)
 
         ctk.CTkLabel(frame, text="Abono inicial:").pack(anchor="w")
@@ -192,10 +226,16 @@ class VentanaCliente(ctk.CTk):
         self.lbl_minimo = ctk.CTkLabel(frame, text="Abono m\u00ednimo: $0.00")
         self.lbl_minimo.pack(anchor="w")
 
-        ctk.CTkButton(frame, text="\U0001F4DD Reservar", command=self._registrar_reserva).pack(fill="x", pady=10)
+        ctk.CTkButton(
+            frame, text="\U0001f4dd Reservar", command=self._registrar_reserva
+        ).pack(fill="x", pady=10)
 
-        ctk.CTkLabel(frame, text="Descuentos disponibles:").pack(anchor="w", pady=(10, 0))
-        self.tree_desc = ttk.Treeview(frame, columns=("desc", "valor"), show="headings", height=4)
+        ctk.CTkLabel(frame, text="Descuentos disponibles:").pack(
+            anchor="w", pady=(10, 0)
+        )
+        self.tree_desc = ttk.Treeview(
+            frame, columns=("desc", "valor"), show="headings", height=4
+        )
         self.tree_desc.heading("desc", text="Descripci\u00f3n")
         self.tree_desc.heading("valor", text="Valor")
         self.tree_desc.column("desc", width=200)
@@ -214,7 +254,9 @@ class VentanaCliente(ctk.CTk):
         try:
             filas = self.conexion.ejecutar(consulta)
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudieron cargar veh\u00edculos:\n{exc}")
+            messagebox.showerror(
+                "Error", f"No se pudieron cargar veh\u00edculos:\n{exc}"
+            )
             filas = []
         self.vehiculos_info: dict[str, tuple[str, float]] = {}
         opciones = []
@@ -225,9 +267,13 @@ class VentanaCliente(ctk.CTk):
         self.combo_vehiculo.configure(values=opciones)
 
         try:
-            medios = self.conexion.ejecutar("SELECT id_medio_pago, descripcion FROM Medio_pago")
+            medios = self.conexion.ejecutar(
+                "SELECT id_medio_pago, descripcion FROM Medio_pago"
+            )
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudieron cargar medios de pago:\n{exc}")
+            messagebox.showerror(
+                "Error", f"No se pudieron cargar medios de pago:\n{exc}"
+            )
             medios = []
         self.medios_info: dict[str, int] = {}
         self.combo_medio.configure(values=[desc for _id, desc in medios])
@@ -236,7 +282,9 @@ class VentanaCliente(ctk.CTk):
 
     def _cargar_descuentos(self) -> None:
         try:
-            descuentos = self.conexion.ejecutar("SELECT descripcion, valor FROM Descuento_alquiler")
+            descuentos = self.conexion.ejecutar(
+                "SELECT descripcion, valor FROM Descuento_alquiler"
+            )
         except Exception as exc:  # pragma: no cover - depende de la BD
             messagebox.showerror("Error", f"No se pudieron cargar descuentos:\n{exc}")
             descuentos = []
@@ -244,10 +292,14 @@ class VentanaCliente(ctk.CTk):
         for desc, val in descuentos:
             self.tree_desc.insert("", tk.END, values=(desc, f"{val}%"))
 
-    def _validar_fechas(self, fecha_ini: datetime, fecha_fin: datetime, mostrar_error: bool = True) -> tuple[datetime, datetime] | None:
+    def _validar_fechas(
+        self, fecha_ini: datetime, fecha_fin: datetime, mostrar_error: bool = True
+    ) -> tuple[datetime, datetime] | None:
         if fecha_fin < fecha_ini:
             if mostrar_error:
-                messagebox.showerror("Error", "La fecha de fin debe ser posterior a la de inicio")
+                messagebox.showerror(
+                    "Error", "La fecha de fin debe ser posterior a la de inicio"
+                )
             return None
         return fecha_ini, fecha_fin
 
@@ -296,7 +348,9 @@ class VentanaCliente(ctk.CTk):
         total_pago = dias * tarifa
         restante = total_pago
         if abono_val < restante * 0.3:
-            messagebox.showerror("Error", "Cada abono debe ser m\u00ednimo el 30% del valor restante")
+            messagebox.showerror(
+                "Error", "Cada abono debe ser m\u00ednimo el 30% del valor restante"
+            )
             return
         restante = total_pago - abono_val
         q1 = (
@@ -309,7 +363,17 @@ class VentanaCliente(ctk.CTk):
             "VALUES (%s, NOW(), LAST_INSERT_ID(), %s)"
         )
         try:
-            self.conexion.ejecutar(q1, (fecha_ini.strftime("%Y-%m-%d %H:%M:%S"), fecha_fin.strftime("%Y-%m-%d %H:%M:%S"), abono_val, restante, self.id_cliente, 1))
+            self.conexion.ejecutar(
+                q1,
+                (
+                    fecha_ini.strftime("%Y-%m-%d %H:%M:%S"),
+                    fecha_fin.strftime("%Y-%m-%d %H:%M:%S"),
+                    abono_val,
+                    restante,
+                    self.id_cliente,
+                    1,
+                ),
+            )
             self.conexion.ejecutar(q2, (abono_val, self.medios_info[medio]))
             messagebox.showinfo("\u00c9xito", "Reserva registrada correctamente")
             self.entry_abono.delete(0, tk.END)
@@ -324,7 +388,9 @@ class VentanaCliente(ctk.CTk):
         frame = ctk.CTkFrame(self.tab_abonos, fg_color="transparent")
         frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        self.tree_abono = ttk.Treeview(frame, columns=("id", "restante"), show="headings")
+        self.tree_abono = ttk.Treeview(
+            frame, columns=("id", "restante"), show="headings"
+        )
         self.tree_abono.heading("id", text="Reserva")
         self.tree_abono.heading("restante", text="Saldo restante")
         self.tree_abono.column("id", width=80, anchor="center")
@@ -332,14 +398,16 @@ class VentanaCliente(ctk.CTk):
         self.tree_abono.pack(fill="both", expand=True, pady=5)
 
         ctk.CTkLabel(frame, text="Medio de pago:").pack(anchor="w")
-        self.combo_abono_medio = ctk.CTkComboBox(frame, values=[])
+        self.combo_abono_medio = CTkScrollableComboBox(frame, values=[])
         self.combo_abono_medio.pack(fill="x", pady=5)
 
         ctk.CTkLabel(frame, text="Monto a abonar:").pack(anchor="w")
         self.entry_abono_monto = ctk.CTkEntry(frame)
         self.entry_abono_monto.pack(fill="x", pady=5)
 
-        ctk.CTkButton(frame, text="Registrar abono", command=self._registrar_abono).pack(pady=10)
+        ctk.CTkButton(
+            frame, text="Registrar abono", command=self._registrar_abono
+        ).pack(pady=10)
 
     def _cargar_reservas_abono(self) -> None:
         query = (
@@ -381,7 +449,9 @@ class VentanaCliente(ctk.CTk):
             messagebox.showerror("Error", "Monto inv\u00e1lido")
             return
         if monto < restante * 0.3:
-            messagebox.showerror("Error", "Cada abono debe ser m\u00ednimo el 30% del saldo restante")
+            messagebox.showerror(
+                "Error", "Cada abono debe ser m\u00ednimo el 30% del saldo restante"
+            )
             return
         query = (
             "INSERT INTO Abono_reserva (valor, fecha_hora, id_reserva, id_medio_pago) "
@@ -401,13 +471,17 @@ class VentanaCliente(ctk.CTk):
         frame = ctk.CTkFrame(self.tab_hist_res, fg_color="transparent")
         frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        self.tree_reservas = ttk.Treeview(frame, columns=("id", "salida", "total", "estado"), show="headings")
+        self.tree_reservas = ttk.Treeview(
+            frame, columns=("id", "salida", "total", "estado"), show="headings"
+        )
         for c in ("id", "salida", "total", "estado"):
             self.tree_reservas.heading(c, text=c.capitalize())
             self.tree_reservas.column(c, anchor="center")
         self.tree_reservas.pack(fill="both", expand=True, pady=5)
 
-        ctk.CTkButton(frame, text="Cancelar reserva", command=self._cancelar_reserva).pack(pady=5)
+        ctk.CTkButton(
+            frame, text="Cancelar reserva", command=self._cancelar_reserva
+        ).pack(pady=5)
 
     def _cargar_historial_reservas(self) -> None:
         query = (
@@ -433,15 +507,24 @@ class VentanaCliente(ctk.CTk):
             return
         id_reserva, fecha_salida, *_rest = self.tree_reservas.item(item)["values"]
         fecha_dt = (
-            fecha_salida if isinstance(fecha_salida, datetime) else datetime.strptime(str(fecha_salida), "%Y-%m-%d %H:%M:%S")
+            fecha_salida
+            if isinstance(fecha_salida, datetime)
+            else datetime.strptime(str(fecha_salida), "%Y-%m-%d %H:%M:%S")
         )
         if fecha_dt <= datetime.now():
-            messagebox.showerror("Error", "La reserva ya sucedi\u00f3 y no puede cancelarse")
+            messagebox.showerror(
+                "Error", "La reserva ya sucedi\u00f3 y no puede cancelarse"
+            )
             return
-        if not messagebox.askyesno("Confirmar", "\u00bfCancelar la reserva seleccionada?"):
+        if not messagebox.askyesno(
+            "Confirmar", "\u00bfCancelar la reserva seleccionada?"
+        ):
             return
         try:
-            self.conexion.ejecutar("UPDATE Reserva_alquiler SET id_estado_reserva=2 WHERE id_reserva=%s", (id_reserva,))
+            self.conexion.ejecutar(
+                "UPDATE Reserva_alquiler SET id_estado_reserva=2 WHERE id_reserva=%s",
+                (id_reserva,),
+            )
             messagebox.showinfo("\u00c9xito", "Reserva cancelada")
             self._cargar_historial_reservas()
             self._cargar_reservas_abono()
@@ -452,13 +535,17 @@ class VentanaCliente(ctk.CTk):
         frame = ctk.CTkFrame(self.tab_hist_alq, fg_color="transparent")
         frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        self.tree_alquileres = ttk.Treeview(frame, columns=("id", "salida", "valor", "estado"), show="headings")
+        self.tree_alquileres = ttk.Treeview(
+            frame, columns=("id", "salida", "valor", "estado"), show="headings"
+        )
         for c in ("id", "salida", "valor", "estado"):
             self.tree_alquileres.heading(c, text=c.capitalize())
             self.tree_alquileres.column(c, anchor="center")
         self.tree_alquileres.pack(fill="both", expand=True, pady=5)
 
-        ctk.CTkButton(frame, text="Cancelar alquiler", command=self._cancelar_alquiler).pack(pady=5)
+        ctk.CTkButton(
+            frame, text="Cancelar alquiler", command=self._cancelar_alquiler
+        ).pack(pady=5)
 
     def _cargar_historial_alquileres(self) -> None:
         query = (
@@ -484,15 +571,23 @@ class VentanaCliente(ctk.CTk):
             return
         id_alquiler, fecha_salida, *_rest = self.tree_alquileres.item(item)["values"]
         fecha_dt = (
-            fecha_salida if isinstance(fecha_salida, datetime) else datetime.strptime(str(fecha_salida), "%Y-%m-%d %H:%M:%S")
+            fecha_salida
+            if isinstance(fecha_salida, datetime)
+            else datetime.strptime(str(fecha_salida), "%Y-%m-%d %H:%M:%S")
         )
         if fecha_dt <= datetime.now():
-            messagebox.showerror("Error", "Este alquiler ya inici\u00f3 y no puede cancelarse")
+            messagebox.showerror(
+                "Error", "Este alquiler ya inici\u00f3 y no puede cancelarse"
+            )
             return
-        if not messagebox.askyesno("Confirmar", "\u00bfCancelar el alquiler seleccionado?"):
+        if not messagebox.askyesno(
+            "Confirmar", "\u00bfCancelar el alquiler seleccionado?"
+        ):
             return
         try:
-            self.conexion.ejecutar("DELETE FROM Alquiler WHERE id_alquiler=%s", (id_alquiler,))
+            self.conexion.ejecutar(
+                "DELETE FROM Alquiler WHERE id_alquiler=%s", (id_alquiler,)
+            )
             messagebox.showinfo("\u00c9xito", "Alquiler cancelado")
             self._cargar_historial_alquileres()
         except Exception as exc:  # pragma: no cover - depende de la BD
@@ -504,7 +599,9 @@ class VentanaCliente(ctk.CTk):
         frame = ctk.CTkFrame(self.tab_vehiculos, fg_color="transparent")
         frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        self.tree_veh = ttk.Treeview(frame, columns=("placa", "modelo"), show="headings")
+        self.tree_veh = ttk.Treeview(
+            frame, columns=("placa", "modelo"), show="headings"
+        )
         for c in ("placa", "modelo"):
             self.tree_veh.heading(c, text=c.capitalize())
             self.tree_veh.column(c, anchor="center", width=200)
@@ -514,7 +611,9 @@ class VentanaCliente(ctk.CTk):
         try:
             filas = self.conexion.ejecutar("SELECT placa, modelo FROM Vehiculo")
         except Exception as exc:  # pragma: no cover - depende de la BD
-            messagebox.showerror("Error", f"No se pudieron obtener los veh\u00edculos:\n{exc}")
+            messagebox.showerror(
+                "Error", f"No se pudieron obtener los veh\u00edculos:\n{exc}"
+            )
             filas = []
         self.tree_veh.delete(*self.tree_veh.get_children())
         for fila in filas:
@@ -526,13 +625,17 @@ class VentanaCliente(ctk.CTk):
 
         self.tree_tar = ttk.Treeview(frame, columns=("desc", "valor"), show="headings")
         for c in ("desc", "valor"):
-            self.tree_tar.heading(c, text="Descripci\u00f3n" if c == "desc" else "Valor")
+            self.tree_tar.heading(
+                c, text="Descripci\u00f3n" if c == "desc" else "Valor"
+            )
             self.tree_tar.column(c, anchor="center", width=200)
         self.tree_tar.pack(fill="both", expand=True, pady=5)
 
     def _cargar_tarifas(self) -> None:
         try:
-            filas = self.conexion.ejecutar("SELECT descripcion, valor FROM Descuento_alquiler")
+            filas = self.conexion.ejecutar(
+                "SELECT descripcion, valor FROM Descuento_alquiler"
+            )
         except Exception as exc:  # pragma: no cover - depende de la BD
             messagebox.showerror("Error", f"No se pudieron obtener las tarifas:\n{exc}")
             filas = []
