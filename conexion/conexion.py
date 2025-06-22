@@ -1,17 +1,32 @@
+"""Módulo de conexión a MySQL con failover y cola de operaciones."""
+
+from __future__ import annotations
+
 import json
 import logging
 import os
 from typing import Any, List, Tuple
 
 import mysql.connector
-from mysql.connector import MySQLConnection, Error
+from mysql.connector import Error, MySQLConnection
 from dotenv import load_dotenv
+
+
+class DatabaseExecutionError(Exception):
+    """Error raised when an SQL statement fails."""
+
+    def __init__(self, query: str, original: Error) -> None:
+        msg = f"Error ejecutando query '{query}': {original}"
+        super().__init__(msg)
+        self.query = query
+        self.original = original
 
 
 class ConexionBD:
     """Manejo de dos conexiones MySQL con failover y cola de operaciones."""
 
     def __init__(self) -> None:
+        """Crear una nueva instancia y establecer la conexión inicial."""
         load_dotenv()
         self.local_conf = {
             'host': os.getenv('DB1_HOST', 'localhost'),
@@ -32,6 +47,7 @@ class ConexionBD:
         self.conectar()
 
     def _cargar_pendientes(self) -> None:
+        """Cargar del disco las operaciones pendientes en caso de existir."""
         if os.path.exists(self.queue_file):
             with open(self.queue_file, 'r', encoding='utf-8') as f:
                 self.pendientes: List[dict[str, Any]] = json.load(f)
@@ -39,10 +55,12 @@ class ConexionBD:
             self.pendientes = []
 
     def _guardar_pendientes(self) -> None:
+        """Guardar la cola de operaciones pendientes en disco."""
         with open(self.queue_file, 'w', encoding='utf-8') as f:
             json.dump(self.pendientes, f, ensure_ascii=False, indent=2)
 
     def conectar(self) -> None:
+        """Conectar a la base de datos activa y sincronizar pendientes."""
         config = self.local_conf if self.active == 'local' else self.remote_conf
         try:
             self.conn = mysql.connector.connect(**config)
@@ -53,6 +71,7 @@ class ConexionBD:
             self._failover()
 
     def _failover(self) -> None:
+        """Cambiar entre la base local y la remota al fallar la conexión."""
         self.active = 'remote' if self.active == 'local' else 'local'
         config = self.local_conf if self.active == 'local' else self.remote_conf
         try:
@@ -66,6 +85,7 @@ class ConexionBD:
     def ejecutar(
         self, query: str, params: Tuple[Any, ...] | None = None
     ) -> List[Tuple[Any, ...]]:
+        """Ejecutar ``query`` y devolver una lista de filas."""
         if not self.conn or not self.conn.is_connected():
             self.conectar()
         if not self.conn:
@@ -85,7 +105,7 @@ class ConexionBD:
             logging.error('Error ejecutando consulta: %s', e)
             self._agregar_pendiente(query, params)
             self._failover()
-            raise
+            raise DatabaseExecutionError(query, e) from e
         finally:
             if cur:
                 try:
@@ -98,7 +118,7 @@ class ConexionBD:
     def ejecutar_con_columnas(
         self, query: str, params: Tuple[Any, ...] | None = None
     ) -> Tuple[List[str], List[Tuple[Any, ...]]]:
-        """Ejecutar una consulta y retornar columnas y filas."""
+        """Ejecutar ``query`` y retornar las columnas junto a sus filas."""
         if not self.conn or not self.conn.is_connected():
             self.conectar()
         if not self.conn:
@@ -119,14 +139,16 @@ class ConexionBD:
             logging.error("Error ejecutando consulta: %s", e)
             self._agregar_pendiente(query, params)
             self._failover()
-            raise
+            raise DatabaseExecutionError(query, e) from e
 
     def _agregar_pendiente(self, query: str, params: Tuple[Any, ...] | None) -> None:
+        """Guardar una operación fallida para reintentar más tarde."""
         self.pendientes.append({'query': query, 'params': params})
         self._guardar_pendientes()
         logging.info('Consulta almacenada en cola de pendientes')
 
     def _sincronizar(self) -> None:
+        """Ejecutar las operaciones pendientes utilizando la conexión activa."""
         if not self.pendientes or not self.conn or not self.conn.is_connected():
             return
         logging.info('Sincronizando %d operaciones pendientes', len(self.pendientes))
@@ -169,3 +191,18 @@ class ConexionBD:
                 self.pendientes.insert(0, op)
                 break
         self._guardar_pendientes()
+
+    # ------------------------------------------------------------------
+    def close(self) -> None:
+        """Cerrar la conexión a la base de datos si está abierta."""
+        if self.conn and self.conn.is_connected():
+            self.conn.close()
+            self.conn = None
+            logging.info("Conexión cerrada")
+
+    def __del__(self) -> None:
+        """Asegurar el cierre de la conexión al destruir el objeto."""
+        try:
+            self.close()
+        except Exception:
+            pass
