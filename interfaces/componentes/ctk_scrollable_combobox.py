@@ -7,7 +7,13 @@ import customtkinter as ctk
 
 
 class CTkScrollableComboBox(ctk.CTkFrame):
-    """Simple scrollable ComboBox using ``ttk.Combobox`` internally."""
+    """Simple scrollable ``ttk.Combobox`` inside a CTk frame.
+
+    Parameters
+    ----------
+    list_height: int
+        Number of options to display when the dropdown opens.
+    """
 
     def __init__(
         self,
@@ -16,6 +22,7 @@ class CTkScrollableComboBox(ctk.CTkFrame):
         command: callable | None = None,
         width: int = 140,
         height: int = 28,
+        list_height: int = 5,
         **kwargs,
     ) -> None:
         super().__init__(
@@ -28,7 +35,7 @@ class CTkScrollableComboBox(ctk.CTkFrame):
             textvariable=self._var,
             values=values or [],
             state="readonly",
-            height=height,
+            height=list_height,
         )
         self._box.pack(fill="both", expand=True)
         if command is not None:
@@ -63,5 +70,7 @@ class CTkScrollableComboBox(ctk.CTkFrame):
             self._command = kwargs.pop("command")
             if self._command is not None:
                 self._box.bind("<<ComboboxSelected>>", self._callback)
+        if "list_height" in kwargs:
+            self._box["height"] = kwargs.pop("list_height")
         self._box.configure(**kwargs)
         super().configure(require_redraw=require_redraw)
