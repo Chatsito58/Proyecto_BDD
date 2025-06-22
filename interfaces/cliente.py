@@ -9,6 +9,7 @@ from tkcalendar import Calendar
 import customtkinter as ctk
 
 import logging
+from utils import cancel_pending_after, safe_bg_error_handler
 
 from conexion.conexion import ConexionBD
 from interfaces.componentes.ctk_scrollable_combobox import CTkScrollableComboBox
@@ -76,6 +77,8 @@ class VentanaCliente(ctk.CTk):
 
     def __init__(self, id_cliente: int) -> None:
         super().__init__()
+        self.report_callback_exception = safe_bg_error_handler
+        self._after_ids: list[str] = []
         self.id_cliente = id_cliente
         self.conexion = ConexionBD()
         self.title("\U0001f464 Panel del Cliente")
@@ -610,6 +613,10 @@ class VentanaCliente(ctk.CTk):
 
     # ------------------------------------------------------------------
     def _logout(self) -> None:
+        from utils import cancel_pending_after
+
+        cancel_pending_after(self)
+        self.quit()
         self.destroy()
         from interfaces.login import VentanaLogin
 
