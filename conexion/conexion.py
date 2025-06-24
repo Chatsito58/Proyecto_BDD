@@ -22,18 +22,27 @@ class DatabaseExecutionError(Exception):
         self.original = original
 
 class ConexionBD:
-    """Gestiona conexiones local y remota con colas de operaciones."""
+    """Gestiona conexiones local y remota con colas de operaciones.
+
+    Parameters
+    ----------
+    failover : bool, optional
+        Si es ``True`` se intentará ejecutar la operación en la base secundaria
+        cuando falle la primaria.
+    """
 
     def __init__(
         self,
         active: str = "remota",
         queue_file_local: str = "pendientes_local.json",
-        queue_file_remota: str = "pendientes_remota.json"
+        queue_file_remota: str = "pendientes_remota.json",
+        failover: bool = True,
     ) -> None:
         load_dotenv()
         self.queue_file_local = queue_file_local
         self.queue_file_remota = queue_file_remota
         self.active = active
+        self.failover = failover
 
         self.local_conf = {
             'host': os.getenv('DB1_HOST', 'localhost'),
@@ -102,72 +111,123 @@ class ConexionBD:
             self.conn_remota = None
 
     def ejecutar(self, query: str, params: Tuple[Any, ...] | None = None) -> List[Tuple[Any, ...]]:
-        if not self.conexion_valida_remota():
-            self.conectar_remota()
-        if self.conexion_valida_remota():
-            try:
-                cur = self.conn_remota.cursor()
-                cur.execute(query, params)
-                res = cur.fetchall() if query.strip().lower().startswith("select") else []
-                if not res:
-                    self.conn_remota.commit()
-                cur.close()
-                return res
-            except Error as e:
-                self._agregar_pendiente_remota(query, params)
+        """Ejecutar una consulta priorizando la base indicada en ``self.active``."""
 
-        if not self.conexion_valida_local():
-            self.conectar_local()
-        if self.conexion_valida_local():
-            try:
-                cur = self.conn_local.cursor()
-                cur.execute(query, params)
-                res = cur.fetchall() if query.strip().lower().startswith("select") else []
-                if not res:
-                    self.conn_local.commit()
-                cur.close()
-                return res
-            except Error as e:
-                self._agregar_pendiente_local(query, params)
-                raise DatabaseExecutionError(query, e) from e
+        def _exec(db: str) -> List[Tuple[Any, ...]]:
+            if db == "local":
+                if not self.conexion_valida_local():
+                    self.conectar_local()
+                if self.conexion_valida_local():
+                    try:
+                        cur = self.conn_local.cursor()
+                        cur.execute(query, params)
+                        res = cur.fetchall() if query.strip().lower().startswith("select") else []
+                        if not res:
+                            self.conn_local.commit()
+                        cur.close()
+                        return res
+                    except Error as err:
+                        raise DatabaseExecutionError(query, err) from err
+                raise ConnectionError("No hay conexión disponible")
+            if not self.conexion_valida_remota():
+                self.conectar_remota()
+            if self.conexion_valida_remota():
+                try:
+                    cur = self.conn_remota.cursor()
+                    cur.execute(query, params)
+                    res = cur.fetchall() if query.strip().lower().startswith("select") else []
+                    if not res:
+                        self.conn_remota.commit()
+                    cur.close()
+                    return res
+                except Error as err:
+                    raise DatabaseExecutionError(query, err) from err
+            raise ConnectionError("No hay conexión disponible")
 
-        self._agregar_pendiente_local(query, params)
-        raise ConnectionError("No hay conexión disponible")
+        primary = "local" if self.active == "local" else "remote"
+        if primary == "remote" and self.active == "remota":
+            primary = "remote"
+        secondary = "remote" if primary == "local" else "local"
+
+        try:
+            return _exec(primary)
+        except (DatabaseExecutionError, ConnectionError) as e:
+            if self.failover:
+                try:
+                    return _exec(secondary)
+                except (DatabaseExecutionError, ConnectionError):
+                    if primary == "local":
+                        self._agregar_pendiente_local(query, params)
+                    else:
+                        self._agregar_pendiente_remota(query, params)
+                    raise
+            else:
+                if primary == "local":
+                    self._agregar_pendiente_local(query, params)
+                else:
+                    self._agregar_pendiente_remota(query, params)
+                raise
 
     def ejecutar_con_columnas(
         self, query: str, params: Tuple[Any, ...] | None = None
     ) -> Tuple[List[str], List[Tuple[Any, ...]]]:
-        if not self.conexion_valida_remota():
-            self.conectar_remota()
-        if self.conexion_valida_remota():
-            try:
-                cur = self.conn_remota.cursor()
-                cur.execute(query, params)
-                columnas = [d[0] for d in cur.description] if cur.description else []
-                filas = cur.fetchall() if query.strip().lower().startswith("select") else []
-                self.conn_remota.commit()
-                cur.close()
-                return columnas, filas
-            except Error as e:
-                self._agregar_pendiente_remota(query, params)
+        """Versión de :meth:`ejecutar` que también devuelve las columnas."""
 
-        if not self.conexion_valida_local():
-            self.conectar_local()
-        if self.conexion_valida_local():
-            try:
-                cur = self.conn_local.cursor()
-                cur.execute(query, params)
-                columnas = [d[0] for d in cur.description] if cur.description else []
-                filas = cur.fetchall() if query.strip().lower().startswith("select") else []
-                self.conn_local.commit()
-                cur.close()
-                return columnas, filas
-            except Error as e:
-                self._agregar_pendiente_local(query, params)
-                raise DatabaseExecutionError(query, e) from e
+        def _exec(db: str) -> Tuple[List[str], List[Tuple[Any, ...]]]:
+            if db == "local":
+                if not self.conexion_valida_local():
+                    self.conectar_local()
+                if self.conexion_valida_local():
+                    try:
+                        cur = self.conn_local.cursor()
+                        cur.execute(query, params)
+                        cols = [d[0] for d in cur.description] if cur.description else []
+                        rows = cur.fetchall() if query.strip().lower().startswith("select") else []
+                        self.conn_local.commit()
+                        cur.close()
+                        return cols, rows
+                    except Error as err:
+                        raise DatabaseExecutionError(query, err) from err
+                raise ConnectionError("No hay conexión disponible")
 
-        self._agregar_pendiente_local(query, params)
-        raise ConnectionError("No hay conexión disponible")
+            if not self.conexion_valida_remota():
+                self.conectar_remota()
+            if self.conexion_valida_remota():
+                try:
+                    cur = self.conn_remota.cursor()
+                    cur.execute(query, params)
+                    cols = [d[0] for d in cur.description] if cur.description else []
+                    rows = cur.fetchall() if query.strip().lower().startswith("select") else []
+                    self.conn_remota.commit()
+                    cur.close()
+                    return cols, rows
+                except Error as err:
+                    raise DatabaseExecutionError(query, err) from err
+            raise ConnectionError("No hay conexión disponible")
+
+        primary = "local" if self.active == "local" else "remote"
+        if primary == "remote" and self.active == "remota":
+            primary = "remote"
+        secondary = "remote" if primary == "local" else "local"
+
+        try:
+            return _exec(primary)
+        except (DatabaseExecutionError, ConnectionError):
+            if self.failover:
+                try:
+                    return _exec(secondary)
+                except (DatabaseExecutionError, ConnectionError):
+                    if primary == "local":
+                        self._agregar_pendiente_local(query, params)
+                    else:
+                        self._agregar_pendiente_remota(query, params)
+                    raise
+            else:
+                if primary == "local":
+                    self._agregar_pendiente_local(query, params)
+                else:
+                    self._agregar_pendiente_remota(query, params)
+                raise
 
     def _agregar_pendiente_local(self, query: str, params: Tuple[Any, ...] | None) -> None:
         self.pendientes_local.append({"query": query, "params": params})
@@ -210,8 +270,14 @@ class ConexionBD:
         self._guardar_pendientes_remota()
 
     def _sincronizar(self) -> None:
-        self._sincronizar_remota()
-        self._sincronizar_local()
+        if not self.failover:
+            return
+
+        secondary = "remote" if self.active == "local" else "local"
+        if secondary == "remote":
+            self._sincronizar_remota()
+        else:
+            self._sincronizar_local()
 
     def close(self) -> None:
         if self.conexion_valida_remota():
