@@ -436,9 +436,9 @@ class VentanaCliente(ctk.CTk):
         frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         self.tree_reservas = ttk.Treeview(
-            frame, columns=("id", "salida", "total", "estado"), show="headings"
+            frame, columns=("id", "fecha", "total", "estado"), show="headings"
         )
-        for c in ("id", "salida", "total", "estado"):
+        for c in ("id", "fecha", "total", "estado"):
             self.tree_reservas.heading(c, text=c.capitalize())
             self.tree_reservas.column(c, anchor="center")
         self.tree_reservas.pack(fill="both", expand=True, pady=5)
@@ -449,7 +449,7 @@ class VentanaCliente(ctk.CTk):
 
     def _cargar_historial_reservas(self) -> None:
         query = (
-            "SELECT r.id_reserva, r.fecha_hora_salida, "
+            "SELECT r.id_reserva, r.fecha_hora, "
             "r.abono + r.saldo_pendiente AS total, er.descripcion "
             "FROM Reserva_alquiler r "
             "JOIN Estado_reserva er ON r.id_estado_reserva=er.id_estado "
@@ -507,9 +507,9 @@ class VentanaCliente(ctk.CTk):
         frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         self.tree_alquileres = ttk.Treeview(
-            frame, columns=("id", "salida", "valor", "estado"), show="headings"
+            frame, columns=("id", "salida", "entrada", "valor", "estado"), show="headings"
         )
-        for c in ("id", "salida", "valor", "estado"):
+        for c in ("id", "salida","entrada", "valor", "estado"):
             self.tree_alquileres.heading(c, text=c.capitalize())
             self.tree_alquileres.column(c, anchor="center")
         self.tree_alquileres.pack(fill="both", expand=True, pady=5)
@@ -520,7 +520,7 @@ class VentanaCliente(ctk.CTk):
 
     def _cargar_historial_alquileres(self) -> None:
         query = (
-            "SELECT a.id_alquiler, a.fecha_hora_salida, a.valor, ea.descripcion "
+            "SELECT a.id_alquiler, a.fecha_hora_salida,a.fecha_hora_entrada, a.valor, ea.descripcion "
             "FROM Alquiler a "
             "JOIN Estado_alquiler ea ON a.id_estado=ea.id_estado "
             "WHERE a.id_cliente=%s "
