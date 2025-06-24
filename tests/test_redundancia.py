@@ -15,6 +15,8 @@ class RedundanciaTest(unittest.TestCase):
         remote = MagicMock()
         mock_conn.side_effect = [local, remote]
         gestor = GestorRedundancia()
+        mock_conn.assert_any_call(active="local", failover=False, queue_file_local="pendientes_local.json")
+        mock_conn.assert_any_call(active="remote", failover=False, queue_file_remota="pendientes_remota.json")
         gestor.ejecutar('INSERT INTO t VALUES (%s)', (1,))
         local.ejecutar.assert_called_once_with('INSERT INTO t VALUES (%s)', (1,))
         remote.ejecutar.assert_called_once_with('INSERT INTO t VALUES (%s)', (1,))
@@ -30,6 +32,17 @@ class RedundanciaTest(unittest.TestCase):
         cols, rows = gestor.ejecutar_con_columnas('SELECT 1')
         self.assertEqual(cols, ['id'])
         self.assertEqual(rows, [(1,)])
+
+    @patch('redundancia.gestor.ConexionBD')
+    def test_remote_error_no_duplicate_local(self, mock_conn):
+        local = MagicMock()
+        remote = MagicMock()
+        remote.ejecutar.side_effect = Exception('fail')
+        mock_conn.side_effect = [local, remote]
+        gestor = GestorRedundancia()
+        gestor.ejecutar('INSERT INTO t VALUES (%s)', (1,))
+        local.ejecutar.assert_called_once_with('INSERT INTO t VALUES (%s)', (1,))
+        remote.ejecutar.assert_called_once_with('INSERT INTO t VALUES (%s)', (1,))
 
 
 if __name__ == '__main__':

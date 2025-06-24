@@ -23,7 +23,9 @@ class ConexionDBTest(unittest.TestCase):
              patch.object(ConexionBD, '_guardar_pendientes_remota', return_value=None), \
              patch.object(ConexionBD, '_sincronizar_local', return_value=None), \
              patch.object(ConexionBD, '_sincronizar_remota', return_value=None):
-            db = ConexionBD()
+            db = ConexionBD(failover=True)
+            db.conectar_remota()
+            db.conectar_local()
             self.assertIs(db.conn_remota, conn_remote)
             self.assertIs(db.conn_local, conn_local)
             self.assertTrue(db.conn_remota.is_connected())
