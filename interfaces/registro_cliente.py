@@ -16,6 +16,7 @@ class VentanaCrearCliente(tk.Toplevel):
         self.title("Crear cliente")
         self.configure(bg="#2a2a2a")
         self.geometry("360x580")
+        self.protocol("WM_DELETE_WINDOW", self._on_close)
         self._configurar_estilo()
         self._build_ui()
 
@@ -77,7 +78,21 @@ class VentanaCrearCliente(tk.Toplevel):
             )
             mostrar_notificacion("Éxito", "Cliente creado correctamente")
             self.destroy()
+            if self.master:
+                try:
+                    self.master.focus_force()
+                except Exception:
+                    pass
         except DatosClienteInvalidos as exc:
             messagebox.showerror("Error", str(exc))
         except Exception as exc:  # pragma: no cover - conexion errors vary
             mostrar_error(exc)
+
+    def _on_close(self) -> None:
+        """Return focus to the parent login window when closed."""
+        self.destroy()
+        if self.master:
+            try:
+                self.master.focus_force()
+            except Exception:
+                pass
