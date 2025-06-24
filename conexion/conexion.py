@@ -33,7 +33,16 @@ class DatabaseExecutionError(Exception):
 class ConexionBD:
     """Manejo de conexión MySQL con failover, cola de operaciones y prueba de conexión."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, active: str = "remote", queue_file: str = "pendientes.json") -> None:
+        """Inicializa la conexión.
+
+        Parameters
+        ----------
+        active:
+            Indica qué base usar inicialmente, ``"remote"`` o ``"local"``.
+        queue_file:
+            Ruta del archivo donde se almacenarán las operaciones pendientes.
+        """
         load_dotenv()
         self.local_conf = {
             'host': os.getenv('DB1_HOST'),
@@ -47,9 +56,9 @@ class ConexionBD:
             'password': os.getenv('DB_PASSWORD'),
             'database': os.getenv('DB_NAME'),
         }
-        self.active = 'remote'
+        self.active = active
         self.conn: MySQLConnection | None = None
-        self.queue_file = 'pendientes.json'
+        self.queue_file = queue_file
         self._cargar_pendientes()
         self.conectar()
 
