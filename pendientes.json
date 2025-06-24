@@ -1,30 +1,3 @@
 [
-  {
-    "query": "INSERT INTO Tipo_documento ( descripci on ) VALUES ( 'Cédula de Ciudadanía' ) ;",
-    "params": null
-  },
-  {
-    "query": "INSERT INTO Tipo_documento ( descripci on ) VALUE ( 'Cédula de Ciudadanía' ) ;",
-    "params": null
-  },
-  {
-    "query": "INSERT INTO tipo_documento ( descripci on ) VALUE ( 'Cédula de Ciudadanía' ) ;",
-    "params": null
-  },
-  {
-    "query": "INSERT INTO Tipo_documento ( descripci on ) VALUE ( \"Prueba documento\" ) ;",
-    "params": null
-  },
-  {
-    "query": "INSERT INTO Tipo_documento ( descripci on ) VALUE ( \"Prueba documento\" ) ;",
-    "params": null
-  },
-  {
-    "query": "INSERT INTO Tipo_documento ( descripci on ) VALUES ( \"Prueba documento\" ) ;",
-    "params": null
-  },
-  {
-    "query": "INSERT INTO Tipo_documento ( descripci on ) VALUES ( 'Prueba documento' ) ;",
-    "params": null
-  }
+  
 ]
