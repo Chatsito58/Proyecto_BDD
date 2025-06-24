@@ -64,14 +64,14 @@ class VentanaLogin(ctk.CTk):
 
         ctk.CTkButton(marco, text="🚪 Iniciar", command=self._ingresar).pack(pady=10, fill="x")
 
-        enlace = ctk.CTkLabel(
+        ctk.CTkButton(
             marco,
             text="🆕 Crear cuenta de cliente",
+            command=self._abrir_registro,
+            fg_color="transparent",
+            hover_color="gray25",
             text_color="blue",
-            cursor="hand2",
-        )
-        enlace.pack()
-        enlace.bind("<Button-1>", lambda _e: self._abrir_registro())
+        ).pack()
 
     def _ingresar(self) -> None:
         correo = self.entry_correo.get().strip()
