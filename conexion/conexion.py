@@ -19,8 +19,13 @@ remote_conf = {
     "user": os.getenv("DB_USER"),
     "password": os.getenv("DB_PASSWORD"),
     "host": os.getenv("DB_HOST"),
-    "port": int(os.getenv("DB_PORT", 3306)),
-    "database": os.getenv("DB_NAME")
+    "port": int(os.getenv("DB_PORT")),
+    "database": os.getenv("DB_NAME"),
+    "user2": os.getenv("DB2_USER"),
+    "password2": os.getenv("DB2_PASSWORD"),
+    "host2": os.getenv("DB2_HOST"),
+    "port2": int(os.getenv("DB2_PORT")),
+    "database2": os.getenv("DB2_NAME")
 }
 
 class DatabaseExecutionError(Exception):
@@ -45,16 +50,16 @@ class ConexionBD:
         """
         load_dotenv()
         self.local_conf = {
-            'host': os.getenv('DB1_HOST'),
-            'user': os.getenv('DB1_USER'),
-            'password': os.getenv('DB1_PASSWORD'),
-            'database': os.getenv('DB1_NAME'),
-        }
-        self.remote_conf = {
             'host': os.getenv('DB_HOST'),
             'user': os.getenv('DB_USER'),
             'password': os.getenv('DB_PASSWORD'),
             'database': os.getenv('DB_NAME'),
+        }
+        self.remote_conf = {
+            'host': os.getenv('DB2_HOST'),
+            'user': os.getenv('DB2_USER'),
+            'password': os.getenv('DB2_PASSWORD'),
+            'database': os.getenv('DB2_NAME'),
         }
         self.active = active
         self.conn: MySQLConnection | None = None
