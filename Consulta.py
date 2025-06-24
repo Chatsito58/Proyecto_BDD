@@ -338,8 +338,8 @@ def main() -> None:
 
     from auth import login
     from roles.cliente import menu_cliente
-    from empleado import menu_empleado
-    from gerente import menu_gerente
+    from roles.empleado import menu_empleado
+    from roles.gerente import menu_gerente
 
     conexion = ConexionBD()
     print("Sistema de Alquiler de Vehículos")
