@@ -6,7 +6,12 @@ from conexion.conexion import ConexionBD
 
 
 class GestorFragmentacion:
-    """Ejecuta operaciones en el fragmento correcto."""
+    """Ejecuta operaciones en el fragmento correcto.
+
+    Cada fragmento mantiene su propia cola de pendientes usando los nuevos
+    nombres ``queue_file_local`` y ``queue_file_remota`` en lugar del
+    argumento obsoleto ``queue_file``.
+    """
 
     def __init__(self) -> None:
         # Un fragmento por cada base
