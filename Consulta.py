@@ -337,7 +337,7 @@ def main() -> None:
     from getpass import getpass
 
     from auth import login
-    from cliente import menu_cliente
+    from roles.cliente import menu_cliente
     from empleado import menu_empleado
     from gerente import menu_gerente
 

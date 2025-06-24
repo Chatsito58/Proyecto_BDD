@@ -212,3 +212,36 @@ def estado_pago(id_cliente: int) -> None:
         restante = float(total) - float(pagado)
         estado = "COMPLETO" if restante <= 0 else f"Falta {restante:.2f}"
         print(f"Reserva {rid} - Total {total:.2f} - Pagado {pagado:.2f} -> {estado}")
+
+
+def menu_cliente(conexion: ConexionBD, correo: str) -> None:
+    """Loop de menú para clientes."""
+    while True:
+        print("\n--- Menú Cliente ---")
+        print("1. Ver vehículos disponibles")
+        print("2. Realizar una reserva")
+        print("3. Cancelar/modificar reservas")
+        print("4. Ver historial de alquileres")
+        print("5. Actualizar mis datos")
+        print("6. Ver tarifas/promociones")
+        print("7. Ver sucursales")
+        print("0. Salir")
+        opcion = input("Seleccione una opción: ").strip()
+        if opcion == "1":
+            ver_vehiculos_disponibles(conexion)
+        elif opcion == "2":
+            realizar_reserva(conexion, correo)
+        elif opcion == "3":
+            cancelar_reserva(conexion, correo)
+        elif opcion == "4":
+            ver_historial(conexion, correo)
+        elif opcion == "5":
+            actualizar_datos(conexion, correo)
+        elif opcion == "6":
+            ver_tarifas(conexion)
+        elif opcion == "7":
+            ver_sucursales(conexion)
+        elif opcion == "0":
+            break
+        else:
+            print("Opción inválida")
