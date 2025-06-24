@@ -36,173 +36,293 @@ class DatabaseExecutionError(Exception):
         self.original = original
 
 class ConexionBD:
-    """Manejo de conexión MySQL con failover, cola de operaciones y prueba de conexión."""
+    """Gestiona conexiones local y remota con colas de operaciones."""
 
-    def __init__(self, *, active: str = "remote", queue_file: str = "pendientes.json") -> None:
-        """Inicializa la conexión.
+    def __init__(
+        self,
+        *,
+        queue_file_local: str = "pendientes_local.json",
+        queue_file_remota: str = "pendientes_remota.json",
+    ) -> None:
+        """Inicializa las dos conexiones y sus colas."""
 
-        Parameters
-        ----------
-        active:
-            Indica qué base usar inicialmente, ``"remote"`` o ``"local"``.
-        queue_file:
-            Ruta del archivo donde se almacenarán las operaciones pendientes.
-        """
         load_dotenv()
         self.local_conf = {
-            'host': os.getenv('DB_HOST'),
-            'user': os.getenv('DB_USER'),
-            'password': os.getenv('DB_PASSWORD'),
-            'database': os.getenv('DB_NAME'),
+            "host": os.getenv("DB_HOST"),
+            "user": os.getenv("DB_USER"),
+            "password": os.getenv("DB_PASSWORD"),
+            "database": os.getenv("DB_NAME"),
         }
         self.remote_conf = {
-            'host': os.getenv('DB2_HOST'),
-            'user': os.getenv('DB2_USER'),
-            'password': os.getenv('DB2_PASSWORD'),
-            'database': os.getenv('DB2_NAME'),
+            "host": os.getenv("DB2_HOST"),
+            "user": os.getenv("DB2_USER"),
+            "password": os.getenv("DB2_PASSWORD"),
+            "database": os.getenv("DB2_NAME"),
         }
-        self.active = active
-        self.conn: MySQLConnection | None = None
-        self.queue_file = queue_file
-        self._cargar_pendientes()
-        self.conectar()
 
-    def conexion_valida(self) -> bool:
-        """Verifica si la conexión actual es válida y activa."""
-        return self.conn is not None and self.conn.is_connected()
+        self.conn_local: MySQLConnection | None = None
+        self.conn_remota: MySQLConnection | None = None
 
-    def _cargar_pendientes(self) -> None:
-        if os.path.exists(self.queue_file):
-            with open(self.queue_file, 'r', encoding='utf-8') as f:
-                self.pendientes: List[dict[str, Any]] = json.load(f)
+        self.queue_file_local = queue_file_local
+        self.queue_file_remota = queue_file_remota
+
+        self._cargar_pendientes_local()
+        self._cargar_pendientes_remota()
+
+        self.conectar_remota()
+        self.conectar_local()
+
+    def conexion_valida_local(self) -> bool:
+        """Verificar la conexión local."""
+        return self.conn_local is not None and self.conn_local.is_connected()
+
+    def conexion_valida_remota(self) -> bool:
+        """Verificar la conexión remota."""
+        return self.conn_remota is not None and self.conn_remota.is_connected()
+
+    # ---- Manejo de pendientes ----
+    def _cargar_pendientes_local(self) -> None:
+        if os.path.exists(self.queue_file_local):
+            with open(self.queue_file_local, "r", encoding="utf-8") as f:
+                self.pendientes_local: List[dict[str, Any]] = json.load(f)
         else:
-            self.pendientes = []
+            self.pendientes_local = []
 
-    def _guardar_pendientes(self) -> None:
-        with open(self.queue_file, 'w', encoding='utf-8') as f:
-            json.dump(self.pendientes, f, ensure_ascii=False, indent=2)
+    def _cargar_pendientes_remota(self) -> None:
+        if os.path.exists(self.queue_file_remota):
+            with open(self.queue_file_remota, "r", encoding="utf-8") as f:
+                self.pendientes_remota: List[dict[str, Any]] = json.load(f)
+        else:
+            self.pendientes_remota = []
 
-    def conectar(self) -> None:
-        config = self.local_conf if self.active == 'local' else self.remote_conf
+    def _guardar_pendientes_local(self) -> None:
+        with open(self.queue_file_local, "w", encoding="utf-8") as f:
+            json.dump(self.pendientes_local, f, ensure_ascii=False, indent=2)
+        logging.debug("Cola local escrita en %s", self.queue_file_local)
+
+    def _guardar_pendientes_remota(self) -> None:
+        with open(self.queue_file_remota, "w", encoding="utf-8") as f:
+            json.dump(self.pendientes_remota, f, ensure_ascii=False, indent=2)
+        logging.debug("Cola remota escrita en %s", self.queue_file_remota)
+
+    # ---- Conexiones ----
+    def conectar_local(self) -> None:
         try:
-            self.conn = mysql.connector.connect(**config)
-            logging.info('Conectado a base %s', self.active)
-            self._sincronizar()
+            self.conn_local = mysql.connector.connect(**self.local_conf)
+            logging.info("Conectado a base local")
+            self._sincronizar_local()
         except Error as e:
-            logging.error('Error al conectar a base %s: %s', self.active, e)
-            self._failover()
+            logging.error("Error al conectar a base local: %s", e)
+            self.conn_local = None
 
-    def _failover(self) -> None:
-        self.active = 'remote' if self.active == 'local' else 'local'
-        config = self.local_conf if self.active == 'local' else self.remote_conf
+    def conectar_remota(self) -> None:
         try:
-            self.conn = mysql.connector.connect(**config)
-            logging.info('Conmutación a base %s exitosa', self.active)
-            self._sincronizar()
+            self.conn_remota = mysql.connector.connect(**self.remote_conf)
+            logging.info("Conectado a base remota")
+            self._sincronizar_remota()
         except Error as e:
-            logging.error('Failover fallido: %s', e)
-            self.conn = None
+            logging.error("Error al conectar a base remota: %s", e)
+            self.conn_remota = None
 
     def ejecutar(self, query: str, params: Tuple[Any, ...] | None = None) -> List[Tuple[Any, ...]]:
-        if not self.conn or not self.conn.is_connected():
-            self.conectar()
-        if not self.conn:
-            self._agregar_pendiente(query, params)
-            raise ConnectionError('No hay conexión disponible')
+        """Ejecuta la consulta priorizando la base remota."""
 
-        cur = None
-        try:
-            cur = self.conn.cursor()
-            cur.execute(query, params)
-            if query.strip().lower().startswith('select'):
-                resultados = cur.fetchall()
-            else:
-                self.conn.commit()
-                resultados = []
-            return resultados
-        except Error as e:
-            logging.error('Error ejecutando consulta: %s', e)
-            self._agregar_pendiente(query, params)
-            self._failover()
-            raise DatabaseExecutionError(query, e) from e
-        finally:
-            if cur:
-                try:
-                    if cur.with_rows and cur.fetchone() is not None:
-                        cur.fetchall()
-                except Error:
-                    pass
-                cur.close()
-
-    def ejecutar_con_columnas(self, query: str, params: Tuple[Any, ...] | None = None) -> Tuple[List[str], List[Tuple[Any, ...]]]:
-        if not self.conn or not self.conn.is_connected():
-            self.conectar()
-        if not self.conn:
-            self._agregar_pendiente(query, params)
-            raise ConnectionError("No hay conexión disponible")
-
-        try:
-            cur = self.conn.cursor()
-            cur.execute(query, params)
-            columnas = [desc[0] for desc in cur.description] if cur.description else []
-            filas = cur.fetchall() if query.strip().lower().startswith("select") else []
-            self.conn.commit()
-            cur.close()
-            return columnas, filas
-        except Error as e:
-            logging.error("Error ejecutando consulta: %s", e)
-            self._agregar_pendiente(query, params)
-            self._failover()
-            raise DatabaseExecutionError(query, e) from e
-
-    def _agregar_pendiente(self, query: str, params: Tuple[Any, ...] | None) -> None:
-        self.pendientes.append({'query': query, 'params': params})
-        self._guardar_pendientes()
-        logging.info('Consulta almacenada en cola de pendientes')
-
-    def _sincronizar(self) -> None:
-        if not self.pendientes or not self.conn or not self.conn.is_connected():
-            return
-        logging.info('Sincronizando %d operaciones pendientes', len(self.pendientes))
-        while self.pendientes:
-            op = self.pendientes.pop(0)
+        # ----- Intento en remota -----
+        if not self.conexion_valida_remota():
+            self.conectar_remota()
+        if self.conexion_valida_remota():
             try:
-                cur = self.conn.cursor()
-                cur.execute(op['query'], op['params'])
-                if op['query'].strip().lower().startswith('select'):
+                cur = self.conn_remota.cursor()
+                cur.execute(query, params)
+                if query.strip().lower().startswith("select"):
+                    res = cur.fetchall()
+                else:
+                    self.conn_remota.commit()
+                    res = []
+                cur.close()
+                logging.info("Consulta ejecutada en remota")
+                return res
+            except Error as e:
+                logging.error("Error ejecutando en remota: %s", e)
+                self._agregar_pendiente_remota(query, params)
+
+        # ----- Fallback local -----
+        if not self.conexion_valida_local():
+            self.conectar_local()
+        if self.conexion_valida_local():
+            try:
+                cur = self.conn_local.cursor()
+                cur.execute(query, params)
+                if query.strip().lower().startswith("select"):
+                    res = cur.fetchall()
+                else:
+                    self.conn_local.commit()
+                    res = []
+                cur.close()
+                logging.info("Consulta ejecutada en local")
+                return res
+            except Error as e:
+                logging.error("Error ejecutando en local: %s", e)
+                self._agregar_pendiente_local(query, params)
+                raise DatabaseExecutionError(query, e) from e
+
+        # No se pudo conectar a ninguna base
+        self._agregar_pendiente_local(query, params)
+        raise ConnectionError("No hay conexión disponible")
+
+    def ejecutar_con_columnas(
+        self, query: str, params: Tuple[Any, ...] | None = None
+    ) -> Tuple[List[str], List[Tuple[Any, ...]]]:
+        """Versión con retorno de columnas."""
+
+        # Intento en remota
+        if not self.conexion_valida_remota():
+            self.conectar_remota()
+        if self.conexion_valida_remota():
+            try:
+                cur = self.conn_remota.cursor()
+                cur.execute(query, params)
+                columnas = [d[0] for d in cur.description] if cur.description else []
+                filas = cur.fetchall() if query.strip().lower().startswith("select") else []
+                self.conn_remota.commit()
+                cur.close()
+                logging.info("Consulta con columnas ejecutada en remota")
+                return columnas, filas
+            except Error as e:
+                logging.error("Error ejecutando en remota: %s", e)
+                self._agregar_pendiente_remota(query, params)
+
+        # Fallback local
+        if not self.conexion_valida_local():
+            self.conectar_local()
+        if self.conexion_valida_local():
+            try:
+                cur = self.conn_local.cursor()
+                cur.execute(query, params)
+                columnas = [d[0] for d in cur.description] if cur.description else []
+                filas = cur.fetchall() if query.strip().lower().startswith("select") else []
+                self.conn_local.commit()
+                cur.close()
+                logging.info("Consulta con columnas ejecutada en local")
+                return columnas, filas
+            except Error as e:
+                logging.error("Error ejecutando en local: %s", e)
+                self._agregar_pendiente_local(query, params)
+                raise DatabaseExecutionError(query, e) from e
+
+        self._agregar_pendiente_local(query, params)
+        raise ConnectionError("No hay conexión disponible")
+
+    # ---- Manejo de colas ----
+    def _agregar_pendiente_local(self, query: str, params: Tuple[Any, ...] | None) -> None:
+        self.pendientes_local.append({"query": query, "params": params})
+        self._guardar_pendientes_local()
+        logging.info("Consulta almacenada en pendientes local")
+
+    def _agregar_pendiente_remota(self, query: str, params: Tuple[Any, ...] | None) -> None:
+        self.pendientes_remota.append({"query": query, "params": params})
+        self._guardar_pendientes_remota()
+        logging.info("Consulta almacenada en pendientes remota")
+
+    # ---- Sincronización ----
+    def _sincronizar_local(self) -> None:
+        if not self.pendientes_local or not self.conexion_valida_local():
+            return
+        logging.info(
+            "Sincronizando %d operaciones pendientes (local)",
+            len(self.pendientes_local),
+        )
+        while self.pendientes_local:
+            op = self.pendientes_local.pop(0)
+            try:
+                cur = self.conn_local.cursor()
+                cur.execute(op["query"], op["params"])
+                if op["query"].strip().lower().startswith("select"):
                     cur.fetchall()
                 else:
-                    self.conn.commit()
+                    self.conn_local.commit()
                 cur.close()
             except Error as e:
-                logging.error('Error al sincronizar: %s', e)
+                logging.error("Error al sincronizar local: %s", e)
                 corregida = None
-                if "clientes" in op['query'].lower() and "doesn't exist" in str(e):
-                    corregida = op['query'].replace('clientes', 'Cliente')
-                elif "empleados" in op['query'].lower() and "doesn't exist" in str(e):
-                    corregida = op['query'].replace('empleados', 'empleado')
+                if "clientes" in op["query"].lower() and "doesn't exist" in str(e):
+                    corregida = op["query"].replace("clientes", "Cliente")
+                elif "empleados" in op["query"].lower() and "doesn't exist" in str(e):
+                    corregida = op["query"].replace("empleados", "empleado")
                 if corregida:
-                    logging.info('Reintentando con tabla: %s', corregida)
+                    logging.info("Reintentando con tabla: %s", corregida)
                     try:
-                        cur.execute(corregida, op['params'])
-                        if corregida.strip().lower().startswith('select'):
+                        cur.execute(corregida, op["params"])
+                        if corregida.strip().lower().startswith("select"):
                             cur.fetchall()
                         else:
-                            self.conn.commit()
+                            self.conn_local.commit()
                         cur.close()
                         continue
                     except Error as e2:
-                        logging.error('Error tras corregir: %s', e2)
-                        op['query'] = corregida
-                self.pendientes.insert(0, op)
+                        logging.error("Error tras corregir: %s", e2)
+                        op["query"] = corregida
+                self.pendientes_local.insert(0, op)
                 break
-        self._guardar_pendientes()
+        self._guardar_pendientes_local()
 
+    def _sincronizar_remota(self) -> None:
+        if not self.pendientes_remota or not self.conexion_valida_remota():
+            return
+        logging.info(
+            "Sincronizando %d operaciones pendientes (remota)",
+            len(self.pendientes_remota),
+        )
+        while self.pendientes_remota:
+            op = self.pendientes_remota.pop(0)
+            try:
+                cur = self.conn_remota.cursor()
+                cur.execute(op["query"], op["params"])
+                if op["query"].strip().lower().startswith("select"):
+                    cur.fetchall()
+                else:
+                    self.conn_remota.commit()
+                cur.close()
+            except Error as e:
+                logging.error("Error al sincronizar remota: %s", e)
+                corregida = None
+                if "clientes" in op["query"].lower() and "doesn't exist" in str(e):
+                    corregida = op["query"].replace("clientes", "Cliente")
+                elif "empleados" in op["query"].lower() and "doesn't exist" in str(e):
+                    corregida = op["query"].replace("empleados", "empleado")
+                if corregida:
+                    logging.info("Reintentando con tabla: %s", corregida)
+                    try:
+                        cur.execute(corregida, op["params"])
+                        if corregida.strip().lower().startswith("select"):
+                            cur.fetchall()
+                        else:
+                            self.conn_remota.commit()
+                        cur.close()
+                        continue
+                    except Error as e2:
+                        logging.error("Error tras corregir: %s", e2)
+                        op["query"] = corregida
+                self.pendientes_remota.insert(0, op)
+                break
+        self._guardar_pendientes_remota()
+
+    def _sincronizar(self) -> None:
+        self._sincronizar_remota()
+        self._sincronizar_local()
+
+    # ---- Cierre ----
     def close(self) -> None:
-        if self.conn and self.conn.is_connected():
-            self.conn.close()
-            self.conn = None
-            logging.info("Conexión cerrada")
+        if self.conexion_valida_remota():
+            self._sincronizar_remota()
+            self.conn_remota.close()
+            self.conn_remota = None
+            logging.info("Conexión remota cerrada")
+        if self.conexion_valida_local():
+            self._sincronizar_local()
+            self.conn_local.close()
+            self.conn_local = None
+            logging.info("Conexión local cerrada")
 
     def __del__(self) -> None:
         try:
