@@ -38,7 +38,7 @@ class MySQLApp:
             r"SELECT|FROM|WHERE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|JOIN|INNER|"
             r"LEFT|RIGHT|ON|GROUP|BY|ORDER|LIMIT|DISTINCT|AS|AND|OR|NOT|NULL"
         )
-        query = re.sub(fr"(?i)({keywords})", r" \1 ", query)
+        query = re.sub(fr"(?i)\b({keywords})\b", r" \1 ", query)
         return re.sub(r"\s+", " ", query).strip()
 
     def mostrar_tablas(self):
