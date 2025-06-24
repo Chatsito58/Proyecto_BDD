@@ -265,13 +265,15 @@ class VentanaGerente(ctk.CTk):
     def _cargar_empleados(self) -> None:
         try:
             tipos = self.conexion.ejecutar(
-                "SELECT id_tipo_empleado, nombre FROM Tipo_empleado"
+                "SELECT id_tipo_empleado, nombre FROM Tipo_empleado "
+                "WHERE LOWER(nombre) NOT IN ('administrador','gerente')"
             )
             self.tipo_map = {n: i for i, n in tipos}
             self.combo_tipo.configure(values=list(self.tipo_map.keys()))
             filas = self.conexion.ejecutar(
                 "SELECT e.id_empleado, e.nombre, e.correo, te.nombre "
-                "FROM Empleado e JOIN Tipo_empleado te ON e.id_tipo_empleado=te.id_tipo_empleado"
+                "FROM Empleado e JOIN Tipo_empleado te ON e.id_tipo_empleado=te.id_tipo_empleado "
+                "WHERE LOWER(te.nombre) NOT IN ('administrador','gerente')"
             )
         except Exception as exc:  # pragma: no cover - conexion errors vary
             mostrar_error(exc)
@@ -287,10 +289,18 @@ class VentanaGerente(ctk.CTk):
             messagebox.showerror("Error", "Seleccione un empleado")
             return
         id_emp, nombre, correo, tipo_act = self.tree_emp.item(item)["values"]
-        if str(tipo_act).lower() == "admin":
-            messagebox.showerror("Error", "No se puede modificar un usuario admin")
+        tipo_act_norm = str(tipo_act).strip().lower()
+        if tipo_act_norm in ("administrador", "gerente", "admin"):
+            messagebox.showerror(
+                "Error", "No se puede modificar un usuario administrador o gerente"
+            )
             return
         tipo_nuevo = self.combo_tipo.get()
+        if str(tipo_nuevo).strip().lower() in ("administrador", "gerente", "admin"):
+            messagebox.showerror(
+                "Error", "No se puede asignar el tipo administrador o gerente"
+            )
+            return
         id_tipo = self.tipo_map.get(tipo_nuevo)
         if not id_tipo:
             messagebox.showerror("Error", "Seleccione un tipo válido")
@@ -311,8 +321,12 @@ class VentanaGerente(ctk.CTk):
             messagebox.showerror("Error", "Seleccione un empleado")
             return
         id_emp, nombre, correo, tipo_act = self.tree_emp.item(item)["values"]
-        if str(tipo_act).lower() == "admin":
-            messagebox.showerror("Error", "No se puede eliminar un usuario admin")
+        tipo_act_norm = str(tipo_act).strip().lower()
+        if tipo_act_norm in ("administrador", "gerente", "admin"):
+            messagebox.showerror(
+                "Error",
+                "No se puede eliminar un usuario administrador o gerente",
+            )
             return
         if not messagebox.askyesno("Confirmar", f"¿Eliminar al empleado {nombre}?"):
             return
