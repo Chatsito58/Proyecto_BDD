@@ -3,11 +3,9 @@ from __future__ import annotations
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from conexion.conexion import ConexionBD
 from interfaces.componentes.ctk_scrollable_combobox import CTkScrollableComboBox
-from utils.hash_utils import sha256_hash
-from utils.validations import validar_correo
 from utils import mostrar_error, mostrar_notificacion
+from logica.clientes import crear_cliente, DatosClienteInvalidos
 
 
 class VentanaCrearCliente(tk.Toplevel):
@@ -18,7 +16,6 @@ class VentanaCrearCliente(tk.Toplevel):
         self.title("Crear cliente")
         self.configure(bg="#2a2a2a")
         self.geometry("360x580")
-        self.conexion = ConexionBD()
         self._configurar_estilo()
         self._build_ui()
 
@@ -65,47 +62,22 @@ class VentanaCrearCliente(tk.Toplevel):
         id_tipo_cliente = self.entradas["id_tipo_cliente"].get().strip()
         id_codigo_postal = self.entradas["id_codigo_postal"].get().strip()
 
-        if (
-            not documento
-            or not nombre
-            or not telefono
-            or not direccion
-            or not correo
-            or not contrasena
-            or not id_licencia
-            or not id_tipo_documento
-            or not id_tipo_cliente
-            or not id_codigo_postal
-        ):
-            messagebox.showerror("Error", "Todos los campos son obligatorios")
-            return
-        if not validar_correo(correo):
-            messagebox.showerror("Error", "Correo no válido")
-            return
-        hashed = sha256_hash(contrasena)
-        query = (
-            "INSERT INTO Cliente (documento, nombre, telefono, direccion, correo, "
-            "contrasena, infracciones, id_licencia, id_tipo_documento, "
-            "id_tipo_cliente, id_codigo_postal, id_cuenta) "
-            "VALUES (%s, %s, %s, %s, %s, %s, 0, %s, %s, %s, %s, NULL)"
-        )
         try:
-            self.conexion.ejecutar(
-                query,
-                (
-                    documento,
-                    nombre,
-                    telefono,
-                    direccion,
-                    correo,
-                    hashed,
-                    id_licencia,
-                    id_tipo_documento,
-                    id_tipo_cliente,
-                    id_codigo_postal,
-                ),
+            crear_cliente(
+                documento,
+                nombre,
+                telefono,
+                direccion,
+                correo,
+                contrasena,
+                id_licencia,
+                id_tipo_documento,
+                id_tipo_cliente,
+                id_codigo_postal,
             )
             mostrar_notificacion("Éxito", "Cliente creado correctamente")
             self.destroy()
+        except DatosClienteInvalidos as exc:
+            messagebox.showerror("Error", str(exc))
         except Exception as exc:  # pragma: no cover - conexion errors vary
             mostrar_error(exc)
