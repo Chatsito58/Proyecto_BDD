@@ -10,8 +10,14 @@ class GestorFragmentacion:
 
     def __init__(self) -> None:
         # Un fragmento por cada base
-        self.frag1 = ConexionBD(active="local", queue_file="pendientes_frag1.json")
-        self.frag2 = ConexionBD(active="remote", queue_file="pendientes_frag2.json")
+        self.frag1 = ConexionBD(
+            active="local",
+            queue_file_local="pendientes_frag1.json",
+        )
+        self.frag2 = ConexionBD(
+            active="remote",
+            queue_file_remota="pendientes_frag2.json",
+        )
 
     def _seleccionar_fragmento(self, id_val: int) -> ConexionBD:
         """Seleccionar fragmento por un criterio simple de par/impar."""
