@@ -17,7 +17,7 @@ class VentanaCrearCliente(tk.Toplevel):
         super().__init__(master)
         self.title("Crear cliente")
         self.configure(bg="#2a2a2a")
-        self.geometry("340x420")
+        self.geometry("360x580")
         self.conexion = ConexionBD()
         self._configurar_estilo()
         self._build_ui()
@@ -33,10 +33,16 @@ class VentanaCrearCliente(tk.Toplevel):
         marco.pack(fill="both", expand=True)
 
         campos = [
-            ("Nombre:", "nombre"),
             ("Documento:", "documento"),
+            ("Nombre:", "nombre"),
+            ("Teléfono:", "telefono"),
+            ("Dirección:", "direccion"),
             ("Correo:", "correo"),
             ("Contraseña:", "pass"),
+            ("ID Licencia:", "id_licencia"),
+            ("ID Tipo Documento:", "id_tipo_documento"),
+            ("ID Tipo Cliente:", "id_tipo_cliente"),
+            ("Código Postal:", "id_codigo_postal"),
         ]
         self.entradas: dict[str, ttk.Entry] = {}
         for etiqueta, clave in campos:
@@ -48,25 +54,57 @@ class VentanaCrearCliente(tk.Toplevel):
         ttk.Button(marco, text="💾 Registrar", command=self._registrar).pack(pady=15)
 
     def _registrar(self) -> None:
-        nombre = self.entradas["nombre"].get().strip()
         documento = self.entradas["documento"].get().strip()
+        nombre = self.entradas["nombre"].get().strip()
+        telefono = self.entradas["telefono"].get().strip()
+        direccion = self.entradas["direccion"].get().strip()
         correo = self.entradas["correo"].get().strip()
         contrasena = self.entradas["pass"].get()
+        id_licencia = self.entradas["id_licencia"].get().strip()
+        id_tipo_documento = self.entradas["id_tipo_documento"].get().strip()
+        id_tipo_cliente = self.entradas["id_tipo_cliente"].get().strip()
+        id_codigo_postal = self.entradas["id_codigo_postal"].get().strip()
 
-        if not nombre or not documento or not correo or not contrasena:
+        if (
+            not documento
+            or not nombre
+            or not telefono
+            or not direccion
+            or not correo
+            or not contrasena
+            or not id_licencia
+            or not id_tipo_documento
+            or not id_tipo_cliente
+            or not id_codigo_postal
+        ):
             messagebox.showerror("Error", "Todos los campos son obligatorios")
             return
         if not validar_correo(correo):
             messagebox.showerror("Error", "Correo no válido")
             return
-
-        query = (
-            "INSERT INTO Cliente (nombre, documento, correo, contrasena) "
-            "VALUES (%s, %s, %s, %s)"
-        )
         hashed = sha256_hash(contrasena)
+        query = (
+            "INSERT INTO Cliente (documento, nombre, telefono, direccion, correo, "
+            "contrasena, infracciones, id_licencia, id_tipo_documento, "
+            "id_tipo_cliente, id_codigo_postal, id_cuenta) "
+            "VALUES (%s, %s, %s, %s, %s, %s, 0, %s, %s, %s, %s, NULL)"
+        )
         try:
-            self.conexion.ejecutar(query, (nombre, documento, correo, hashed))
+            self.conexion.ejecutar(
+                query,
+                (
+                    documento,
+                    nombre,
+                    telefono,
+                    direccion,
+                    correo,
+                    hashed,
+                    id_licencia,
+                    id_tipo_documento,
+                    id_tipo_cliente,
+                    id_codigo_postal,
+                ),
+            )
             mostrar_notificacion("Éxito", "Cliente creado correctamente")
             self.destroy()
         except Exception as exc:  # pragma: no cover - conexion errors vary
