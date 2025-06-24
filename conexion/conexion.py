@@ -29,14 +29,14 @@ class ConexionBD:
         """Crear una nueva instancia y establecer la conexión inicial."""
         load_dotenv()
         self.local_conf = {
-            'host': os.getenv('DB1_HOST', 'localhost'),
-            'user': os.getenv('DB1_USER', 'admin'),
-            'password': os.getenv('DB1_PASSWORD', 'admin'),
+            'host': os.getenv('DB1_HOST', '192.168.50.1'),
+            'user': os.getenv('DB1_USER', 'usuario_bdd'),
+            'password': os.getenv('DB1_PASSWORD', 'admin123'),
             'database': os.getenv('DB1_NAME', 'alquiler_vehiculos'),
         }
         self.remote_conf = {
-            'host': os.getenv('DB2_HOST', 'localhost'),
-            'user': os.getenv('DB2_USER', 'root'),
+            'host': os.getenv('DB2_HOST', '192.168.50.1'),
+            'user': os.getenv('DB2_USER', 'usuario_bdd'),
             'password': os.getenv('DB2_PASSWORD', 'admin123'),
             'database': os.getenv('DB2_NAME', 'alquiler_vehiculos'),
         }
