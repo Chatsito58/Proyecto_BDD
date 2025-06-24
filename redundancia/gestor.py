@@ -10,8 +10,14 @@ class GestorRedundancia:
 
     def __init__(self) -> None:
         # Conexión dedicada para cada base
-        self.local = ConexionBD(active="local", queue_file="pendientes_local.json")
-        self.remota = ConexionBD(active="remote", queue_file="pendientes_remota.json")
+        self.local = ConexionBD(
+            active="local",
+            queue_file_local="pendientes_local.json",
+        )
+        self.remota = ConexionBD(
+            active="remote",
+            queue_file_remota="pendientes_remota.json",
+        )
 
     def ejecutar(self, query: str, params: Optional[Tuple[Any, ...]] = None) -> List[Tuple[Any, ...]]:
         """Ejecuta una consulta en ambas bases de datos.
