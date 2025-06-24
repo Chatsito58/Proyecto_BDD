@@ -12,10 +12,12 @@ class GestorRedundancia:
         # Conexión dedicada para cada base
         self.local = ConexionBD(
             active="local",
+            failover=False,
             queue_file_local="pendientes_local.json",
         )
         self.remota = ConexionBD(
             active="remote",
+            failover=False,
             queue_file_remota="pendientes_remota.json",
         )
 
