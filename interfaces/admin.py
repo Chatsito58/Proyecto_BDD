@@ -5,7 +5,7 @@ from tkinter import ttk
 from ttkthemes import ThemedTk
 
 from Consulta import MySQLApp
-from conexion.conexion import ConexionBD
+from redundancia import GestorRedundancia
 from utils import cancel_pending_after, safe_bg_error_handler
 
 
@@ -43,7 +43,7 @@ class VentanaAdmin(ThemedTk):
 
         self.ventana_consulta = tk.Toplevel(self)
         self.btn_sql.config(state=tk.DISABLED)
-        MySQLApp(self.ventana_consulta, ConexionBD())
+        MySQLApp(self.ventana_consulta, GestorRedundancia())
         self.ventana_consulta.protocol("WM_DELETE_WINDOW", self._cerrar_consulta)
 
     def _logout(self) -> None:

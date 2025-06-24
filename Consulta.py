@@ -6,10 +6,11 @@ from ttkthemes import ThemedTk
 from tkinter import filedialog
 from mysql.connector import Error, InterfaceError
 from conexion.conexion import ConexionBD
+from redundancia import GestorRedundancia
 
 
 class MySQLApp:
-    def __init__(self, root, conexion: ConexionBD | None = None):
+    def __init__(self, root, conexion: ConexionBD | GestorRedundancia | None = None):
         self.sql_keywords = [
             "SELECT", "FROM", "WHERE", "INSERT", "INTO", "VALUES", "UPDATE", "SET",
             "DELETE", "JOIN", "INNER", "LEFT", "RIGHT", "ON", "GROUP BY", "ORDER BY",
@@ -31,8 +32,8 @@ class MySQLApp:
 
     def _normalizar_query(self, query: str) -> str:
         """Inserta espacios entre palabras clave y símbolos para evitar errores."""
-        # Separar operadores y paréntesis
-        query = re.sub(r"([(),=*<>])", r" \1 ", query)
+        # Separar operadores comunes evitando alterar paréntesis
+        query = re.sub(r"([,=*<>])", r" \1 ", query)
         # Agregar espacios en keywords importantes
         keywords = (
             r"SELECT|FROM|WHERE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|JOIN|INNER|"
@@ -265,11 +266,6 @@ class MySQLApp:
         # Guardar en historial
         self.actualizar_historial(query)
 
-        if not self.conexion.conn or not self.conexion.conn.is_connected():
-            self.conexion.conectar()
-        if not self.conexion.conn or not self.conexion.conn.is_connected():
-            mostrar_error(Exception("No hay conexión a la base de datos."))
-            return
 
         try:
             columnas, filas = self.conexion.ejecutar_con_columnas(query)
