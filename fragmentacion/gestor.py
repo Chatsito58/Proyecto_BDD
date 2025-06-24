@@ -17,10 +17,12 @@ class GestorFragmentacion:
         # Un fragmento por cada base
         self.frag1 = ConexionBD(
             active="local",
+            failover=False,
             queue_file_local="pendientes_frag1.json",
         )
         self.frag2 = ConexionBD(
             active="remote",
+            failover=False,
             queue_file_remota="pendientes_frag2.json",
         )
 
