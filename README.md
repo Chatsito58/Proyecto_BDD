@@ -32,3 +32,18 @@ en caso de fallo:
 ```bash
 python tests/simular_falla.py
 ```
+
+## Redundancia y Fragmentación
+
+El paquete `redundancia` ejecuta cada operación en dos bases de datos para mantener copias sincronizadas. Para la fragmentación se añadió el paquete `fragmentacion`, que distribuye las operaciones sobre la tabla `Cliente` en dos fragmentos simples según el identificador (pares a la base local e impares a la remota).
+
+```python
+from redundancia import GestorRedundancia
+from fragmentacion import GestorFragmentacion
+
+red = GestorRedundancia()
+frag = GestorFragmentacion()
+
+red.ejecutar("SELECT 1")
+frag.ejecutar("INSERT INTO Cliente VALUES (%s)", (2,))
+```
