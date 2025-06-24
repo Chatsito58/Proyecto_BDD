@@ -204,13 +204,13 @@ class VentanaGerente(ctk.CTk):
         q_veh = (
             "SELECT id_vehiculo, COUNT(*) AS c FROM Alquiler "
             "WHERE DATE(fecha_hora_salida) BETWEEN %s AND %s "
-            "GROUP BY id_vehiculo ORDER BY c DESC LIMIT 5"
+            "GROUP BY id_vehiculo ORDER BY c DESC"
         )
         q_cli = (
             "SELECT c.nombre, COUNT(*) AS c FROM Reserva_alquiler r "
             "JOIN Cliente c ON r.id_cliente=c.id_cliente "
             "WHERE DATE(r.fecha_hora_salida) BETWEEN %s AND %s "
-            "GROUP BY c.id_cliente, c.nombre ORDER BY c DESC LIMIT 5"
+            "GROUP BY c.id_cliente, c.nombre ORDER BY c DESC "
         )
         try:
             ingresos = self.conexion.ejecutar(
