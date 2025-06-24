@@ -33,7 +33,7 @@ class ConexionBD:
 
     def __init__(
         self,
-        active: str = "remota",
+        active: str = "local",
         queue_file_local: str = "pendientes_local.json",
         queue_file_remota: str = "pendientes_remota.json",
         failover: bool = True,
