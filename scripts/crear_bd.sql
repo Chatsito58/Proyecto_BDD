@@ -1,377 +1,328 @@
--- ------------------------------------------------------------------
--- 1) TABLAS AUXILIARES / CATÁLOGOS
--- ------------------------------------------------------------------
--- ¡ATENCIÓN! No colocar claves reales aquí. Usa variables de entorno en producción.
--- DROP DATABASE alquiler_vehiculos;
-CREATE DATABASE IF NOT EXISTS alquiler_vehiculos;
-USE alquiler_vehiculos;
-CREATE TABLE Tipo_entidad (
-  id_tipo_entidad   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(100) NOT NULL
-) ENGINE=InnoDB;
+DROP DATABASE remota_alquiler_vehiculos;
+CREATE DATABASE IF NOT EXISTS remota_alquiler_vehiculos;
+USE remota_alquiler_vehiculos;
+CREATE TABLE Remota_Tipo_entidad (
+  id_tipo_entidad   INT,
+  descripcion       VARCHAR(100) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Tipo_entidad';
 
-CREATE TABLE Medio_pago (
-  id_medio_pago     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(100) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Medio_pago (
+  id_medio_pago     INT,
+  descripcion       VARCHAR(100) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Medio_pago';
 
-CREATE TABLE Tipo_cliente (
-  id_tipo           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(100) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Tipo_cliente (
+  id_tipo           INT,
+  descripcion       VARCHAR(100) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Tipo_cliente';
 
-CREATE TABLE Tipo_documento (
-  id_tipo_documento INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(100) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Tipo_documento (
+  id_tipo_documento INT,
+  descripcion       VARCHAR(100) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Tipo_documento';
 
-CREATE TABLE Codigo_postal (
-  id_codigo_postal  VARCHAR(50) NOT NULL PRIMARY KEY,
-  pais              VARCHAR(50) NOT NULL,
-  departamento      VARCHAR(50) NOT NULL,
-  ciudad            VARCHAR(50) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Codigo_postal (
+  id_codigo_postal  VARCHAR(50) ,
+  pais              VARCHAR(50) ,
+  departamento      VARCHAR(50) ,
+  ciudad            VARCHAR(50) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Codigo_postal';
 
-CREATE TABLE Categoria_licencia (
-  id_categoria      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(100) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Categoria_licencia (
+  id_categoria      INT,
+  descripcion       VARCHAR(100) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Categoria_licencia';
 
-CREATE TABLE Tipo_mantenimiento (
-  id_tipo           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(100) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Tipo_mantenimiento (
+  id_tipo           INT,
+  descripcion       VARCHAR(100) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Tipo_mantenimiento';
 
-CREATE TABLE Taller_mantenimiento (
-  id_taller         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  nombre            VARCHAR(100) NOT NULL,
+CREATE TABLE Remota_Taller_mantenimiento (
+  id_taller         INT,
+  nombre            VARCHAR(100) ,
   direccion         VARCHAR(150),
   telefono          VARCHAR(20)
-) ENGINE=InnoDB;
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Taller_mantenimiento';
 
-CREATE TABLE Estado_vehiculo (
-  id_estado         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(100) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Estado_vehiculo (
+  id_estado         INT,
+  descripcion       VARCHAR(100) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Estado_vehiculo';
 
-CREATE TABLE Marca_vehiculo (
-  id_marca          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  nombre_marca      VARCHAR(100) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Marca_vehiculo (
+  id_marca          INT,
+  nombre_marca      VARCHAR(100) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Marca_vehiculo';
 
-CREATE TABLE Color_vehiculo (
-  id_color          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  nombre_color      VARCHAR(50) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Color_vehiculo (
+  id_color          INT,
+  nombre_color      VARCHAR(50) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Color_vehiculo';
 
-CREATE TABLE Tipo_vehiculo (
-  id_tipo           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(100) NOT NULL,
+CREATE TABLE Remota_Tipo_vehiculo (
+  id_tipo           INT,
+  descripcion       VARCHAR(100) ,
   capacidad         INT,
   combustible       VARCHAR(50),
   tarifa_dia        DECIMAL(10,2)
-) ENGINE=InnoDB;
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Tipo_vehiculo';
 
-CREATE TABLE Blindaje_vehiculo (
-  id_blindaje       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(100) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Blindaje_vehiculo (
+  id_blindaje       INT,
+  descripcion       VARCHAR(100) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Blindaje_vehiculo';
 
-CREATE TABLE Transmision_vehiculo (
-  id_transmision    INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(50) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Transmision_vehiculo (
+  id_transmision    INT,
+  descripcion       VARCHAR(50) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Transmision_vehiculo';
 
-CREATE TABLE Cilindraje_vehiculo (
-  id_cilindraje     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(50) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Cilindraje_vehiculo (
+  id_cilindraje     INT,
+  descripcion       VARCHAR(50) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Cilindraje_vehiculo';
 
-CREATE TABLE Estado_alquiler (
-  id_estado         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  descripcion       VARCHAR(100) NOT NULL
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Estado_alquiler (
+  id_estado         INT,
+  descripcion       VARCHAR(100) 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Estado_alquiler';
 
 -- Tabla de roles para empleados
-CREATE TABLE Tipo_empleado (
-  id_tipo_empleado INT AUTO_INCREMENT PRIMARY KEY,
-  nombre VARCHAR(50) NOT NULL UNIQUE,
+CREATE TABLE Remota_Tipo_empleado (
+  id_tipo_empleado INT,
+  nombre VARCHAR(50) ,
   descripcion TEXT,
-  permisos JSON NOT NULL
-) ENGINE=InnoDB;
+  permisos JSON 
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Tipo_empleado';
 
 
 -- ------------------------------------------------------------------
 -- 2) TABLAS PRINCIPALES / TRANSACCIONALES
 -- ------------------------------------------------------------------
 
-CREATE TABLE Sucursal (
-  id_sucursal       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  nombre            VARCHAR(100) NOT NULL,
+CREATE TABLE Remota_Sucursal (
+  id_sucursal       INT,
+  nombre            VARCHAR(100),
   direccion         VARCHAR(150),
   telefono          VARCHAR(20),
   gerente           VARCHAR(100),
-  id_codigo_postal  VARCHAR(50),
-  FOREIGN KEY (id_codigo_postal)
-    REFERENCES Codigo_postal(id_codigo_postal)
-) ENGINE=InnoDB;
+  id_codigo_postal  VARCHAR(50)
+  ) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Sucursal';
 
-CREATE TABLE Empleado (
-  id_empleado       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  documento         VARCHAR(20) NOT NULL,
-  nombre            VARCHAR(100) NOT NULL,
+CREATE TABLE Remota_Empleado (
+  id_empleado       INT,
+  documento         VARCHAR(20),
+  nombre            VARCHAR(100),
   salario           DECIMAL(10,2),
   cargo             VARCHAR(100),
   telefono          VARCHAR(20),
   direccion         VARCHAR(150),
-  correo            VARCHAR(100) UNIQUE NOT NULL,
-  contrasena        CHAR(64) NOT NULL,
-  id_tipo_empleado  INT NOT NULL DEFAULT 1,
-  id_tipo_documento INT UNSIGNED,
-  FOREIGN KEY (id_tipo_documento)
-    REFERENCES Tipo_documento(id_tipo_documento),
-  FOREIGN KEY (id_tipo_empleado)
-    REFERENCES Tipo_empleado(id_tipo_empleado)
-) ENGINE=InnoDB;
+  correo            VARCHAR(100),
+  contrasena        CHAR(64),
+  id_tipo_empleado  INT,
+  id_tipo_documento INT
+  ) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Empleado';
 
-CREATE TABLE Licencia_conduccion (
-  id_licencia       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Licencia_conduccion (
+  id_licencia       INT,
   estado            VARCHAR(20),
   fecha_emision     DATE,
   fecha_vencimiento DATE,
-  id_categoria      INT UNSIGNED,
-  FOREIGN KEY (id_categoria)
-    REFERENCES Categoria_licencia(id_categoria)
-) ENGINE=InnoDB;
+  id_categoria      INT
+  ) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Licencia_conduccion';
 
-CREATE TABLE Cliente (
-  id_cliente        INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  documento         VARCHAR(20) NOT NULL,
-  nombre            VARCHAR(100) NOT NULL,
+CREATE TABLE Remota_Cliente (
+  id_cliente        INT,
+  documento         VARCHAR(20) ,
+  nombre            VARCHAR(100) ,
   telefono          VARCHAR(20),
   direccion         VARCHAR(150),
-  correo            VARCHAR(100) UNIQUE NOT NULL,
-  contrasena        CHAR(64) NOT NULL,
-  infracciones      INT DEFAULT 0,
-  id_licencia       INT UNSIGNED,
-  id_tipo_documento INT UNSIGNED,
-  id_tipo_cliente   INT UNSIGNED,
+  correo            VARCHAR(100)  ,
+  contrasena        CHAR(64) ,
+  infracciones      INT ,
+  id_licencia       INT,
+  id_tipo_documento INT,
+  id_tipo_cliente   INT,
   id_codigo_postal  VARCHAR(50),
-  id_cuenta         INT UNSIGNED,
-  FOREIGN KEY (id_licencia)
-    REFERENCES Licencia_conduccion(id_licencia),
-  FOREIGN KEY (id_tipo_documento)
-    REFERENCES Tipo_documento(id_tipo_documento),
-  FOREIGN KEY (id_tipo_cliente)
-    REFERENCES Tipo_cliente(id_tipo),
-  FOREIGN KEY (id_codigo_postal)
-    REFERENCES Codigo_postal(id_codigo_postal)
-  -- id_cuenta se añade tras definir la tabla Cuenta
-) ENGINE=InnoDB;
+  id_cuenta         INT
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Cliente';
 
-CREATE TABLE Seguro_vehiculo (
-  id_seguro         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Seguro_vehiculo (
+  id_seguro         INT,
   estado            VARCHAR(50),
   descripcion       VARCHAR(255),
   vencimiento       DATE,
   costo             DECIMAL(10,2)
-) ENGINE=InnoDB;
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Seguro_vehiculo';
 
-CREATE TABLE Proveedor_vehiculo (
-  id_proveedor      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Proveedor_vehiculo (
+  id_proveedor      INT,
   nombre            VARCHAR(100),
   direccion         VARCHAR(150),
   telefono          VARCHAR(20),
   correo            VARCHAR(100),
-  id_cuenta         INT UNSIGNED
-  -- FK a Cuenta si quieres trackear facturación
-) ENGINE=InnoDB;
+  id_cuenta         INT
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Proveedor_vehiculo';
 
-CREATE TABLE Mantenimiento_vehiculo (
-  id_mantenimiento  INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Mantenimiento_vehiculo (
+  id_mantenimiento  INT,
   descripcion       VARCHAR(255),
   fecha_hora        DATETIME,
   valor             DECIMAL(10,2),
-  id_tipo           INT UNSIGNED,
-  id_taller         INT UNSIGNED,
-  FOREIGN KEY (id_tipo)
-    REFERENCES Tipo_mantenimiento(id_tipo),
-  FOREIGN KEY (id_taller)
-    REFERENCES Taller_mantenimiento(id_taller)
-) ENGINE=InnoDB;
+  id_tipo           INT,
+  id_taller         INT,
+  id_vehiculo       VARCHAR(20)
+  
+  ) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Mantenimiento_vehiculo';
 
 -- Crear tabla Vehiculo
-CREATE TABLE Vehiculo (
-  placa              VARCHAR(20) PRIMARY KEY,
+CREATE TABLE Remota_Vehiculo (
+  placa              VARCHAR(20),
   n_chasis           VARCHAR(50),
   modelo             VARCHAR(50),
   kilometraje        INT,
-  id_marca           INT UNSIGNED,
-  id_color           INT UNSIGNED,
-  id_tipo_vehiculo   INT UNSIGNED,
-  id_blindaje        INT UNSIGNED,
-  id_transmision     INT UNSIGNED,
-  id_cilindraje      INT UNSIGNED,
-  id_seguro_vehiculo INT UNSIGNED,
-  id_estado_vehiculo INT UNSIGNED,
-  id_proveedor       INT UNSIGNED,
-  id_sucursal        INT UNSIGNED,
-  FOREIGN KEY (id_marca)           REFERENCES Marca_vehiculo(id_marca),
-  FOREIGN KEY (id_color)           REFERENCES Color_vehiculo(id_color),
-  FOREIGN KEY (id_tipo_vehiculo)   REFERENCES Tipo_vehiculo(id_tipo),
-  FOREIGN KEY (id_blindaje)        REFERENCES Blindaje_vehiculo(id_blindaje),
-  FOREIGN KEY (id_transmision)     REFERENCES Transmision_vehiculo(id_transmision),
-  FOREIGN KEY (id_cilindraje)      REFERENCES Cilindraje_vehiculo(id_cilindraje),
-  FOREIGN KEY (id_seguro_vehiculo) REFERENCES Seguro_vehiculo(id_seguro),
-  FOREIGN KEY (id_estado_vehiculo) REFERENCES Estado_vehiculo(id_estado),
-  FOREIGN KEY (id_proveedor)       REFERENCES Proveedor_vehiculo(id_proveedor),
-  FOREIGN KEY (id_sucursal)        REFERENCES Sucursal(id_sucursal)
-) ENGINE=InnoDB;
+  id_marca           INT,
+  id_color           INT,
+  id_tipo_vehiculo   INT,
+  id_blindaje        INT,
+  id_transmision     INT,
+  id_cilindraje      INT,
+  id_seguro_vehiculo INT,
+  id_estado_vehiculo INT,
+  id_proveedor       INT,
+  id_sucursal        INT
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Vehiculo';
 
--- Agregar columna id_vehiculo y su clave foránea a Mantenimiento_vehiculo
-ALTER TABLE Mantenimiento_vehiculo
-ADD COLUMN id_vehiculo VARCHAR(20),
-ADD FOREIGN KEY (id_vehiculo) REFERENCES Vehiculo(placa);
-
-CREATE TABLE Descuento_alquiler (
-  id_descuento      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Descuento_alquiler (
+  id_descuento      INT,
   descripcion       VARCHAR(255),
   valor             DECIMAL(10,2)
-) ENGINE=InnoDB;
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Descuento_alquiler';
 
-CREATE TABLE Estado_reserva (
-  id_estado         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Estado_reserva (
+  id_estado         INT,
   descripcion       VARCHAR(100)
-) ENGINE=InnoDB;
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Estado_reserva';
 
-CREATE TABLE Seguro_alquiler (
-  id_seguro         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Seguro_alquiler (
+  id_seguro         INT,
   estado            VARCHAR(50),
   descripcion       VARCHAR(255),
   vencimiento       DATE,
   costo             DECIMAL(10,2)
-) ENGINE=InnoDB;
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Seguro_alquiler';
 
 -- Crear tabla Reserva_alquiler sin la columna id_alquiler
-CREATE TABLE Reserva_alquiler (
-  id_reserva         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Reserva_alquiler (
+  id_reserva         INT,
   fecha_hora         DATETIME,
   fecha_hora_salida  DATETIME,
   fecha_hora_entrada DATETIME,
   abono              DECIMAL(10,2),
   saldo_pendiente    DECIMAL(10,2),
-  id_cliente         INT UNSIGNED,
-  id_estado_reserva  INT UNSIGNED,
-  FOREIGN KEY (id_estado_reserva)
-    REFERENCES Estado_reserva(id_estado),
-  FOREIGN KEY (id_cliente)
-    REFERENCES Cliente(id_cliente)
-) ENGINE=InnoDB;
+  id_cliente         INT,
+  id_estado_reserva  INT
+  ) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Reserva_alquiler';
 
 -- Crear tabla Alquiler
-CREATE TABLE Alquiler (
-  id_alquiler        INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Alquiler (
+  id_alquiler        INT,
   fecha_hora_salida  DATETIME,
   valor              DECIMAL(10,2),
   fecha_hora_entrada DATETIME,
   id_vehiculo        VARCHAR(20),
-  id_cliente         INT UNSIGNED,
-  id_sucursal        INT UNSIGNED,
-  id_medio_pago      INT UNSIGNED,
-  id_estado          INT UNSIGNED,
-  id_seguro          INT UNSIGNED,
-  id_descuento       INT UNSIGNED,
-  FOREIGN KEY (id_vehiculo)    REFERENCES Vehiculo(placa),
-  FOREIGN KEY (id_cliente)     REFERENCES Cliente(id_cliente),
-  FOREIGN KEY (id_sucursal)    REFERENCES Sucursal(id_sucursal),
-  FOREIGN KEY (id_medio_pago)  REFERENCES Medio_pago(id_medio_pago),
-  FOREIGN KEY (id_estado)      REFERENCES Estado_alquiler(id_estado),
-  FOREIGN KEY (id_seguro)      REFERENCES Seguro_alquiler(id_seguro),
-  FOREIGN KEY (id_descuento)   REFERENCES Descuento_alquiler(id_descuento)
-) ENGINE=InnoDB;
+  id_cliente         INT,
+  id_sucursal        INT,
+  id_medio_pago      INT,
+  id_estado          INT,
+  id_seguro          INT,
+  id_descuento       INT
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Alquiler';
 
--- Alterar tabla Reserva_alquiler para agregar columna id_alquiler y su clave foránea
-ALTER TABLE Reserva_alquiler
-ADD COLUMN id_alquiler INT UNSIGNED,
-ADD FOREIGN KEY (id_alquiler) REFERENCES Alquiler(id_alquiler);
-
-
-CREATE TABLE Det_factura (
-  id_det_factura    INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  id_servicio       INT UNSIGNED,
+CREATE TABLE Remota_Det_factura (
+  id_det_factura    INT,
+  id_servicio       INT,
   valor             DECIMAL(10,2),
   impuestos         DECIMAL(10,2)
-) ENGINE=InnoDB;
+) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Det_factura';
 
-CREATE TABLE Factura (
-  id_factura        INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Factura (
+  id_factura        INT,
   valor             DECIMAL(10,2),
-  id_alquiler       INT UNSIGNED,
-  id_cliente        INT UNSIGNED,
+  id_alquiler       INT,
+  id_cliente        INT,
   id_vehiculo       VARCHAR(20),
-  id_det_factura    INT UNSIGNED,
-  FOREIGN KEY (id_alquiler)
-    REFERENCES Alquiler(id_alquiler),
-  FOREIGN KEY (id_cliente)
-    REFERENCES Cliente(id_cliente),
-  FOREIGN KEY (id_vehiculo)
-    REFERENCES Vehiculo(placa),
-  FOREIGN KEY (id_det_factura)
-    REFERENCES Det_factura(id_det_factura)
-) ENGINE=InnoDB;
+  id_det_factura    INT  
+  ) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Factura';
 
-CREATE TABLE Cuenta_pagar (
-  id_cuenta_pagar   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Cuenta_pagar (
+  id_cuenta_pagar   INT,
   fecha_hora        DATETIME,
   valor             DECIMAL(10,2),
   descripcion       VARCHAR(255),
-  id_medio_pago     INT UNSIGNED,
-  id_tipo_entidad   INT UNSIGNED,
-  id_entidad        INT UNSIGNED,
-  FOREIGN KEY (id_medio_pago)
-    REFERENCES Medio_pago(id_medio_pago),
-  FOREIGN KEY (id_tipo_entidad)
-    REFERENCES Tipo_entidad(id_tipo_entidad)
-) ENGINE=InnoDB;
+  id_medio_pago     INT,
+  id_tipo_entidad   INT,
+  id_entidad        INT  
+  ) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Cuenta_pagar';
 
-CREATE TABLE Cuenta_cobrar (
-  id_cuenta_cobrar  INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Cuenta_cobrar (
+  id_cuenta_cobrar  INT,
   fecha_hora        DATETIME,
   valor             DECIMAL(10,2),
   descripcion       VARCHAR(255),
-  id_medio_pago     INT UNSIGNED,
-  id_tipo_entidad   INT UNSIGNED,
-  id_entidad        INT UNSIGNED,
-  FOREIGN KEY (id_medio_pago)
-    REFERENCES Medio_pago(id_medio_pago),
-  FOREIGN KEY (id_tipo_entidad)
-    REFERENCES Tipo_entidad(id_tipo_entidad)
-) ENGINE=InnoDB;
+  id_medio_pago     INT,
+  id_tipo_entidad   INT,
+  id_entidad        INT
+  ) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Cuenta_cobrar';
 
-CREATE TABLE Cuenta (
-  id_cuenta         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  id_cuenta_pagar   INT UNSIGNED,
-  id_cuenta_cobrar  INT UNSIGNED,
-  FOREIGN KEY (id_cuenta_pagar)
-    REFERENCES Cuenta_pagar(id_cuenta_pagar),
-  FOREIGN KEY (id_cuenta_cobrar)
-    REFERENCES Cuenta_cobrar(id_cuenta_cobrar)
-) ENGINE=InnoDB;
+CREATE TABLE Remota_Cuenta (
+  id_cuenta         INT,
+  id_cuenta_pagar   INT,
+  id_cuenta_cobrar  INT  
+  ) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Cuenta';
 
-CREATE TABLE Abono_reserva (
-  id_abono          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE Remota_Abono_reserva (
+  id_abono          INT,
   valor             DECIMAL(10,2),
   fecha_hora        DATETIME,
-  id_reserva        INT UNSIGNED,
-  id_medio_pago     INT UNSIGNED,
-  FOREIGN KEY (id_reserva)
-    REFERENCES Reserva_alquiler(id_reserva),
-  FOREIGN KEY (id_medio_pago)
-    REFERENCES Medio_pago(id_medio_pago)
-) ENGINE=InnoDB;
+  id_reserva        INT,
+  id_medio_pago     INT  
+  ) ENGINE=FEDERATED
+CONNECTION='mysql://alquiler:12345@192.168.230.200:3306/alquiler_vehiculos/Abono_reserva';
 
-
--- Finalmente actualizamos la FK pendiente en Cliente:
-ALTER TABLE Cliente
-  ADD FOREIGN KEY (id_cuenta)
-    REFERENCES Cuenta(id_cuenta);
