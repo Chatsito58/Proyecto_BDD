@@ -1,5 +1,5 @@
 """Módulos relacionados con tolerancia a fallos y sincronización."""
 
-from .gestor import GestorRedundancia
+from .gestor import GestorRedundanciaRespaldo
 
-__all__ = ["GestorRedundancia"]
+__all__ = ["GestorRedundanciaRespaldo"]
