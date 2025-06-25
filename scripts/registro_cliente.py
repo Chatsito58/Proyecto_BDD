@@ -1,3 +1,4 @@
+# ¡ATENCIÓN! No colocar claves reales aquí. Usa variables de entorno en producción.
 from utils.logger import configurar_logging
 from interfaces.registro_cliente import VentanaCrearCliente
 import tkinter as tk
