@@ -77,11 +77,11 @@ class SimpleDateEntry(ttk.Frame):
             return date.today()
 
 
-class VentanaCliente(ctk.CTk):
+class VentanaCliente(ctk.CTkToplevel):
     """Panel principal del cliente con pesta\u00f1as."""
 
-    def __init__(self, id_cliente: int) -> None:
-        super().__init__()
+    def __init__(self, master: tk.Misc, id_cliente: int) -> None:
+        super().__init__(master)
         self.report_callback_exception = safe_bg_error_handler
         self._after_ids: list[str] = []
         self.id_cliente = id_cliente
@@ -614,11 +614,9 @@ class VentanaCliente(ctk.CTk):
 
     # ------------------------------------------------------------------
     def _logout(self) -> None:
-        from utils import cancel_pending_after
 
         cancel_pending_after(self)
-        self.quit()
         self.destroy()
-        from interfaces.login import VentanaLogin
+        if self.master is not None:
+            self.master.deiconify()
 
-        VentanaLogin().mainloop()
