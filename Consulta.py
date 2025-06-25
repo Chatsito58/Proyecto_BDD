@@ -7,6 +7,7 @@ from tkinter import filedialog
 from mysql.connector import Error, InterfaceError
 from conexion.conexion import ConexionBD
 from redundancia import GestorRedundancia
+from utils.logger import logger
 
 
 class MySQLApp:
@@ -342,16 +343,16 @@ def main() -> None:
     from roles.gerente import menu_gerente
 
     conexion = ConexionBD()
-    print("Sistema de Alquiler de Vehículos")
+    logger.info("Sistema de Alquiler de Vehículos")
     for _ in range(3):
         correo = input("Correo: ").strip()
         password = getpass("Contraseña: ")
         rol = login(conexion, correo, password)
         if rol:
             break
-        print("Credenciales inválidas. Intente nuevamente.\n")
+        logger.warning("Credenciales inválidas. Intente nuevamente.\n")
     else:
-        print("Demasiados intentos fallidos")
+        logger.warning("Demasiados intentos fallidos")
         return
 
     if rol == "cliente":

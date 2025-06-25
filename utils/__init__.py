@@ -1,8 +1,11 @@
+from utils.logger import logger
+
+
 def safe_bg_error_handler(*_args) -> None:
     """Global handler for exceptions raised in Tk callbacks."""
     import traceback
 
-    print("Error capturado en bgerror:")
+    logger.error("Error capturado en bgerror:")
     traceback.print_exc()
 
 
