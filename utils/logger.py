@@ -1,5 +1,8 @@
 import logging
 
+# Logger to be imported across the project
+logger = logging.getLogger(__name__)
+
 
 def configurar_logging() -> None:
     """Configure root logging with INFO level and standard format."""

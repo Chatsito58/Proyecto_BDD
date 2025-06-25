@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from conexion.conexion import ConexionBD
+from utils.logger import logger
 
 
 def _print_table(headers: list[str], rows: list[tuple]) -> None:
@@ -18,11 +19,11 @@ def _print_table(headers: list[str], rows: list[tuple]) -> None:
         col_widths.append(max_len)
     header_line = " | ".join(str(h).ljust(col_widths[i]) for i, h in enumerate(headers))
     separator = "-+-".join("-" * w for w in col_widths)
-    print(header_line)
-    print(separator)
+    logger.info(header_line)
+    logger.info(separator)
     for row in rows:
         line = " | ".join(str(row[i]).ljust(col_widths[i]) for i in range(len(headers)))
-        print(line)
+        logger.info(line)
 
 
 def ver_reservas(id_cliente: int) -> None:
@@ -42,10 +43,10 @@ def ver_reservas(id_cliente: int) -> None:
     try:
         filas = conn.ejecutar(query, (id_cliente,))
     except Exception as exc:  # pragma: no cover - depende de la BD
-        print("Error consultando reservas:", exc)
+        logger.error(f"Error consultando reservas: {exc}")
         return
     if not filas:
-        print("No hay reservas registradas para este cliente.")
+        logger.info("No hay reservas registradas para este cliente.")
         return
     headers = ["ID", "Tipo", "Inicio", "Fin", "Estado"]
     _print_table(headers, filas)
@@ -62,10 +63,10 @@ def _input_fechas() -> tuple[str, str] | None:
         d_ini = datetime.strptime(ini, "%Y-%m-%d")
         d_fin = datetime.strptime(fin, "%Y-%m-%d")
     except ValueError:
-        print("Formato de fecha inválido")
+        logger.warning("Formato de fecha inválido")
         return None
     if d_fin < d_ini:
-        print("La fecha final debe ser posterior a la inicial")
+        logger.warning("La fecha final debe ser posterior a la inicial")
         return None
     return d_ini.strftime("%Y-%m-%d %H:%M:%S"), d_fin.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -80,7 +81,7 @@ def realizar_reserva(id_cliente: int) -> None:
     fecha_ini, fecha_fin = fechas
     tipo = input("Tipo de vehículo: ").strip()
     if not tipo:
-        print("Debe indicar el tipo de vehículo")
+        logger.warning("Debe indicar el tipo de vehículo")
         return
     # Monto base fijo por día (ejemplo)
     tarifa_dia = 100.0
@@ -105,9 +106,9 @@ def realizar_reserva(id_cliente: int) -> None:
         id_reserva = int(res[0][0]) if res else None
         if id_reserva:
             conn.ejecutar(query_abono, (abono, id_reserva))
-        print(f"Reserva creada con ID {id_reserva} y abono de {abono:.2f}")
+        logger.info(f"Reserva creada con ID {id_reserva} y abono de {abono:.2f}")
     except Exception as exc:  # pragma: no cover - depende de la BD
-        print("Error al crear la reserva:", exc)
+        logger.error(f"Error al crear la reserva: {exc}")
 
 
 
@@ -128,33 +129,33 @@ def realizar_abono(id_cliente: int) -> None:
     try:
         filas = conn.ejecutar(query, (id_cliente,))
     except Exception as exc:  # pragma: no cover - depende de la BD
-        print("Error obteniendo reservas:", exc)
+        logger.error(f"Error obteniendo reservas: {exc}")
         return
     if not filas:
-        print("No hay reservas pendientes de pago")
+        logger.info("No hay reservas pendientes de pago")
         return
     pendientes: dict[int, float] = {}
     for rid, total, pagado in filas:
         restante = float(total) - float(pagado)
         pendientes[int(rid)] = restante
-        print(f"Reserva {rid} - Saldo restante: {restante:.2f}")
+        logger.info(f"Reserva {rid} - Saldo restante: {restante:.2f}")
     try:
         sel = int(input("ID de reserva a abonar: ").strip())
     except ValueError:
-        print("ID inválido")
+        logger.warning("ID inválido")
         return
     if sel not in pendientes:
-        print("Reserva no válida")
+        logger.warning("Reserva no válida")
         return
     restante = pendientes[sel]
     monto_str = input("Monto a abonar: ").strip()
     try:
         monto = float(monto_str)
     except ValueError:
-        print("Monto inválido")
+        logger.warning("Monto inválido")
         return
     if monto < restante * 0.3:
-        print("Debe abonar al menos el 30% del saldo restante")
+        logger.warning("Debe abonar al menos el 30% del saldo restante")
         return
     query_ins = (
         "INSERT INTO Abono_reserva (valor, fecha_hora, id_reserva, id_medio_pago) "
@@ -162,9 +163,9 @@ def realizar_abono(id_cliente: int) -> None:
     )
     try:
         conn.ejecutar(query_ins, (monto, sel))
-        print("Abono registrado")
+        logger.info("Abono registrado")
     except Exception as exc:  # pragma: no cover - depende de la BD
-        print("Error registrando abono:", exc)
+        logger.error(f"Error registrando abono: {exc}")
 
 
 # ------------------------------
@@ -183,14 +184,16 @@ def estado_pago(id_cliente: int) -> None:
     try:
         filas = conn.ejecutar(query, (id_cliente,))
     except Exception as exc:  # pragma: no cover - depende de la BD
-        print("Error consultando estado de pagos:", exc)
+        logger.error(f"Error consultando estado de pagos: {exc}")
         return
     if not filas:
-        print("No tiene reservas registradas")
+        logger.info("No tiene reservas registradas")
         return
     for rid, total, pagado in filas:
         restante = float(total) - float(pagado)
         estado = "COMPLETO" if restante <= 0 else f"Falta {restante:.2f}"
-        print(f"Reserva {rid} - Total {total:.2f} - Pagado {pagado:.2f} -> {estado}")
+        logger.info(
+            f"Reserva {rid} - Total {total:.2f} - Pagado {pagado:.2f} -> {estado}"
+        )
 
 
