@@ -2,16 +2,20 @@ from __future__ import annotations
 
 import tkinter as tk
 from tkinter import ttk
-from ttkthemes import ThemedTk
 
 from Consulta import MySQLApp
 from redundancia import GestorRedundancia
 from utils import cancel_pending_after, safe_bg_error_handler
 
 
-class VentanaAdmin(ThemedTk):
-    def __init__(self) -> None:
-        super().__init__(theme="arc")
+class VentanaAdmin(tk.Toplevel):
+    def __init__(self, master: tk.Misc) -> None:
+        super().__init__(master)
+        estilo = ttk.Style(self)
+        try:
+            estilo.theme_use("arc")
+        except Exception:
+            pass
         self.report_callback_exception = safe_bg_error_handler
         self._after_ids: list[str] = []
         self.title("🛠️ Panel del Administrador")
@@ -50,11 +54,9 @@ class VentanaAdmin(ThemedTk):
         if self.ventana_consulta and self.ventana_consulta.winfo_exists():
             self.ventana_consulta.destroy()
         cancel_pending_after(self)
-        self.quit()
         self.destroy()
-        from interfaces.login import VentanaLogin
-
-        VentanaLogin().mainloop()
+        if self.master is not None:
+            self.master.deiconify()
 
     def _cerrar_consulta(self) -> None:
         if self.ventana_consulta:

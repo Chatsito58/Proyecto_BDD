@@ -3,7 +3,6 @@ from __future__ import annotations
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from ttkthemes import ThemedTk
 
 import logging
 
@@ -17,9 +16,14 @@ from utils import (
 )
 
 
-class VentanaEmpleado(ThemedTk):
-    def __init__(self) -> None:
-        super().__init__(theme="arc")
+class VentanaEmpleado(tk.Toplevel):
+    def __init__(self, master: tk.Misc) -> None:
+        super().__init__(master)
+        self.style = ttk.Style(self)
+        try:
+            self.style.theme_use("arc")
+        except Exception:
+            pass
         self.report_callback_exception = safe_bg_error_handler
         self._after_ids: list[str] = []
         self.title("🧑‍🔧 Panel del Empleado")
@@ -75,11 +79,9 @@ class VentanaEmpleado(ThemedTk):
         for win in list(self._subventanas):
             win.destroy()
         cancel_pending_after(self)
-        self.quit()
         self.destroy()
-        from interfaces.login import VentanaLogin
-
-        VentanaLogin().mainloop()
+        if self.master is not None:
+            self.master.deiconify()
 
 
 class VentanaGestionReservas(tk.Toplevel):

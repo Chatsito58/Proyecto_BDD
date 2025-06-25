@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from tkinter import messagebox
 import customtkinter as ctk
-from utils import cancel_pending_after, safe_bg_error_handler
+from utils import safe_bg_error_handler
 
 ctk.set_appearance_mode("dark")  # o "light"
 ctk.set_default_color_theme("blue")
@@ -82,31 +82,31 @@ class VentanaLogin(ctk.CTk):
             return
 
         rol = self._normalizar_rol(rol)
-        cancel_pending_after(self)
-        self.quit()
-        self.destroy()
+        self.withdraw()
         if rol == "cliente":
             from interfaces.cliente import VentanaCliente
 
             id_cliente = self.autenticador.obtener_id_cliente(correo)
             if id_cliente is None:
                 messagebox.showerror("Error", "Cliente no encontrado")
+                self.deiconify()
                 return
-            VentanaCliente(id_cliente).mainloop()
+            VentanaCliente(self, id_cliente)
         elif rol == "empleado":
             from interfaces.empleado import VentanaEmpleado
 
-            VentanaEmpleado().mainloop()
+            VentanaEmpleado(self)
         elif rol == "gerente":
             from interfaces.gerente import VentanaGerente
 
-            VentanaGerente().mainloop()
+            VentanaGerente(self)
         elif rol == "admin":
             from interfaces.admin import VentanaAdmin
 
-            VentanaAdmin().mainloop()
+            VentanaAdmin(self)
         else:
             messagebox.showerror("Error", "Rol desconocido")
+            self.deiconify()
 
     def _abrir_registro(self) -> None:
         from interfaces.registro_cliente import VentanaCrearCliente

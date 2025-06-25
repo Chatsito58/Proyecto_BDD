@@ -16,11 +16,11 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
 
-class VentanaGerente(ctk.CTk):
+class VentanaGerente(ctk.CTkToplevel):
     """Panel principal para el rol de gerente."""
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, master: tk.Misc) -> None:
+        super().__init__(master)
         self.report_callback_exception = safe_bg_error_handler
         self._after_ids: list[str] = []
         self.conexion = ConexionBD()
@@ -342,8 +342,6 @@ class VentanaGerente(ctk.CTk):
     # ------------------------------------------------------------------
     def _logout(self) -> None:
         cancel_pending_after(self)
-        self.quit()
         self.destroy()
-        from interfaces.login import VentanaLogin
-
-        VentanaLogin().mainloop()
+        if self.master is not None:
+            self.master.deiconify()
