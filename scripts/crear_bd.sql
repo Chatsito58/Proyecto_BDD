@@ -1,6 +1,7 @@
 -- ------------------------------------------------------------------
 -- 1) TABLAS AUXILIARES / CATÁLOGOS
 -- ------------------------------------------------------------------
+-- ¡ATENCIÓN! No colocar claves reales aquí. Usa variables de entorno en producción.
 -- DROP DATABASE alquiler_vehiculos;
 CREATE DATABASE IF NOT EXISTS alquiler_vehiculos;
 USE alquiler_vehiculos;

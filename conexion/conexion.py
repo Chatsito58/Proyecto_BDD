@@ -45,16 +45,16 @@ class ConexionBD:
         self.failover = failover
 
         self.local_conf = {
-            'host': os.getenv('DB1_HOST', 'localhost'),
-            'user': os.getenv('DB1_USER', 'root'),
-            'password': os.getenv('DB1_PASSWORD', 'admin123'),
-            'database': os.getenv('DB1_NAME', 'alquiler_vehiculos'),
+            'host': os.getenv('DB1_HOST'),
+            'user': os.getenv('DB1_USER'),
+            'password': os.getenv('DB1_PASSWORD'),
+            'database': os.getenv('DB1_NAME'),
         }
         self.remote_conf = {
-            'host': os.getenv('DB2_HOST', '192.168.50.1'),
-            'user': os.getenv('DB2_USER', 'usuario_bdd'),
-            'password': os.getenv('DB2_PASSWORD', 'admin123'),
-            'database': os.getenv('DB2_NAME', 'alquiler_vehiculos'),
+            'host': os.getenv('DB2_HOST'),
+            'user': os.getenv('DB2_USER'),
+            'password': os.getenv('DB2_PASSWORD'),
+            'database': os.getenv('DB2_NAME'),
         }
 
         self.conn_local: MySQLConnection | None = None
