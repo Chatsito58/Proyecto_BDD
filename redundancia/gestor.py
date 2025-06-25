@@ -1,73 +1,66 @@
-from __future__ import annotations
+import os
+import json
+from mysql.connector import connect, Error
+from utils.logger import logger
 
-from typing import Any, List, Tuple, Optional
+class GestorRedundanciaRespaldo:
+    def __init__(self):
+        self.remote_conf = {
+            "host": os.getenv("DB_HOST"),
+            "port": int(os.getenv("DB_PORT")),
+            "database": os.getenv("DB_NAME"),
+            "user": os.getenv("DB_USER"),
+            "password": os.getenv("DB_PASSWORD")
+        }
 
-from conexion.conexion import ConexionBD
+        self.local_conf = {
+            "host": os.getenv("DB2_HOST"),
+            "port": int(os.getenv("DB2_PORT")),
+            "database": os.getenv("DB2_NAME"),
+            "user": os.getenv("DB2_USER"),
+            "password": os.getenv("DB2_PASSWORD")
+        }
 
+        self.respaldo_path = "pendientes_local.json"
+        if not os.path.exists(self.respaldo_path):
+            with open(self.respaldo_path, "w", encoding="utf-8") as f:
+                json.dump([], f)
 
-class GestorRedundancia:
-    """Ejecuta cada operación en la base local y en la remota."""
-
-    def __init__(self) -> None:
-        # Conexión dedicada para cada base
-        self.local = ConexionBD(
-            active="local",
-            failover=False,
-            queue_file_local="pendientes_local.json",
-        )
-        self.remota = ConexionBD(
-            active="remote",
-            failover=False,
-            queue_file_remota="pendientes_remota.json",
-        )
-
-    def ejecutar(self, query: str, params: Optional[Tuple[Any, ...]] = None) -> List[Tuple[Any, ...]]:
-        """Ejecuta una consulta en ambas bases de datos.
-
-        Devuelve el resultado obtenido de la base remota si está disponible;
-        de lo contrario devuelve el de la base local.
-        """
-        res_local: List[Tuple[Any, ...]] | None = None
-        res_remota: List[Tuple[Any, ...]] | None = None
+    def ejecutar(self, query: str, params=None):
         try:
-            res_local = self.local.ejecutar(query, params)
-        except Exception:
-            # ``ConexionBD`` ya maneja la cola de pendientes en caso de error
-            pass
+            with connect(**self.remote_conf) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(query, params)
+                    if query.strip().lower().startswith("select"):
+                        return cursor.fetchall()
+                    conn.commit()
+                    return True
+        except Error as e:
+            logger.warning(f"Fallo en BD remota: {e}")
+            return self._respaldo_local(query, params)
+
+    def _respaldo_local(self, query, params=None):
         try:
-            res_remota = self.remota.ejecutar(query, params)
-        except Exception:
-            pass
+            with connect(**self.local_conf) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(query, params)
+                    if query.strip().lower().startswith("select"):
+                        return cursor.fetchall()
+                    conn.commit()
+                    self._registrar_en_respaldo(query, params)
+                    return True
+        except Error as e:
+            logger.error(f"No se pudo acceder a la BD local: {e}")
+            self._registrar_en_respaldo(query, params)
+            return None
 
-        return res_remota if res_remota is not None else (res_local or [])
-
-    def ejecutar_con_columnas(
-        self, query: str, params: Optional[Tuple[Any, ...]] = None
-    ) -> Tuple[List[str], List[Tuple[Any, ...]]]:
-        """Versión con columnas de :meth:`ejecutar`.
-
-        Ejecuta la consulta en ambas bases y prioriza los resultados de la
-        remota si están disponibles.
-        """
-        cols_local: List[str] | None = None
-        res_local: List[Tuple[Any, ...]] | None = None
-        cols_remote: List[str] | None = None
-        res_remote: List[Tuple[Any, ...]] | None = None
-
+    def _registrar_en_respaldo(self, query, params):
         try:
-            cols_local, res_local = self.local.ejecutar_con_columnas(query, params)
-        except Exception:
-            pass
-        try:
-            cols_remote, res_remote = self.remota.ejecutar_con_columnas(query, params)
-        except Exception:
-            pass
-
-        if cols_remote is not None:
-            return cols_remote, res_remote or []
-        return cols_local or [], res_local or []
-
-    def close(self) -> None:
-        """Cerrar ambas conexiones."""
-        self.local.close()
-        self.remota.close()
+            with open(self.respaldo_path, "r+", encoding="utf-8") as f:
+                data = json.load(f)
+                data.append({"query": query, "params": params})
+                f.seek(0)
+                json.dump(data, f, ensure_ascii=False, indent=2)
+                logger.info("Consulta guardada localmente en pendientes_local.json")
+        except Exception as e:
+            logger.error(f"No se pudo guardar en respaldo local: {e}")
